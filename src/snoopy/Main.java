@@ -1,5 +1,6 @@
 package snoopy;
 
+import javax.swing.*;
 import java.util.Scanner;
 
 public class Main {
@@ -19,10 +20,21 @@ public class Main {
         carte.ajouter(new Oiseau(4, 0));
         carte.ajouter(new Oiseau(4, 4));
 
-        boolean continuer = true;
+        // Graphisme
+        Aire aire = new Aire(carte, snoopy);
+        JFrame fenetre = new JFrame();
+
+        fenetre.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        fenetre.setVisible(true);
+        fenetre.setTitle("Snoopy");
+
+        fenetre.setContentPane(aire);
+        fenetre.setMinimumSize(aire.getMinimumSize());
+        aire.requestFocus();
+
+        /*boolean continuer = true;
 
         while (continuer) {
-            gotoxy(10, 0);
             System.out.println(carte.afficher());
             String cmd = scanner.next();
 
@@ -47,10 +59,6 @@ public class Main {
                     continuer = false;
                     break;
             }
-        }
-    }
-
-    public static void gotoxy(int x, int y) {
-        System.out.print(String.format("%c[%d;%dm", 0x1B, y, x));
+        }*/
     }
 }

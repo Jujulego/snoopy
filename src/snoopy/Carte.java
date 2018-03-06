@@ -2,6 +2,8 @@ package snoopy;
 
 import com.sun.istack.internal.Nullable;
 
+import java.awt.*;
+
 public class Carte implements Affichable {
     // Attributs
     private Case[][] cases;
@@ -48,6 +50,16 @@ public class Carte implements Affichable {
         return builder.toString();
     }
 
+    @Override
+    public void afficher(Graphics2D g2d) {
+        // Afficher les cases
+        for (Case[] ligne : cases) {
+            for (Case c : ligne) {
+                c.afficher(g2d);
+            }
+        }
+    }
+
     public void ajouter(Objet obj) {
         // Déjà un objet
         cases[obj.getY()][obj.getX()].ajouter(obj);
@@ -64,5 +76,12 @@ public class Carte implements Affichable {
         } catch (ArrayIndexOutOfBoundsException err) {
             return null;
         }
+    }
+
+    public int getTx() {
+        return tx;
+    }
+    public int getTy() {
+        return ty;
     }
 }

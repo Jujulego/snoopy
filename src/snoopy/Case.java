@@ -2,6 +2,7 @@ package snoopy;
 
 import com.sun.istack.internal.NotNull;
 
+import java.awt.*;
 import java.util.LinkedList;
 
 public class Case implements Affichable {
@@ -15,6 +16,13 @@ public class Case implements Affichable {
             return "  ";
         } else {
             return objets.getFirst().afficher();
+        }
+    }
+
+    @Override
+    public void afficher(Graphics2D g2d) {
+        if (objets.size() != 0) {
+            objets.getFirst().afficher(g2d);
         }
     }
 

@@ -1,8 +1,8 @@
 package snoopy;
 
+import java.awt.*;
+
 public interface Affichable {
     String afficher();
-
-    // Ceci est un conflit ;)
-
+    void afficher(Graphics2D g2d);
 }

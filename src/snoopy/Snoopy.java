@@ -1,5 +1,6 @@
 package snoopy;
 
+import java.awt.*;
 import java.util.LinkedList;
 
 public class Snoopy extends Objet implements Deplacable {
@@ -11,12 +12,20 @@ public class Snoopy extends Objet implements Deplacable {
         super(x, y, 1);
     }
     
-    //Ca marche
-    
     // Méthodes
     @Override
     public String afficher() {
         return "Sn";
+    }
+
+    @Override
+    public void afficher(Graphics2D g2d) {
+        g2d.setColor(Color.red);
+        g2d.fillOval(
+                getX() * Aire.LARG_IMG + (Aire.LARG_IMG - 30)/2,
+                getY() * Aire.LONG_IMG + (Aire.LONG_IMG - 30)/2,
+                30, 30
+        );
     }
 
     @Override
