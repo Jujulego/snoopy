@@ -5,6 +5,8 @@ import com.sun.istack.internal.Nullable;
 public class Carte implements Affichable {
     // Attributs
     private Case[][] cases;
+
+    // Taille carte
     private int tx;
     private int ty;
 
