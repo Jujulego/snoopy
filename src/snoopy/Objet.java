@@ -1,13 +1,15 @@
 package snoopy;
 
-/** Classe Objet
- * Base pour les blocks et le personnage
+/**
+ * Représente un objet sur la carte
  */
 public abstract class Objet implements Affichable {
     // Attributs
+    // - coordonées
     private int x;
     private int y;
-    private int z = 0;
+    private int z = 0; // indice z, sur une même case seul l'objet avec l'indice le plus grand sera affiché
+                       // Ne pas changer !
 
     // Constructeur
     public Objet(int x, int y) {
@@ -21,10 +23,15 @@ public abstract class Objet implements Affichable {
     }
 
     // Méthodes
+    /**
+     * Indique si l'objet empèche le passage (est bloquant) d'autres objets
+     * @return true si bloquant, false sinon
+     */
     public boolean estBloquant() {
         return true;
     }
 
+    // Accesseurs
     public int getX() {
         return x;
     }
@@ -41,8 +48,5 @@ public abstract class Objet implements Affichable {
 
     public int getZ() {
         return z;
-    }
-    public void setZ(int z) {
-        this.z = z;
     }
 }

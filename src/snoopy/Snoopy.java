@@ -3,16 +3,25 @@ package snoopy;
 import java.awt.*;
 import java.util.LinkedList;
 
+/**
+ * Représente Snoopy !!!
+ */
 public class Snoopy extends Objet implements Deplacable, Animation {
     // Attributs
     private LinkedList<Oiseau> oiseaux = new LinkedList<>();
-    private double etat = 1.0;
-    private int ox;
+
+    // - animation
+    private int ox; // position précédante
     private int oy;
+
+    private double etat = 1.0; // varie de 0 -> 1, représente l'avancement dans l'animation
+                               // Passe de 0 à 1, en 200ms de seconde
 
     // Constructeur
     public Snoopy(int x, int y) {
         super(x, y, 1);
+
+        // On initialise la position précédante à la position de départ
         ox = x;
         oy = y;
     }
@@ -25,9 +34,9 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     }
 
     @Override
-    public void animer() {
+    public synchronized void animer() {
         if (etat < 1.0) {
-            etat += 0.17;
+            etat += 5.0/Aire.FPS;
 
             if (etat >= 1.0) {
                 etat = 1.0;
@@ -36,11 +45,12 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     }
 
     @Override
-    public boolean animation() {
+    public synchronized boolean animation() {
         return etat < 1.0;
     }
 
     private void afficher(Graphics2D g2d, int x, int y) {
+        // Affiche snoopy centré sur la position donnée
         g2d.setColor(Color.red);
         g2d.fillOval(
             x + (Aire.LARG_IMG - 30)/2,
@@ -50,7 +60,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     }
 
     @Override
-    public void afficher(Graphics2D g2d) {
+    public synchronized void afficher(Graphics2D g2d) {
         // Variations en x
         double x = ox;
         if (getX() > ox) {
@@ -67,6 +77,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
             y -= etat;
         }
 
+        // Affichage !
         afficher(g2d, (int) (x * Aire.LARG_IMG), (int) (y * Aire.LONG_IMG));
     }
 
@@ -76,9 +87,10 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         int nx = getX() + dx;
         int ny = getY() + dy;
 
-        // Récupération de la case
+        // Récupération de la case cible
         Case case_ = carte.getCase(nx, ny);
-        if (case_ == null || !case_.vide()) {
+        if (case_ == null || !case_.accessible()) {
+            // La case n'est pas accessible, voire n'existe même pas !
             return false;
         }
 

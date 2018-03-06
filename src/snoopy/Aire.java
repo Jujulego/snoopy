@@ -9,19 +9,31 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * L'aire de jeu.
+ * Gère les interactions et les animations
+ */
 public class Aire extends JPanel implements KeyListener {
     // Constantes
-    public static final int LARG_IMG = 50;
-    public static final int LONG_IMG = 50;
+    public static final int FPS = 60;      // Fréquence de rafraichissement de l'écran
+    public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
+    public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
 
     // Attributs
-    private Carte carte;
-    private Snoopy snoopy;
+    // - jeu
+    private Carte carte;   // Carte affichée
+    private Snoopy snoopy; // Le personnage controllé
 
+    // - animation
     private LinkedList<Animation> animations = new LinkedList<>();
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
     // Constructeur
+
+    /**
+     * @param carte  carte à afficher
+     * @param snoopy personnage à controller
+     */
     public Aire(Carte carte, Snoopy snoopy) {
         this.carte = carte;
         this.snoopy = snoopy;
@@ -32,18 +44,27 @@ public class Aire extends JPanel implements KeyListener {
 
         // Scheduler
         animations.add(snoopy);
-        scheduler.scheduleAtFixedRate(this::animer, 0, 1000/60, TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(this::animer, 0, 1000/FPS, TimeUnit.MILLISECONDS);
     }
 
     // Méthodes
+    /**
+     * Gestion des animations et mise à jour de l'écran
+     * Appelée FPS fois par secondes
+     */
     private void animer() {
+        // Evolution des animation
         for (Animation a : animations) {
             a.animer();
         }
 
+        // Rafraichissement de l'ecran
         repaint();
     }
 
+    /**
+     * Affichage de la grille
+     */
     @Override
     protected void paintComponent(Graphics graphics) {
         // Options
@@ -67,6 +88,7 @@ public class Aire extends JPanel implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent keyEvent) {
+        // Ignoré
     }
 
     @Override
@@ -76,31 +98,28 @@ public class Aire extends JPanel implements KeyListener {
             return;
         }
 
-        //
+        // Lancement d'une animation de déplacement
         switch (keyEvent.getKeyCode()) {
-            case KeyEvent.VK_UP:
+            case KeyEvent.VK_UP:    // HAUT
                 snoopy.deplacer(carte, 0, -1);
-                repaint();
                 break;
 
-            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_DOWN:  // BAS
                 snoopy.deplacer(carte, 0, 1);
-                repaint();
                 break;
 
-            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_LEFT:  // GAUCHE
                 snoopy.deplacer(carte, -1, 0);
-                repaint();
                 break;
 
-            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_RIGHT: // DROITE
                 snoopy.deplacer(carte, 1, 0);
-                repaint();
                 break;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent keyEvent) {
+        // Ignoré
     }
 }
