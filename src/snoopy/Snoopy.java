@@ -10,7 +10,9 @@ public class Snoopy extends Objet implements Deplacable {
     public Snoopy(int x, int y) {
         super(x, y, 1);
     }
-
+    
+    //Ca marche
+    
     // Méthodes
     @Override
     public String afficher() {
