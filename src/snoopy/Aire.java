@@ -4,6 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.LinkedList;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Aire extends JPanel implements KeyListener {
     // Constantes
@@ -14,6 +18,9 @@ public class Aire extends JPanel implements KeyListener {
     private Carte carte;
     private Snoopy snoopy;
 
+    private LinkedList<Animation> animations = new LinkedList<>();
+    private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+
     // Constructeur
     public Aire(Carte carte, Snoopy snoopy) {
         this.carte = carte;
@@ -22,9 +29,21 @@ public class Aire extends JPanel implements KeyListener {
         // Paramètres
         setMinimumSize(new Dimension(carte.getTx() * LARG_IMG, carte.getTy() * LONG_IMG + 35));
         addKeyListener(this);
+
+        // Scheduler
+        animations.add(snoopy);
+        scheduler.scheduleAtFixedRate(this::animer, 0, 1000/60, TimeUnit.MILLISECONDS);
     }
 
     // Méthodes
+    private void animer() {
+        for (Animation a : animations) {
+            a.animer();
+        }
+
+        repaint();
+    }
+
     @Override
     protected void paintComponent(Graphics graphics) {
         // Options
@@ -52,6 +71,12 @@ public class Aire extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent keyEvent) {
+        // Ignoré si animation en cours
+        if (snoopy.animation()) {
+            return;
+        }
+
+        //
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.VK_UP:
                 snoopy.deplacer(carte, 0, -1);

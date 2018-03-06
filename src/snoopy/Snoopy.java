@@ -3,29 +3,71 @@ package snoopy;
 import java.awt.*;
 import java.util.LinkedList;
 
-public class Snoopy extends Objet implements Deplacable {
+public class Snoopy extends Objet implements Deplacable, Animation {
     // Attributs
     private LinkedList<Oiseau> oiseaux = new LinkedList<>();
+    private double etat = 1.0;
+    private int ox;
+    private int oy;
 
     // Constructeur
     public Snoopy(int x, int y) {
         super(x, y, 1);
+        ox = x;
+        oy = y;
     }
     
     // Méthodes
     @Override
     public String afficher() {
+        etat = 1.0;
         return "Sn";
     }
 
     @Override
-    public void afficher(Graphics2D g2d) {
+    public void animer() {
+        if (etat < 1.0) {
+            etat += 0.17;
+
+            if (etat >= 1.0) {
+                etat = 1.0;
+            }
+        }
+    }
+
+    @Override
+    public boolean animation() {
+        return etat < 1.0;
+    }
+
+    private void afficher(Graphics2D g2d, int x, int y) {
         g2d.setColor(Color.red);
         g2d.fillOval(
-                getX() * Aire.LARG_IMG + (Aire.LARG_IMG - 30)/2,
-                getY() * Aire.LONG_IMG + (Aire.LONG_IMG - 30)/2,
-                30, 30
+            x + (Aire.LARG_IMG - 30)/2,
+            y + (Aire.LONG_IMG - 30)/2,
+            30, 30
         );
+    }
+
+    @Override
+    public void afficher(Graphics2D g2d) {
+        // Variations en x
+        double x = ox;
+        if (getX() > ox) {
+            x += etat;
+        } else if (getX() < ox) {
+            x -= etat;
+        }
+
+        // Variations en y
+        double y = oy;
+        if (getY() > oy) {
+            y += etat;
+        } else if (getY() < oy) {
+            y -= etat;
+        }
+
+        afficher(g2d, (int) (x * Aire.LARG_IMG), (int) (y * Aire.LONG_IMG));
     }
 
     @Override
@@ -47,6 +89,11 @@ public class Snoopy extends Objet implements Deplacable {
                 oiseaux.add((Oiseau) o);
             }
         }
+
+        // Animation
+        ox = getX();
+        oy = getY();
+        etat = 0.0;
 
         // Déplacement
         carte.enlever(this);
