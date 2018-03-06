@@ -4,6 +4,8 @@ import java.awt.*;
 
 public class Oiseau extends Objet {
     // Constructeur
+    //Drucker
+
     public Oiseau(int x, int y) {
         super(x, y);
     }
