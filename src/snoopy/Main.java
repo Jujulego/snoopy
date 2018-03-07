@@ -20,45 +20,57 @@ public class Main {
         carte.ajouter(new Oiseau(4, 0));
         carte.ajouter(new Oiseau(4, 4));
 
-        // Graphisme
-        Aire aire = new Aire(carte, snoopy);
-        JFrame fenetre = new JFrame();
+        // Question !
+        String rep = "";
 
-        fenetre.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        fenetre.setVisible(true);
-        fenetre.setTitle("Snoopy");
+        while (!rep.equals("o") && !rep.equals("n")) {
+            System.out.println("Graphique ? o/n");
+            rep = scanner.nextLine();
+        }
 
-        fenetre.setContentPane(aire);
-        fenetre.setMinimumSize(aire.getMinimumSize());
-        aire.requestFocus();
+        if (rep.equals("o")) {
+            // Graphisme
+            Aire aire = new Aire(carte, snoopy);
+            JFrame fenetre = new JFrame();
 
-        /*boolean continuer = true;
+            fenetre.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            fenetre.setVisible(true);
+            fenetre.setTitle("Snoopy");
 
-        while (continuer) {
-            System.out.println(carte.afficher());
-            String cmd = scanner.next();
+            fenetre.setContentPane(aire);
+            fenetre.setMinimumSize(aire.getMinimumSize());
+            aire.requestFocus();
 
-            switch (cmd) {
-                case "z":
-                    snoopy.deplacer(carte, 0, -1);
-                    break;
+        } else {
+            // Console
+            boolean continuer = true;
 
-                case "q":
-                    snoopy.deplacer(carte, -1, 0);
-                    break;
+            while (continuer) {
+                System.out.println(carte.afficher());
+                String cmd = scanner.next();
 
-                case "s":
-                    snoopy.deplacer(carte, 0, 1);
-                    break;
+                switch (cmd) {
+                    case "z":
+                        snoopy.deplacer(carte, 0, -1);
+                        break;
 
-                case "d":
-                    snoopy.deplacer(carte, 1, 0);
-                    break;
+                    case "q":
+                        snoopy.deplacer(carte, -1, 0);
+                        break;
 
-                case "p":
-                    continuer = false;
-                    break;
+                    case "s":
+                        snoopy.deplacer(carte, 0, 1);
+                        break;
+
+                    case "d":
+                        snoopy.deplacer(carte, 1, 0);
+                        break;
+
+                    case "p":
+                        continuer = false;
+                        break;
+                }
             }
-        }*/
+        }
     }
 }

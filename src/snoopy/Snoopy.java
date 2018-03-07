@@ -8,6 +8,7 @@ import java.util.LinkedList;
  */
 public class Snoopy extends Objet implements Deplacable, Animation {
     // Attributs
+    private Direction direction = Direction.BAS;
     private LinkedList<Oiseau> oiseaux = new LinkedList<>();
 
     // - animation
@@ -29,8 +30,25 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     // Méthodes
     @Override
     public String afficher() {
+        // Pas d'animation en console
         etat = 1.0;
-        return "Sn";
+
+        switch (direction) {
+            case HAUT:
+                return "S^";
+
+            case BAS:
+                return "Sv";
+
+            case GAUCHE:
+                return "S<";
+
+            case DROITE:
+                return "S>";
+
+            default:
+                return "Sn";
+        }
     }
 
     @Override
@@ -57,6 +75,25 @@ public class Snoopy extends Objet implements Deplacable, Animation {
             y + (Aire.LONG_IMG - 30)/2,
             30, 30
         );
+
+        g2d.setColor(Color.black);
+        switch (direction) {
+            case HAUT:
+                g2d.fillOval(x + Aire.LARG_IMG/2 - 2, y + 6, 4, 4);
+                break;
+
+            case BAS:
+                g2d.fillOval(x + Aire.LARG_IMG/2 - 2, y + Aire.LONG_IMG - 10, 4, 4);
+                break;
+
+            case GAUCHE:
+                g2d.fillOval(x + 6, y + Aire.LARG_IMG/2 - 2, 4, 4);
+                break;
+
+            case DROITE:
+                g2d.fillOval(x + Aire.LARG_IMG - 10, y + Aire.LARG_IMG/2 - 2, 4, 4);
+                break;
+        }
     }
 
     @Override
@@ -106,6 +143,17 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         ox = getX();
         oy = getY();
         etat = 0.0;
+
+        // Direction
+        if (dx < 0) {
+            direction = Direction.GAUCHE;
+        } else if (dx > 0) {
+            direction = Direction.DROITE;
+        } else if (dy < 0) {
+            direction = Direction.HAUT;
+        } else if (dy > 0) {
+            direction = Direction.BAS;
+        }
 
         // Déplacement
         carte.enlever(this);
