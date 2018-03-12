@@ -33,6 +33,12 @@ public class Main {
         if (rep.equals("o")) {
             // Graphisme
             Aire aire = new Aire(carte, snoopy);
+            aire.ajouterBalle(new Balle(
+                    (int) (2.5 * Aire.LARG_IMG),
+                    (int) (0.5 * Aire.LARG_IMG),
+                    -1, 1
+            ));
+
             JFrame fenetre = new JFrame();
 
             fenetre.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

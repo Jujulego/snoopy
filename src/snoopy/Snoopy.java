@@ -52,7 +52,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     }
 
     @Override
-    public synchronized void animer() {
+    public synchronized void animer(Carte carte) {
         if (etat < 1.0) {
             etat += 5.0/Aire.FPS;
 

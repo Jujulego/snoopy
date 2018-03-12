@@ -25,6 +25,7 @@ public class Aire extends JPanel implements KeyListener {
     private Snoopy snoopy; // Le personnage controllé
 
     // - animation
+    private LinkedList<Balle> balles = new LinkedList<>();
     private LinkedList<Animation> animations = new LinkedList<>();
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
@@ -48,6 +49,11 @@ public class Aire extends JPanel implements KeyListener {
     }
 
     // Méthodes
+    public void ajouterBalle(Balle balle) {
+        animations.add(balle);
+        balles.add(balle);
+    }
+
     /**
      * Gestion des animations et mise à jour de l'écran
      * Appelée FPS fois par secondes
@@ -55,7 +61,7 @@ public class Aire extends JPanel implements KeyListener {
     private void animer() {
         // Evolution des animation
         for (Animation a : animations) {
-            a.animer();
+            a.animer(carte);
         }
 
         // Rafraichissement de l'ecran
@@ -84,6 +90,11 @@ public class Aire extends JPanel implements KeyListener {
 
         // Objets
         carte.afficher(g2d);
+
+        // Balles
+        for (Balle balle : balles) {
+            balle.afficher(g2d);
+        }
     }
 
     @Override

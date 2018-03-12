@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * Représente un bloc sur la carte
  */
-public class BlocPoussable extends Objet implements Animation, Poussable {
+public class BlocPoussable extends Bloc implements Animation, Poussable {
     // Constantes
     private static final int MARGE = 8;
 
@@ -21,7 +21,7 @@ public class BlocPoussable extends Objet implements Animation, Poussable {
 
     // Constructeur
     public BlocPoussable(int x, int y) {
-        super(x, y, 1);
+        super(x, y);
 
         // On initialise la position précédante à la position de départ
         ox = x;
@@ -34,11 +34,11 @@ public class BlocPoussable extends Objet implements Animation, Poussable {
         // Pas d'animation en console
         etat = 1.0;
 
-        return "Bl";
+        return "Po";
     }
 
     @Override
-    public synchronized void animer() {
+    public synchronized void animer(Carte carte) {
         if (etat < 1.0) {
             etat += 5.0/Aire.FPS;
 
