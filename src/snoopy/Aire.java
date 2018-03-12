@@ -39,11 +39,11 @@ public class Aire extends JPanel implements KeyListener {
         this.snoopy = snoopy;
 
         // Paramètres
-        setMinimumSize(new Dimension(carte.getTx() * LARG_IMG, carte.getTy() * LONG_IMG + 35));
+        setMinimumSize(new Dimension(carte.getTx() * LARG_IMG + 1, carte.getTy() * LONG_IMG + 38));
         addKeyListener(this);
 
         // Scheduler
-        animations.add(snoopy);
+        animations.addAll(carte.objetsAnimes());
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/FPS, TimeUnit.MILLISECONDS);
     }
 

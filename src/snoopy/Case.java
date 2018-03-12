@@ -1,9 +1,11 @@
 package snoopy;
 
 import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 
 import java.awt.*;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 /**
  * Gestion d'une case. Permet la présence de plusieurs objets au même endroit
@@ -71,7 +73,12 @@ public class Case implements Affichable {
         return objets;
     }
 
+    @Nullable
     public Objet getObjet() {
-        return objets.getFirst();
+        try {
+            return objets.getFirst();
+        } catch (NoSuchElementException err) {
+            return null;
+        }
     }
 }

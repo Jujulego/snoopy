@@ -20,6 +20,8 @@ public class Main {
         carte.ajouter(new Oiseau(4, 0));
         carte.ajouter(new Oiseau(4, 4));
 
+        carte.ajouter(new BlocPoussable(2, 1));
+
         // Question !
         String rep = "";
 
@@ -35,7 +37,7 @@ public class Main {
 
             fenetre.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             fenetre.setVisible(true);
-            fenetre.setTitle("Snoopy");
+            fenetre.setTitle("SnoopMan ECE");
 
             fenetre.setContentPane(aire);
             fenetre.setMinimumSize(aire.getMinimumSize());

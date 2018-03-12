@@ -3,6 +3,7 @@ package snoopy;
 import com.sun.istack.internal.Nullable;
 
 import java.awt.*;
+import java.util.LinkedList;
 
 /**
  * Gestion de la grille.
@@ -94,6 +95,21 @@ public class Carte implements Affichable {
         } catch (ArrayIndexOutOfBoundsException err) {
             return null;
         }
+    }
+
+    public LinkedList<Animation> objetsAnimes() {
+        LinkedList<Animation> animations = new LinkedList<>();
+        for (Case[] ligne : cases) {
+            for (Case case_ : ligne) {
+                for (Objet objet : case_.listeObjets()) {
+                    if (objet instanceof Animation) {
+                        animations.add((Animation) objet);
+                    }
+                }
+            }
+        }
+
+        return animations;
     }
 
     // Accesseurs

@@ -124,10 +124,29 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         int nx = getX() + dx;
         int ny = getY() + dy;
 
+        // Direction
+        if (dx < 0) {
+            direction = Direction.GAUCHE;
+        } else if (dx > 0) {
+            direction = Direction.DROITE;
+        } else if (dy < 0) {
+            direction = Direction.HAUT;
+        } else if (dy > 0) {
+            direction = Direction.BAS;
+        }
+
         // Récupération de la case cible
         Case case_ = carte.getCase(nx, ny);
-        if (case_ == null || !case_.accessible()) {
-            // La case n'est pas accessible, voire n'existe même pas !
+        if (case_ == null) { // La case n'existe pas !
+            return false;
+        }
+
+        Objet obj = case_.getObjet();
+        if (obj instanceof Poussable) {
+            if (!((Poussable) obj).pousser(carte, dx, dy)) {
+                return false;
+            }
+        } else if (!case_.accessible()) { // La case n'est pas accessible !
             return false;
         }
 
@@ -143,17 +162,6 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         ox = getX();
         oy = getY();
         etat = 0.0;
-
-        // Direction
-        if (dx < 0) {
-            direction = Direction.GAUCHE;
-        } else if (dx > 0) {
-            direction = Direction.DROITE;
-        } else if (dy < 0) {
-            direction = Direction.HAUT;
-        } else if (dy > 0) {
-            direction = Direction.BAS;
-        }
 
         // Déplacement
         carte.enlever(this);
