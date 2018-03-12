@@ -4,3 +4,9 @@ Snoopy.iml
 
 
 \.project
+
+\.classpath
+
+\.settings/
+
+bin/
