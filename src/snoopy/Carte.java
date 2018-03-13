@@ -1,13 +1,10 @@
 package snoopy;
 
-import com.sun.istack.internal.Nullable;
-
 import java.awt.*;
-import java.util.LinkedList;
 
 /**
  * Gestion de la grille.
- * Accès aux cases et gestion de l'affichage
+ * AccÃ¨s aux cases et gestion de l'affichage
  */
 public class Carte implements Affichable {
     // Attributs
@@ -19,12 +16,12 @@ public class Carte implements Affichable {
 
     // Constructeur
     public Carte(int tx, int ty) {
-        // Création de la matrice
+        // Cr�ation de la matrice
         this.cases = new Case[ty][tx];
         this.tx = tx;
         this.ty = ty;
 
-        // Création des cases
+        // Cr�ation des cases
         for (int i = 0; i < ty; ++i) {
             for (int j = 0; j < tx; ++j) {
                 cases[i][j] = new Case();
@@ -79,47 +76,31 @@ public class Carte implements Affichable {
     }
 
     /**
-     * Ajoute un objet à une case
-     * @param obj objet à ajouter
+     * Ajoute un objet à  une case
+     * @param obj objet à  ajouter
      */
     public void ajouter(Objet obj) {
         cases[obj.getY()][obj.getX()].ajouter(obj);
     }
 
     /**
-     * Enlève un objet à une case
-     * @param obj objet à enlever
+     * Enlève un objet Ã  une case
+     * @param obj objet Ã  enlever
      */
     public void enlever(Objet obj) {
         cases[obj.getY()][obj.getX()].enlever(obj);
     }
 
     /**
-     * Renvoie la case aux coordonnées données
-     * @return renvoie une case ou null si la coordonnée n'existe pas
+     * Renvoie la case aux coordonnÃ©es données
+     * @return renvoie une case ou null si la coordonnÃ©e n'existe pas
      */
-    @Nullable
     public Case getCase(int x, int y) {
         try {
             return cases[y][x];
         } catch (ArrayIndexOutOfBoundsException err) {
             return null;
         }
-    }
-
-    public LinkedList<Animation> objetsAnimes() {
-        LinkedList<Animation> animations = new LinkedList<>();
-        for (Case[] ligne : cases) {
-            for (Case case_ : ligne) {
-                for (Objet objet : case_.listeObjets()) {
-                    if (objet instanceof Animation) {
-                        animations.add((Animation) objet);
-                    }
-                }
-            }
-        }
-
-        return animations;
     }
 
     // Accesseurs

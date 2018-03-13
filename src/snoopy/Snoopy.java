@@ -83,6 +83,14 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     }
 
     private void dessiner(Graphics2D g2d,Theme theme, int x, int y) {
+        int num_anim=0;
+        if (animation()) {
+            num_anim = (int) Math.floor(etat * 10) % theme.getNbImgPerso(direction);
+        }
+
+        g2d.drawImage(theme.getPersoImg(direction,num_anim), x, y, Aire.LARG_IMG, Aire.LONG_IMG, null);
+
+        /*
         // Affiche snoopy centré sur la position donnée
         g2d.setColor(vies == 0 ? Color.gray : Color.red);
         g2d.fillOval(
@@ -108,7 +116,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
             case DROITE:
                 g2d.fillOval(x + Aire.LARG_IMG - 10, y + Aire.LARG_IMG/2 - 2, 4, 4);
                 break;
-        }
+        }*/
     }
 
     @Override
