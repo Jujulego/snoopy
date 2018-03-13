@@ -85,21 +85,21 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     private void dessiner(Graphics2D g2d,Theme theme, int x, int y) {
         switch (direction) {
             case HAUT:
-                g2d.drawImage(theme.get_truc(0), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+                g2d.drawImage(theme.get_truc(0), x, y,36,Aire.LONG_IMG, null);
                 break;
 
             case BAS:
-                g2d.drawImage(theme.get_truc(1), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+                g2d.drawImage(theme.get_truc(1), x, y,36,Aire.LONG_IMG, null);
 
                 break;
 
             case GAUCHE:
-                g2d.drawImage(theme.get_truc(2), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+                g2d.drawImage(theme.get_truc(2), x, y,36,Aire.LONG_IMG, null);
 
                 break;
 
             case DROITE:
-                g2d.drawImage(theme.get_truc(3), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+                g2d.drawImage(theme.get_truc(3), x, y,36,Aire.LONG_IMG, null);
 
                 break;
         }
@@ -189,6 +189,10 @@ public class Snoopy extends Objet implements Deplacable, Animation {
                 return false;
             }
         } else if (!case_.accessible()) { // La case n'est pas accessible !
+            if (obj instanceof BlocPiege) { // Bouum !
+                ((BlocPiege) obj).toucher(carte, this);
+            }
+
             return false;
         }
 

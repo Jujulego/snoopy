@@ -188,8 +188,14 @@ public class Aire extends JPanel implements KeyListener {
                         ajouterDirY(snoopy.getY(), snoopy.getDirection())
                 );
 
-                if (case_ != null && case_.getObjet() instanceof BlocCassable) {
-                    ((BlocCassable) case_.getObjet()).casser(carte);
+                if (case_ != null) {
+                    Objet objet = case_.getObjet();
+
+                    if (objet instanceof BlocCassable) {
+                        ((BlocCassable) objet).casser(carte);
+                    } else if (objet instanceof BlocPiege) {
+                        ((BlocPiege) objet).toucher(carte, snoopy);
+                    }
                 }
 
                 break;

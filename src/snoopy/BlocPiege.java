@@ -2,16 +2,16 @@ package snoopy;
 
 import java.awt.*;
 
-public class BlocCassable extends Bloc {
+public class BlocPiege extends Bloc {
     // Constructeur
-    public BlocCassable(int x, int y) {
+    public BlocPiege(int x, int y) {
         super(x, y);
     }
 
     // Méthodes
     @Override
     public String afficher() {
-        return "Ca";
+        return "T ";
     }
 
     @Override
@@ -23,7 +23,8 @@ public class BlocCassable extends Bloc {
         );
     }
 
-    public void casser(Carte carte) {
+    public void toucher(Carte carte, Snoopy snoopy) {
+        snoopy.tuer();
         carte.enlever(this);
     }
 }

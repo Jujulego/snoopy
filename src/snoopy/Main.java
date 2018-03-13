@@ -22,6 +22,7 @@ public class Main {
 
         carte.ajouter(new BlocPoussable(2, 1));
         carte.ajouter(new BlocCassable(0,2));
+        carte.ajouter(new BlocPiege(2, 4));
 
         // Question !
         String rep = "";
