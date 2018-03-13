@@ -36,7 +36,7 @@ public class Main {
             aire.ajouterBalle(new Balle(
                     (int) (2.5 * Aire.LARG_IMG),
                     (int) (0.5 * Aire.LARG_IMG),
-                    -1, 1
+                    -2, 2
             ));
 
             JFrame fenetre = new JFrame();

@@ -1,5 +1,6 @@
 package snoopy;
 
+
 import java.awt.*;
 import java.util.LinkedList;
 
@@ -7,7 +8,11 @@ import java.util.LinkedList;
  * Représente Snoopy !!!
  */
 public class Snoopy extends Objet implements Deplacable, Animation {
+    // Constantes
+    public static final int MAX_VIES = 3;
+
     // Attributs
+    private int vies = MAX_VIES;
     private Direction direction = Direction.BAS;
     private LinkedList<Oiseau> oiseaux = new LinkedList<>();
 
@@ -22,12 +27,22 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     public Snoopy(int x, int y) {
         super(x, y, 1);
 
+
+
         // On initialise la position précédante à la position de départ
         ox = x;
         oy = y;
     }
     
     // Méthodes
+    public boolean tuer() {
+        if (vies > 0) {
+            vies--;
+        }
+
+        return vies == 0;
+    }
+
     @Override
     public String afficher() {
         // Pas d'animation en console
@@ -67,9 +82,32 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         return etat < 1.0;
     }
 
-    private void afficher(Graphics2D g2d, int x, int y) {
+    private void dessiner(Graphics2D g2d,Theme theme, int x, int y) {
+        int num_anim=0;
+        switch (direction) {
+            case HAUT:
+                g2d.drawImage(theme.get_truc(direction,num_anim), x, y, Aire.LARG_IMG, Aire.LONG_IMG, null);
+                break;
+
+            case BAS:
+                g2d.drawImage(theme.get_truc(direction,num_anim), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+
+                break;
+
+            case GAUCHE:
+                g2d.drawImage(theme.get_truc(direction,num_anim), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+
+                break;
+
+            case DROITE:
+                g2d.drawImage(theme.get_truc(direction,num_anim), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+
+                break;
+        }
+
+        /*
         // Affiche snoopy centré sur la position donnée
-        g2d.setColor(Color.red);
+        g2d.setColor(vies == 0 ? Color.gray : Color.red);
         g2d.fillOval(
             x + (Aire.LARG_IMG - 30)/2,
             y + (Aire.LONG_IMG - 30)/2,
@@ -93,11 +131,11 @@ public class Snoopy extends Objet implements Deplacable, Animation {
             case DROITE:
                 g2d.fillOval(x + Aire.LARG_IMG - 10, y + Aire.LARG_IMG/2 - 2, 4, 4);
                 break;
-        }
+        }*/
     }
 
     @Override
-    public synchronized void afficher(Graphics2D g2d) {
+    public synchronized void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Variations en x
         double x = ox;
         if (getX() > ox) {
@@ -115,11 +153,16 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         }
 
         // Affichage !
-        afficher(g2d, (int) (x * Aire.LARG_IMG), (int) (y * Aire.LONG_IMG));
+        dessiner(g2d,theme, bx + (int) (x * Aire.LARG_IMG), by + (int) (y * Aire.LONG_IMG));
     }
 
     @Override
     public boolean deplacer(Carte carte, int dx, int dy) {
+        // Il est mort !!!
+        if (vies == 0) {
+            return false;
+        }
+
         // Calcul des nouvelles coordonnees
         int nx = getX() + dx;
         int ny = getY() + dy;
@@ -170,5 +213,14 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         carte.ajouter(this);
 
         return true;
+    }
+
+    // - accesseurs
+    public int getVies() {
+        return vies;
+    }
+
+    public int getOiseaux() {
+        return oiseaux.size();
     }
 }

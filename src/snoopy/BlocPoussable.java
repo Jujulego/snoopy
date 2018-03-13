@@ -53,7 +53,7 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
         return etat < 1.0;
     }
 
-    private void afficher(Graphics2D g2d, int x, int y) {
+    private void dessiner(Graphics2D g2d, int x, int y) {
         g2d.setColor(new Color(0x592901));
         g2d.fillRect(
                 x + MARGE, y + MARGE,
@@ -62,7 +62,7 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
     }
 
     @Override
-    public void afficher(Graphics2D g2d) {
+    public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Variations en x
         double x = ox;
         if (getX() > ox) {
@@ -80,7 +80,7 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
         }
 
         // Affichage !
-        afficher(g2d, (int) (x * Aire.LARG_IMG), (int) (y * Aire.LONG_IMG));
+        dessiner(g2d, bx + (int) (x * Aire.LARG_IMG), by + (int) (y * Aire.LONG_IMG));
     }
 
     @Override

@@ -19,10 +19,17 @@ public class Aire extends JPanel implements KeyListener {
     public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
     public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
 
+    public static final int MARGE_X_CARTE = 0;
+    public static final int MARGE_Y_CARTE = 25;
+
     // Attributs
     // - jeu
     private Carte carte;   // Carte affichée
     private Snoopy snoopy; // Le personnage controllé
+
+    private Image coeur_plein;
+    private Image coeur_vide;
+    private Theme theme;
 
     // - animation
     private LinkedList<Balle> balles = new LinkedList<>();
@@ -40,12 +47,19 @@ public class Aire extends JPanel implements KeyListener {
         this.snoopy = snoopy;
 
         // Paramètres
-        setMinimumSize(new Dimension(carte.getTx() * LARG_IMG + 1, carte.getTy() * LONG_IMG + 38));
+        setMinimumSize(new Dimension(carte.getTx() * LARG_IMG + 1, carte.getTy() * LONG_IMG + MARGE_Y_CARTE + 38));
         addKeyListener(this);
 
         // Scheduler
         animations.addAll(carte.objetsAnimes());
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/FPS, TimeUnit.MILLISECONDS);
+
+        // Chargement des images
+        coeur_plein = Toolkit.getDefaultToolkit().getImage("images/coeur_plein.png");
+        coeur_vide = Toolkit.getDefaultToolkit().getImage("images/coeur_vide.png");
+
+        theme = new Theme(1);
+
     }
 
     // Méthodes
@@ -78,22 +92,38 @@ public class Aire extends JPanel implements KeyListener {
         g2d.clearRect(0, 0, getWidth(), getHeight());
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Grille
-        g2d.setColor(Color.black);
-        for (int i = 0; i <= carte.getTx(); ++i) {
-            g2d.drawLine(i * LARG_IMG, 0, i * LARG_IMG, carte.getTy() * LONG_IMG);
-        }
-
-        for (int i = 0; i <= carte.getTy(); ++i) {
-            g2d.drawLine(0, i * LONG_IMG, carte.getTx() * LARG_IMG, i * LONG_IMG);
-        }
-
         // Objets
-        carte.afficher(g2d);
+        carte.afficher(g2d, theme, MARGE_X_CARTE, MARGE_Y_CARTE);
 
         // Balles
         for (Balle balle : balles) {
-            balle.afficher(g2d);
+            balle.afficher(g2d,theme,  MARGE_X_CARTE, MARGE_Y_CARTE);
+
+            // Touche ?
+            if (snoopy.getX() * LARG_IMG < balle.getX() && balle.getX() < (snoopy.getX() + 1) * LARG_IMG &&
+                    snoopy.getY() * LONG_IMG < balle.getY() && balle.getY() < (snoopy.getY() + 1) * LONG_IMG) {
+
+                if (!balle.getTouche()) {
+                    balle.setTouche(true);
+                    snoopy.tuer();
+                }
+            } else if (balle.getTouche()) {
+                balle.setTouche(false);
+            }
+        }
+
+        // Coeurs
+        for (int i = 0; i < Snoopy.MAX_VIES; ++i) {
+            g2d.drawImage(i < snoopy.getVies() ? coeur_plein : coeur_vide,
+                    carte.getTx() * LARG_IMG - 25*(Snoopy.MAX_VIES-i), 0,
+                    25, 25, null
+            );
+        }
+
+        // Oiseaux gagnés
+        for (int i = 0; i < snoopy.getOiseaux(); ++i) {
+            g2d.setColor(Color.blue);
+            g2d.fillOval(i*20+5, 5, 15, 15);
         }
     }
 
