@@ -64,6 +64,31 @@ public class Aire extends JPanel implements KeyListener {
         balles.add(balle);
     }
 
+    public static int ajouterDirX(int x, Direction direction) {
+        switch (direction) {
+            case DROITE:
+                return x+1;
+
+            case GAUCHE:
+                return x-1;
+
+            default:
+                return x;
+        }
+    }
+    public static int ajouterDirY(int y, Direction direction) {
+        switch (direction) {
+            case BAS:
+                return y+1;
+
+            case HAUT:
+                return y-1;
+
+            default:
+                return y;
+        }
+    }
+
     /**
      * Gestion des animations et mise à jour de l'écran
      * Appelée FPS fois par secondes
@@ -151,6 +176,18 @@ public class Aire extends JPanel implements KeyListener {
 
             case KeyEvent.VK_RIGHT: // DROITE
                 snoopy.deplacer(carte, 1, 0);
+                break;
+
+            case KeyEvent.VK_A: // Attaque !!!
+                Case case_ = carte.getCase(
+                        ajouterDirX(snoopy.getX(), snoopy.getDirection()),
+                        ajouterDirY(snoopy.getY(), snoopy.getDirection())
+                );
+
+                if (case_ != null && case_.getObjet() instanceof BlocCassable) {
+                    ((BlocCassable) case_.getObjet()).casser(carte);
+                }
+
                 break;
         }
     }

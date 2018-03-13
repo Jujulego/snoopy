@@ -190,10 +190,12 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     }
 
     // - accesseurs
+    public Direction getDirection() {
+        return direction;
+    }
     public int getVies() {
         return vies;
     }
-
     public int getOiseaux() {
         return oiseaux.size();
     }

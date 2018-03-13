@@ -21,6 +21,7 @@ public class Main {
         carte.ajouter(new Oiseau(4, 4));
 
         carte.ajouter(new BlocPoussable(2, 1));
+        carte.ajouter(new BlocCassable(0,2));
 
         // Question !
         String rep = "";
@@ -35,8 +36,8 @@ public class Main {
             Aire aire = new Aire(carte, snoopy);
             aire.ajouterBalle(new Balle(
                     (int) (2.5 * Aire.LARG_IMG),
-                    (int) (0.5 * Aire.LARG_IMG),
-                    -2, 2
+                    (int) (3.5 * Aire.LARG_IMG),
+                    -2, 0
             ));
 
             JFrame fenetre = new JFrame();
