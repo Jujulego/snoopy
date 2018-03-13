@@ -1,7 +1,10 @@
 package snoopy;
 
+
+import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
+import java.awt.image.BufferedImage;
 
 /**
  * Représente Snoopy !!!
@@ -25,6 +28,8 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     // Constructeur
     public Snoopy(int x, int y) {
         super(x, y, 1);
+
+
 
         // On initialise la position précédante à la position de départ
         ox = x;
