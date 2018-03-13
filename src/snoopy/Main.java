@@ -36,9 +36,8 @@ public class Main {
             // Graphisme
             Aire aire = new Aire(carte, snoopy);
             aire.ajouterBalle(new Balle(
-                    (int) (2.5 * Aire.LARG_IMG),
-                    (int) (3.5 * Aire.LARG_IMG),
-                    -2, 0
+                    (int) (2.5 * Aire.LARG_IMG), (int) (0.5 * Aire.LONG_IMG),
+                    -2, 2
             ));
 
             JFrame fenetre = new JFrame();

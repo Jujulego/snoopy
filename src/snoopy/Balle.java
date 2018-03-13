@@ -25,6 +25,16 @@ public class Balle implements Animation, Affichable {
     }
 
     // Méthodes
+    public boolean estAuBordX(int marge) {
+        return (x + marge) / Aire.LARG_IMG != (x - marge) / Aire.LARG_IMG;
+    }
+    public boolean estAuBordY(int marge) {
+        return (y + marge) / Aire.LONG_IMG != (y - marge) / Aire.LONG_IMG;
+    }
+    public boolean estAuBord(int marge) {
+        return estAuBordX(marge) || estAuBordY(marge);
+    }
+
     @Override
     public String afficher() {
         return "Ba";
@@ -36,24 +46,41 @@ public class Balle implements Animation, Affichable {
         x += dx;
         y += dy;
 
-        // Rebond sur les blocs
-        Case case_ = carte.getCase((x + dx) / Aire.LARG_IMG, (y + dy) / Aire.LONG_IMG);
-
-        if (case_ != null && case_.getObjet() instanceof Bloc) {
-            if ((Aire.LARG_IMG + x + dx) / Aire.LARG_IMG != (Aire.LARG_IMG + x - dx) / Aire.LARG_IMG ||
-                    (y + dy) / Aire.LONG_IMG != (y - dy) / Aire.LONG_IMG) {
-                dx = -dx;
-                dy = -dy;
-            }
-        }
-
         // Rebonds sur les bords
-        if (x + dx < 0 || x + dx >= carte.getTx() * Aire.LARG_IMG) {
+        if (x <= RAYON) {
+            x = RAYON;
+            dx = -dx;
+        } else if (x + RAYON >= carte.getTx() * Aire.LARG_IMG) {
+            x = carte.getTx() * Aire.LARG_IMG - RAYON;
             dx = -dx;
         }
 
-        if (y + dy < 0 || y + dy >= carte.getTy() * Aire.LONG_IMG) {
+        if (y <= RAYON) {
+            y = RAYON;
             dy = -dy;
+        } else if (y + RAYON >= carte.getTy() * Aire.LONG_IMG) {
+            y = carte.getTy() * Aire.LONG_IMG - RAYON;
+            dy = -dy;
+        }
+
+        // Rebond sur les blocs
+        Case case_ = carte.getCase(
+                (x / Aire.LARG_IMG),
+                (y / Aire.LONG_IMG)
+        );
+        Case case_suiv = carte.getCase(
+                ((x + dx) / Aire.LARG_IMG),
+                ((y + dy) / Aire.LONG_IMG)
+        );
+
+        if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
+            if (x / Aire.LARG_IMG != (x + dx) / Aire.LARG_IMG) {
+                dx *= -1;
+            }
+
+            if (y / Aire.LONG_IMG != (y + dy) / Aire.LONG_IMG) {
+                dy *= -1;
+            }
         }
     }
 
