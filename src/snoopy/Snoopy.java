@@ -84,26 +84,11 @@ public class Snoopy extends Objet implements Deplacable, Animation {
 
     private void dessiner(Graphics2D g2d,Theme theme, int x, int y) {
         int num_anim=0;
-        switch (direction) {
-            case HAUT:
-                g2d.drawImage(theme.get_truc(direction,num_anim), x, y, Aire.LARG_IMG, Aire.LONG_IMG, null);
-                break;
-
-            case BAS:
-                g2d.drawImage(theme.get_truc(direction,num_anim), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
-
-                break;
-
-            case GAUCHE:
-                g2d.drawImage(theme.get_truc(direction,num_anim), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
-
-                break;
-
-            case DROITE:
-                g2d.drawImage(theme.get_truc(direction,num_anim), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
-
-                break;
+        if (animation()) {
+            num_anim = (int) Math.floor(etat * 10) % theme.getNbImgPerso(direction);
         }
+
+        g2d.drawImage(theme.getPersoImg(direction,num_anim), x, y, Aire.LARG_IMG, Aire.LONG_IMG, null);
 
         /*
         // Affiche snoopy centré sur la position donnée

@@ -46,25 +46,14 @@ public class Theme {
             perso.get(Direction.DROITE).add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/perso3/anim"+z+".png"));
             z++;
         }
-
-
-
     }
 
-    public Image get_truc(Direction direction, Integer num_anim)
+    public Image getPersoImg(Direction direction, int num_anim)
     {
-        Image stock=perso.get(direction).get(num_anim);
-        if(num_anim==perso.get(direction).size()-1)
-        {
-            num_anim=0;
-        }
-        else
-        {
-            num_anim++;
-        }
-        return stock;
-
+        return perso.get(direction).get(num_anim);
     }
 
-
+    public int getNbImgPerso(Direction direction) {
+        return perso.get(direction).size();
+    }
 }
