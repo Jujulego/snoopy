@@ -26,10 +26,10 @@ public class Case implements Affichable {
     }
 
     @Override
-    public void afficher(Graphics2D g2d, int bx, int by) {
+    public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affiche uniqement l'objet avec l'indice z le plus grand
         if (objets.size() != 0) {
-            objets.getFirst().afficher(g2d, bx, by);
+            objets.getFirst().afficher(g2d, theme, bx, by);
         }
     }
 

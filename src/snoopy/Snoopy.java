@@ -1,10 +1,8 @@
 package snoopy;
 
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
-import java.awt.image.BufferedImage;
 
 /**
  * Représente Snoopy !!!
@@ -84,7 +82,29 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         return etat < 1.0;
     }
 
-    private void dessiner(Graphics2D g2d, int x, int y) {
+    private void dessiner(Graphics2D g2d,Theme theme, int x, int y) {
+        switch (direction) {
+            case HAUT:
+                g2d.drawImage(theme.get_truc(0), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+                break;
+
+            case BAS:
+                g2d.drawImage(theme.get_truc(1), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+
+                break;
+
+            case GAUCHE:
+                g2d.drawImage(theme.get_truc(2), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+
+                break;
+
+            case DROITE:
+                g2d.drawImage(theme.get_truc(3), x, y,Aire.LARG_IMG,Aire.LONG_IMG, null);
+
+                break;
+        }
+
+        /*
         // Affiche snoopy centré sur la position donnée
         g2d.setColor(vies == 0 ? Color.gray : Color.red);
         g2d.fillOval(
@@ -110,11 +130,11 @@ public class Snoopy extends Objet implements Deplacable, Animation {
             case DROITE:
                 g2d.fillOval(x + Aire.LARG_IMG - 10, y + Aire.LARG_IMG/2 - 2, 4, 4);
                 break;
-        }
+        }*/
     }
 
     @Override
-    public synchronized void afficher(Graphics2D g2d, int bx, int by) {
+    public synchronized void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Variations en x
         double x = ox;
         if (getX() > ox) {
@@ -132,7 +152,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         }
 
         // Affichage !
-        dessiner(g2d, bx + (int) (x * Aire.LARG_IMG), by + (int) (y * Aire.LONG_IMG));
+        dessiner(g2d,theme, bx + (int) (x * Aire.LARG_IMG), by + (int) (y * Aire.LONG_IMG));
     }
 
     @Override

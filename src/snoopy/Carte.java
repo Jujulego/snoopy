@@ -59,7 +59,7 @@ public class Carte implements Affichable {
     }
 
     @Override
-    public void afficher(Graphics2D g2d, int bx, int by) {
+    public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Grille
         g2d.setColor(Color.black);
         for (int i = 0; i <= tx; ++i) {
@@ -73,7 +73,7 @@ public class Carte implements Affichable {
         // Affichage des cases
         for (Case[] ligne : cases) {
             for (Case c : ligne) {
-                c.afficher(g2d, bx, by);
+                c.afficher(g2d, theme, bx, by);
             }
         }
     }

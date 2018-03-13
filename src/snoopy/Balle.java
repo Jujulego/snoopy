@@ -60,7 +60,7 @@ public class Balle implements Animation, Affichable {
     }
 
     @Override
-    public void afficher(Graphics2D g2d, int bx, int by) {
+    public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         g2d.setColor(Color.yellow);
         g2d.fillOval(
                 bx + x - RAYON,

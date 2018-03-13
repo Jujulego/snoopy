@@ -6,19 +6,22 @@ import java.awt.*;
 
 public class Theme {
 
-    private Image snoopy_droite;
+    private Image[] perso;
 
 
-    public void charger()
+    public Theme(int i)
     {
-        snoopy_droite=Toolkit.getDefaultToolkit().getImage("images/snoopy_droite.jpg");
+        perso=new Image[4];
+        for (int z=0;z<perso.length;z++)
+        {
+            perso[z]=Toolkit.getDefaultToolkit().getImage("images/theme"+i+"/perso"+z+".png");
+        }
     }
 
-    private void afficher(Graphics2D m) {
-
-        m.drawImage(snoopy_droite,30,30,null);
-
-
+    public Image get_truc(int i)
+    {
+        return perso[i];
     }
+
 
 }
