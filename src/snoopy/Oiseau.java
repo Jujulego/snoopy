@@ -18,7 +18,7 @@ public class Oiseau extends Objet {
     }
 
     @Override
-    public void afficher(Graphics2D g2d, int bx, int by) {
+    public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         g2d.setColor(Color.blue);
         g2d.fillOval(
                 bx + getX() * Aire.LARG_IMG + (Aire.LARG_IMG - 30)/2,

@@ -59,7 +59,7 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
     }
 
     @Override
-    public void afficher(Graphics2D g2d, int bx, int by) {
+    public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Variations en x
         double x = ox;
         if (getX() > ox) {

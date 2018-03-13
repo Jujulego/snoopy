@@ -29,6 +29,7 @@ public class Aire extends JPanel implements KeyListener {
 
     private Image coeur_plein;
     private Image coeur_vide;
+    private Theme theme;
 
     // - animation
     private LinkedList<Balle> balles = new LinkedList<>();
@@ -56,6 +57,9 @@ public class Aire extends JPanel implements KeyListener {
         // Chargement des images
         coeur_plein = Toolkit.getDefaultToolkit().getImage("images/coeur_plein.png");
         coeur_vide = Toolkit.getDefaultToolkit().getImage("images/coeur_vide.png");
+
+        theme = new Theme(1);
+
     }
 
     // Méthodes
@@ -114,11 +118,11 @@ public class Aire extends JPanel implements KeyListener {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Objets
-        carte.afficher(g2d, MARGE_X_CARTE, MARGE_Y_CARTE);
+        carte.afficher(g2d, theme, MARGE_X_CARTE, MARGE_Y_CARTE);
 
         // Balles
         for (Balle balle : balles) {
-            balle.afficher(g2d, MARGE_X_CARTE, MARGE_Y_CARTE);
+            balle.afficher(g2d,theme,  MARGE_X_CARTE, MARGE_Y_CARTE);
 
             // Touche ?
             if (snoopy.getX() * LARG_IMG < balle.getX() && balle.getX() < (snoopy.getX() + 1) * LARG_IMG &&
