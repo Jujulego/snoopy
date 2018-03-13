@@ -115,6 +115,12 @@ public class Aire extends JPanel implements KeyListener {
                     25, 25, null
             );
         }
+
+        // Oiseaux gagnés
+        for (int i = 0; i < snoopy.getOiseaux(); ++i) {
+            g2d.setColor(Color.blue);
+            g2d.fillOval(i*20+5, 5, 15, 15);
+        }
     }
 
     @Override
