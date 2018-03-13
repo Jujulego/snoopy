@@ -40,8 +40,11 @@ public class Balle implements Animation, Affichable {
         Case case_ = carte.getCase((x + dx) / Aire.LARG_IMG, (y + dy) / Aire.LONG_IMG);
 
         if (case_ != null && case_.getObjet() instanceof Bloc) {
-            dx = -dx;
-            dy = -dy;
+            if ((Aire.LARG_IMG + x + dx) / Aire.LARG_IMG != (Aire.LARG_IMG + x - dx) / Aire.LARG_IMG ||
+                    (y + dy) / Aire.LONG_IMG != (y - dy) / Aire.LONG_IMG) {
+                dx = -dx;
+                dy = -dy;
+            }
         }
 
         // Rebonds sur les bords

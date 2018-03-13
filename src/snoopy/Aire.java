@@ -183,6 +183,10 @@ public class Aire extends JPanel implements KeyListener {
                 break;
 
             case KeyEvent.VK_A: // Attaque !!!
+                if (snoopy.getVies() == 0) {
+                    break;
+                }
+
                 Case case_ = carte.getCase(
                         ajouterDirX(snoopy.getX(), snoopy.getDirection()),
                         ajouterDirY(snoopy.getY(), snoopy.getDirection())
