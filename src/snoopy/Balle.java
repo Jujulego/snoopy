@@ -32,15 +32,24 @@ public class Balle implements Animation, Affichable {
 
     @Override
     public void animer(Carte carte) {
+        // Déplacement
         x += dx;
         y += dy;
 
+        // Rebond sur les blocs
+        Case case_ = carte.getCase((x + dx) / Aire.LARG_IMG, (y + dy) / Aire.LONG_IMG);
+
+        if (case_ != null && case_.getObjet() instanceof Bloc) {
+            dx = -dx;
+            dy = -dy;
+        }
+
         // Rebonds sur les bords
-        if (x <= 0 || x >= carte.getTx() * Aire.LARG_IMG) {
+        if (x + dx < 0 || x + dx >= carte.getTx() * Aire.LARG_IMG) {
             dx = -dx;
         }
 
-        if (y <= 0 || y >= carte.getTy() * Aire.LONG_IMG) {
+        if (y + dy < 0 || y + dy >= carte.getTy() * Aire.LONG_IMG) {
             dy = -dy;
         }
     }
