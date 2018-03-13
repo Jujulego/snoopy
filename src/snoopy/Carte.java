@@ -59,11 +59,21 @@ public class Carte implements Affichable {
     }
 
     @Override
-    public void afficher(Graphics2D g2d) {
+    public void afficher(Graphics2D g2d, int bx, int by) {
+        // Grille
+        g2d.setColor(Color.black);
+        for (int i = 0; i <= tx; ++i) {
+            g2d.drawLine(bx + i * Aire.LARG_IMG, by, bx + i * Aire.LARG_IMG, by + ty * Aire.LONG_IMG);
+        }
+
+        for (int i = 0; i <= ty; ++i) {
+            g2d.drawLine(bx, by + i * Aire.LONG_IMG, bx + tx * Aire.LARG_IMG, by + i * Aire.LONG_IMG);
+        }
+
         // Affichage des cases
         for (Case[] ligne : cases) {
             for (Case c : ligne) {
-                c.afficher(g2d);
+                c.afficher(g2d, bx, by);
             }
         }
     }

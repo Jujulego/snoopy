@@ -15,6 +15,8 @@ public interface Affichable {
     /**
      * Affichage en graphique
      * @param g2d
+     * @param bx
+     * @param by
      */
-    void afficher(Graphics2D g2d);
+    void afficher(Graphics2D g2d, int bx, int by);
 }
