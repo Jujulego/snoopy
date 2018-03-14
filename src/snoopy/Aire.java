@@ -36,8 +36,9 @@ public class Aire extends JPanel implements KeyListener {
     private LinkedList<Animation> animations = new LinkedList<>();
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
-    // Constructeur
+    public int etat=1;
 
+    // Constructeur
     /**
      * @param carte  carte à afficher
      * @param snoopy personnage à controller
@@ -77,6 +78,9 @@ public class Aire extends JPanel implements KeyListener {
         for (Animation a : animations) {
             a.animer(carte);
         }
+
+        etat++;
+        etat%=60;
 
         // Rafraichissement de l'ecran
         repaint();
@@ -122,8 +126,20 @@ public class Aire extends JPanel implements KeyListener {
 
         // Oiseaux gagnés
         for (int i = 0; i < snoopy.getOiseaux(); ++i) {
+            int num_anim=0;
+
+
+            float a=(etat*theme.getNbImgOiseau()/Aire.FPS);
+            num_anim = (int) Math.floor(a) % theme.getNbImgOiseau();
+
+
+            g2d.drawImage(theme.getOiseauImg(num_anim), i*25+10, 3, 20, 20, null);
+
+
+/*
             g2d.setColor(Color.blue);
             g2d.fillOval(i*20+5, 5, 15, 15);
+*/
         }
     }
 
