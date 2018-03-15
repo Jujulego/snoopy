@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 public class Aire extends JPanel implements KeyListener {
     // Constantes
     public static final int FPS = 60;      // Fréquence de rafraichissement de l'écran
-    public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
-    public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
+    public static final int LARG_IMG = 100; // Largeur de base (d'une case de la grille)
+    public static final int LONG_IMG = 100; // Longueur de base (d'une case de la grille)
 
     public static final int MARGE_X_CARTE = 0;
     public static final int MARGE_Y_CARTE = 25;
@@ -30,7 +30,11 @@ public class Aire extends JPanel implements KeyListener {
     private Image coeur_plein;
     private Image coeur_vide;
     private Theme theme;
-
+    
+    //Clock
+    private int timer=60;
+    private String timerString;
+    
     // - animation
     private LinkedList<Balle> balles = new LinkedList<>();
     private LinkedList<Animation> animations = new LinkedList<>();
@@ -53,7 +57,9 @@ public class Aire extends JPanel implements KeyListener {
         // Scheduler
         animations.addAll(carte.objetsAnimes());
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/FPS, TimeUnit.MILLISECONDS);
-
+        
+        scheduler.scheduleAtFixedRate(this::clock, 0, 1000, TimeUnit.MILLISECONDS);
+        
         // Chargement des images
         coeur_plein = Toolkit.getDefaultToolkit().getImage("images/coeur_plein.png");
         coeur_vide = Toolkit.getDefaultToolkit().getImage("images/coeur_vide.png");
@@ -115,7 +121,22 @@ public class Aire extends JPanel implements KeyListener {
         // Rafraichissement de l'ecran
         repaint();
     }
+    
+   //Décompte de 60 secondes
+   public void clock() {
+	   //Chaque seconde il change l'état d'une variable de Air
+	   if(timer==0) {
+		   //Si on arrive à 0, Snoopy perd une vie 
+		   snoopy.tuer();
+		   timer=60;
+		   
+	   }
+	   else if(timer<=60) 
+		   timer--;
+	   
 
+   }
+    
     /**
      * Affichage de la grille
      */
@@ -160,6 +181,14 @@ public class Aire extends JPanel implements KeyListener {
             g2d.setColor(Color.blue);
             g2d.fillOval(i*20+5, 5, 15, 15);
         }
+        
+        //Affichage de l'horloge
+		g2d.setColor(Color.black);
+		g2d.setFont(new Font ("Plain", Font.BOLD,LARG_IMG/3));
+		
+		timerString = String.valueOf(timer);
+		g2d.drawString(timerString, LARG_IMG*2, 20);
+
     }
 
     @Override

@@ -73,7 +73,8 @@ public class Case implements Affichable {
 
     public Objet getObjet() {
         try {
-            return objets.getFirst();
+        	Objet obj = objets.getFirst();
+            return obj;
         } catch (NoSuchElementException err) {
             return null;
         }
