@@ -69,6 +69,7 @@ public class Aire extends JPanel implements KeyListener {
         coeur_plein = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur1.png");
         coeur_vide = Toolkit.getDefaultToolkit().getImage("images/theme/"+theme.getNumTheme()+"/coeur/coeur0.png");
 
+        theme = new Theme(3);
 
     }
 

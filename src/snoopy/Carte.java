@@ -92,6 +92,21 @@ public class Carte implements Affichable {
         cases[obj.getY()][obj.getX()].enlever(obj);
     }
 
+    public LinkedList<Animation> objetsAnimes() {
+        LinkedList<Animation> animations = new LinkedList<>();
+        for (Case[] ligne : cases) {
+            for (Case case_ : ligne) {
+                for (Objet objet : case_.listeObjets()) {
+                    if (objet instanceof Animation) {
+                        animations.add((Animation) objet);
+                    }
+                }
+            }
+        }
+
+        return animations;
+    }
+
     /**
      * Renvoie la case aux coordonnÃ©es données
      * @return renvoie une case ou null si la coordonnÃ©e n'existe pas
