@@ -47,6 +47,10 @@ public class Aire extends JPanel implements KeyListener {
         this.carte = carte;
         this.snoopy = snoopy;
 
+        //Creation du theme
+        theme = new Theme(1);
+
+
         // Paramètres
         setMinimumSize(new Dimension(carte.getTx() * LARG_IMG + 1, carte.getTy() * LONG_IMG + MARGE_Y_CARTE + 38));
         addKeyListener(this);
@@ -56,10 +60,9 @@ public class Aire extends JPanel implements KeyListener {
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/FPS, TimeUnit.MILLISECONDS);
 
         // Chargement des images
-        coeur_plein = Toolkit.getDefaultToolkit().getImage("images/coeur_plein.png");
-        coeur_vide = Toolkit.getDefaultToolkit().getImage("images/coeur_vide.png");
+        coeur_plein = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur1.png");
+        coeur_vide = Toolkit.getDefaultToolkit().getImage("images/theme/"+theme.getNumTheme()+"/coeur/coeur0.png");
 
-        theme = new Theme(1);
 
     }
 
@@ -173,6 +176,11 @@ public class Aire extends JPanel implements KeyListener {
                 snoopy.deplacer(carte, 1, 0);
                 break;
         }
+    }
+
+    public void SetTheme(int a)
+    {
+        theme = new Theme (a);
     }
 
     @Override

@@ -12,6 +12,7 @@ public class Theme {
 
     private HashMap<Direction,ArrayList<Image>> perso = new HashMap<>();
     private ArrayList<Image> img_oiseau=new ArrayList<>();
+    int num_theme=0;
 
     //1er= direction: 0=haut   1=bas,   2=gauche,   3=droite;
 
@@ -24,7 +25,7 @@ public class Theme {
         perso.put(Direction.GAUCHE, new ArrayList<>());
         perso.put(Direction.DROITE, new ArrayList<>());
 
-
+        this.num_theme=num_theme;
 
         int z=0;
         /////////////////////////// Chargement animations snoopy haut, bas, gauche, droite
@@ -62,6 +63,9 @@ public class Theme {
 
     }
 
+
+
+
     public Image getPersoImg(Direction direction, int num_anim)
     {
         return perso.get(direction).get(num_anim);
@@ -79,4 +83,11 @@ public class Theme {
     {
         return img_oiseau.size();
     }
+
+    public int getNumTheme()
+    {
+        return num_theme;
+    }
+
+
 }
