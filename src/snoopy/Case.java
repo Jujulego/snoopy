@@ -1,8 +1,5 @@
 package snoopy;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -53,7 +50,7 @@ public class Case implements Affichable {
      * Ajoute un objet à la case
      * @param objet l'objet à ajouter
      */
-    public void ajouter(@NotNull Objet objet) {
+    public void ajouter(Objet objet) {
         objets.add(objet);
 
         // Tri décroissant sur l'indice Z
@@ -73,10 +70,11 @@ public class Case implements Affichable {
         return objets;
     }
 
-    @Nullable
+
     public Objet getObjet() {
         try {
-            return objets.getFirst();
+        	Objet obj = objets.getFirst();
+            return obj;
         } catch (NoSuchElementException err) {
             return null;
         }

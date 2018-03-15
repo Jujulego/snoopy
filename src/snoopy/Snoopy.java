@@ -175,6 +175,10 @@ public class Snoopy extends Objet implements Deplacable, Animation {
                 return false;
             }
         } else if (!case_.accessible()) { // La case n'est pas accessible !
+            if (obj instanceof BlocPiege) { // Bouum !
+                ((BlocPiege) obj).toucher(carte, this);
+            }
+
             return false;
         }
 
@@ -201,10 +205,12 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     }
 
     // - accesseurs
+    public Direction getDirection() {
+        return direction;
+    }
     public int getVies() {
         return vies;
     }
-
     public int getOiseaux() {
         return oiseaux.size();
     }

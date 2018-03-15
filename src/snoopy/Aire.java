@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 public class Aire extends JPanel implements KeyListener {
     // Constantes
     public static final int FPS = 60;      // Fréquence de rafraichissement de l'écran
-    public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
-    public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
+    public static final int LARG_IMG = 100; // Largeur de base (d'une case de la grille)
+    public static final int LONG_IMG = 100; // Longueur de base (d'une case de la grille)
 
     public static final int MARGE_X_CARTE = 0;
     public static final int MARGE_Y_CARTE = 25;
@@ -30,7 +30,11 @@ public class Aire extends JPanel implements KeyListener {
     private Image coeur_plein;
     private Image coeur_vide;
     private Theme theme;
-
+    
+    //Clock
+    private int timer=60;
+    private String timerString;
+    
     // - animation
     private LinkedList<Balle> balles = new LinkedList<>();
     private LinkedList<Animation> animations = new LinkedList<>();
@@ -58,7 +62,9 @@ public class Aire extends JPanel implements KeyListener {
         // Scheduler
         animations.addAll(carte.objetsAnimes());
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/FPS, TimeUnit.MILLISECONDS);
-
+        
+        scheduler.scheduleAtFixedRate(this::clock, 0, 1000, TimeUnit.MILLISECONDS);
+        
         // Chargement des images
         coeur_plein = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur1.png");
         coeur_vide = Toolkit.getDefaultToolkit().getImage("images/theme/"+theme.getNumTheme()+"/coeur/coeur0.png");
@@ -70,6 +76,40 @@ public class Aire extends JPanel implements KeyListener {
     public void ajouterBalle(Balle balle) {
         animations.add(balle);
         balles.add(balle);
+    }
+
+    public static int ajouterDirX(int x, Direction direction) {
+        switch (direction) {
+            case DROITE:
+                return x+1;
+
+            case GAUCHE:
+                return x-1;
+
+            default:
+                return x;
+        }
+    }
+    public static int ajouterDirY(int y, Direction direction) {
+        switch (direction) {
+            case BAS:
+                return y+1;
+
+            case HAUT:
+                return y-1;
+
+            default:
+                return y;
+        }
+    }
+
+    public static boolean pointDedans(Objet obj, Balle balle) {
+        return pointDedans(obj.getX(), obj.getY(), balle.getX(), balle.getY());
+    }
+
+    public static boolean pointDedans(int casex, int casey, int ptx, int pty) {
+        return casex * LARG_IMG < ptx && ptx < (casex + 1) * LARG_IMG &&
+                casey * LONG_IMG < pty && pty < (casey + 1) * LONG_IMG;
     }
 
     /**
@@ -88,7 +128,22 @@ public class Aire extends JPanel implements KeyListener {
         // Rafraichissement de l'ecran
         repaint();
     }
+    
+   //Décompte de 60 secondes
+   public void clock() {
+	   //Chaque seconde il change l'état d'une variable de Air
+	   if(timer==0) {
+		   //Si on arrive à 0, Snoopy perd une vie 
+		   snoopy.tuer();
+		   timer=60;
+		   
+	   }
+	   else if(timer<=60) 
+		   timer--;
+	   
 
+   }
+    
     /**
      * Affichage de la grille
      */
@@ -107,15 +162,16 @@ public class Aire extends JPanel implements KeyListener {
             balle.afficher(g2d,theme,  MARGE_X_CARTE, MARGE_Y_CARTE);
 
             // Touche ?
-            if (snoopy.getX() * LARG_IMG < balle.getX() && balle.getX() < (snoopy.getX() + 1) * LARG_IMG &&
-                    snoopy.getY() * LONG_IMG < balle.getY() && balle.getY() < (snoopy.getY() + 1) * LONG_IMG) {
+            if (!balle.estAuBord(5)) {
+                if (pointDedans(snoopy, balle)) {
 
-                if (!balle.getTouche()) {
-                    balle.setTouche(true);
-                    snoopy.tuer();
+                    if (!balle.getTouche()) {
+                        balle.setTouche(true);
+                        snoopy.tuer();
+                    }
+                } else if (balle.getTouche()) {
+                    balle.setTouche(false);
                 }
-            } else if (balle.getTouche()) {
-                balle.setTouche(false);
             }
         }
 
@@ -144,6 +200,14 @@ public class Aire extends JPanel implements KeyListener {
             g2d.fillOval(i*20+5, 5, 15, 15);
 */
         }
+        
+        //Affichage de l'horloge
+		g2d.setColor(Color.black);
+		g2d.setFont(new Font ("Plain", Font.BOLD,LARG_IMG/3));
+		
+		timerString = String.valueOf(timer);
+		g2d.drawString(timerString, LARG_IMG*2, 20);
+
     }
 
     @Override
@@ -174,6 +238,28 @@ public class Aire extends JPanel implements KeyListener {
 
             case KeyEvent.VK_RIGHT: // DROITE
                 snoopy.deplacer(carte, 1, 0);
+                break;
+
+            case KeyEvent.VK_A: // Attaque !!!
+                if (snoopy.getVies() == 0) {
+                    break;
+                }
+
+                Case case_ = carte.getCase(
+                        ajouterDirX(snoopy.getX(), snoopy.getDirection()),
+                        ajouterDirY(snoopy.getY(), snoopy.getDirection())
+                );
+
+                if (case_ != null) {
+                    Objet objet = case_.getObjet();
+
+                    if (objet instanceof BlocCassable) {
+                        ((BlocCassable) objet).casser(carte);
+                    } else if (objet instanceof BlocPiege) {
+                        ((BlocPiege) objet).toucher(carte, snoopy);
+                    }
+                }
+
                 break;
         }
     }

@@ -6,9 +6,6 @@ import java.awt.*;
  * Représente un bloc sur la carte
  */
 public class BlocPoussable extends Bloc implements Animation, Poussable {
-    // Constantes
-    private static final int MARGE = 8;
-
     // Attributs
     private boolean poussable = true;
 
