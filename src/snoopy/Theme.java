@@ -10,6 +10,10 @@ import java.util.Vector;
 
 public class Theme {
 
+    public static final int SOKOBAN = 1;
+    public static final int DRUCKER = 2;
+    public static final int SNOOPY = 3;
+
     private HashMap<Direction,ArrayList<Image>> perso = new HashMap<>();
     private ArrayList<Image> img_oiseau=new ArrayList<>();
     int num_theme=0;

@@ -64,10 +64,6 @@ public class Balle implements Animation, Affichable {
         }
 
         // Rebond sur les blocs
-        Case case_ = carte.getCase(
-                (x / Aire.LARG_IMG),
-                (y / Aire.LONG_IMG)
-        );
         Case case_suiv = carte.getCase(
                 ((x + dx) / Aire.LARG_IMG),
                 ((y + dy) / Aire.LONG_IMG)

@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 public class Aire extends JPanel implements KeyListener {
     // Constantes
     public static final int FPS = 60;      // Fréquence de rafraichissement de l'écran
-    public static final int LARG_IMG = 100; // Largeur de base (d'une case de la grille)
-    public static final int LONG_IMG = 100; // Longueur de base (d'une case de la grille)
+    public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
+    public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
 
     public static final int MARGE_X_CARTE = 0;
     public static final int MARGE_Y_CARTE = 25;
@@ -47,15 +47,13 @@ public class Aire extends JPanel implements KeyListener {
      * @param carte  carte à afficher
      * @param snoopy personnage à controller
      */
-    public Aire(Carte carte, Snoopy snoopy) {
+    public Aire(Carte carte, Snoopy snoopy, Theme theme) {
         this.carte = carte;
         this.snoopy = snoopy;
-
-        //Creation du theme
-        theme = new Theme(1);
-
+        this.theme = theme;
 
         // Paramètres
+        setDoubleBuffered(true);
         setMinimumSize(new Dimension(carte.getTx() * LARG_IMG + 1, carte.getTy() * LONG_IMG + MARGE_Y_CARTE + 38));
         addKeyListener(this);
 
@@ -68,9 +66,6 @@ public class Aire extends JPanel implements KeyListener {
         // Chargement des images
         coeur_plein = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur1.png");
         coeur_vide = Toolkit.getDefaultToolkit().getImage("images/theme/"+theme.getNumTheme()+"/coeur/coeur0.png");
-
-        theme = new Theme(3);
-
     }
 
     // Méthodes
@@ -130,21 +125,23 @@ public class Aire extends JPanel implements KeyListener {
         repaint();
     }
     
-   //Décompte de 60 secondes
-   public void clock() {
-	   //Chaque seconde il change l'état d'une variable de Air
-	   if(timer==0) {
-		   //Si on arrive à 0, Snoopy perd une vie 
-		   snoopy.tuer();
-		   timer=60;
-		   
-	   }
-	   else if(timer<=60) 
-		   timer--;
-	   
+    // Décompte de 60 secondes
+    public void clock() {
+       //Chaque seconde il change l'état d'une variable de Air
+       if(timer==0) {
+           //Si on arrive à 0, Snoopy perd une vie
+           snoopy.tuer();
+           timer=60;
 
-   }
-    
+       }
+       else if(timer<=60)
+           timer--;
+    }
+
+    public void stop() {
+        scheduler.shutdown();
+    }
+
     /**
      * Affichage de la grille
      */
@@ -188,18 +185,11 @@ public class Aire extends JPanel implements KeyListener {
         for (int i = 0; i < snoopy.getOiseaux(); ++i) {
             int num_anim=0;
 
-
             float a=(etat*theme.getNbImgOiseau()/Aire.FPS);
             num_anim = (int) Math.floor(a) % theme.getNbImgOiseau();
 
 
             g2d.drawImage(theme.getOiseauImg(num_anim), i*25+10, 3, 20, 20, null);
-
-
-/*
-            g2d.setColor(Color.blue);
-            g2d.fillOval(i*20+5, 5, 15, 15);
-*/
         }
         
         //Affichage de l'horloge

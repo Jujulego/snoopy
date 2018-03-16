@@ -118,21 +118,6 @@ public class Carte implements Affichable {
             return null;
         }
     }
-
-    public LinkedList<Animation> objetsAnimes() { 
-        LinkedList<Animation> animations = new LinkedList<>(); 
-        for (Case[] ligne : cases) { 
-            for (Case case_ : ligne) { 
-                for (Objet objet : case_.listeObjets()) { 
-                    if (objet instanceof Animation) { 
-                        animations.add((Animation) objet); 
-                    } 
-                } 
-            } 
-        } 
- 
-        return animations; 
-    } 
  
     // Accesseurs
     public int getTx() {

@@ -9,8 +9,11 @@ public class Main {
 
     // Main
     public static void main(String[] args) {
+        // Menu !!!
+        Fenetre fenetre = new Fenetre();
+
         // Init
-        Carte carte = new Carte(5, 5);
+        /*Carte carte = new Carte(5, 5);
 
         Snoopy snoopy = new Snoopy(2, 2);
         carte.ajouter(snoopy);
@@ -80,6 +83,6 @@ public class Main {
                         break;
                 }
             }
-        }
+        }*/
     }
 }
