@@ -17,15 +17,15 @@ public class Carte implements Affichable {
 
     // Constructeur
     public Carte(int tx, int ty) {
-        // Cr�ation de la matrice
+        // Création de la matrice
         this.cases = new Case[ty][tx];
         this.tx = tx;
         this.ty = ty;
 
-        // Cr�ation des cases
+        // Création des cases
         for (int i = 0; i < ty; ++i) {
             for (int j = 0; j < tx; ++j) {
-                cases[i][j] = new Case();
+                cases[i][j] = new Case(j, i);
             }
         }
     }

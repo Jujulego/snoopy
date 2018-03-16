@@ -9,7 +9,16 @@ import java.util.NoSuchElementException;
  */
 public class Case implements Affichable {
     // Attributs
+    private int x;
+    private int y;
+
     private LinkedList<Objet> objets = new LinkedList<>();
+
+    // Constructeur
+    public Case(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 
     // Méthodes
     @Override

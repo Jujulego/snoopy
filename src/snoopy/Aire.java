@@ -60,8 +60,7 @@ public class Aire extends JPanel implements KeyListener {
         // Scheduler
         animations.addAll(carte.objetsAnimes());
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/FPS, TimeUnit.MILLISECONDS);
-        
-        scheduler.scheduleAtFixedRate(this::clock, 0, 1000, TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(this::clock, 0, 1, TimeUnit.SECONDS);
         
         // Chargement des images
         coeur_plein = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur1.png");
@@ -157,7 +156,7 @@ public class Aire extends JPanel implements KeyListener {
 
         // Balles
         for (Balle balle : balles) {
-            balle.afficher(g2d,theme,  MARGE_X_CARTE, MARGE_Y_CARTE);
+            balle.afficher(g2d, theme, MARGE_X_CARTE, MARGE_Y_CARTE);
 
             // Touche ?
             if (!balle.estAuBord(5)) {
@@ -198,7 +197,6 @@ public class Aire extends JPanel implements KeyListener {
 		
 		timerString = String.valueOf(timer);
 		g2d.drawString(timerString, LARG_IMG*2, 20);
-
     }
 
     @Override

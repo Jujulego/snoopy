@@ -16,7 +16,7 @@ public class Theme {
 
     private HashMap<Direction,ArrayList<Image>> perso = new HashMap<>();
     private ArrayList<Image> img_oiseau=new ArrayList<>();
-    int num_theme=0;
+    private int num_theme=0;
 
     //1er= direction: 0=haut   1=bas,   2=gauche,   3=droite;
 
@@ -64,11 +64,7 @@ public class Theme {
             img_oiseau.add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/oizo/anim"+z+".png"));
             z++;
         }
-
     }
-
-
-
 
     public Image getPersoImg(Direction direction, int num_anim)
     {
@@ -93,5 +89,18 @@ public class Theme {
         return num_theme;
     }
 
+    public String getNomTheme() {
+        switch (num_theme) {
+            case SOKOBAN:
+                return "Sokoban";
 
+            case DRUCKER:
+                return "Drucker";
+
+            case SNOOPY:
+                return "Snoopy";
+        }
+
+        return "";
+    }
 }

@@ -11,7 +11,7 @@ public class Fenetre extends JFrame {
 
     // Attributs
     private Etat etat = null;
-    private Menu menu = null;
+    private Menu menu;
     private Aire aire = null;
     private Theme theme = new Theme(Theme.SNOOPY);
 
@@ -27,6 +27,8 @@ public class Fenetre extends JFrame {
         menu.getBtnJouer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
 
         retourMenu();
+
+        menu.addChgThemeListener((Theme theme) -> this.theme = theme);
     }
 
     // Méthodes
@@ -43,12 +45,19 @@ public class Fenetre extends JFrame {
         // Ajout du menu
         setContentPane(menu);
         setMinimumSize(menu.getMinimumSize());
+        setSize(menu.getMinimumSize());
+
+        menu.lancer();
+        menu.requestFocus();
     }
 
     public void lancerJeu() {
         // Gardien
         if (etat == Etat.JEU) return;
         etat = Etat.JEU;
+
+        // Arrêt du menu
+        menu.stop();
 
         // Création de la carte
         Carte carte = new Carte(5, 5);
@@ -76,6 +85,5 @@ public class Fenetre extends JFrame {
         setMinimumSize(aire.getMinimumSize());
         setSize(aire.getMinimumSize());
         aire.requestFocus();
-        repaint();
     }
 }
