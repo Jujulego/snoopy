@@ -18,7 +18,7 @@ public class Theme {
     private ArrayList<Image> img_oiseau=new ArrayList<>();
     private int num_theme=0;
     private ArrayList<Image> img_bloc=new ArrayList<>();
-
+    //bloc 0 =case vide     1=pégé    2=poussable
 
     //1er= direction: 0=haut   1=bas,   2=gauche,   3=droite;
 
@@ -68,6 +68,15 @@ public class Theme {
             img_oiseau.add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/oizo/anim"+z+".png"));
             z++;
         }
+
+        z=0;
+        ///////////////////Chargement des blocs
+        while(  new File("images/theme"+num_theme+"/bloc/bloc"+z+".png").exists()  )
+        {
+            img_bloc.add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/bloc/bloc"+z+".png"));
+            z++;
+        }
+
     }
 
     public Image getPersoImg(Direction direction, int num_anim)
@@ -80,9 +89,9 @@ public class Theme {
     }
 
 
-    public Image getBlocImg()
+    public Image getBlocImg(int num_bloc)
     {
-        return img_bloc.get(0);
+        return img_bloc.get(num_bloc);
     }
 
 

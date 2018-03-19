@@ -225,13 +225,11 @@ public class Aire extends JPanel implements KeyListener {
 
             case KeyEvent.VK_LEFT:  // GAUCHE
                 snoopy.deplacer(carte, -1, 0);
-                theme=new Theme(1);
 
                 break;
 
             case KeyEvent.VK_RIGHT: // DROITE
                 snoopy.deplacer(carte, 1, 0);
-                theme=new Theme(2);
                 break;
 
             case KeyEvent.VK_A: // Attaque !!!
