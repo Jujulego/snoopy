@@ -46,7 +46,6 @@ public class Case implements Affichable, Animation {
 
 
 
-
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affiche uniqement l'objet avec l'indice z le plus grand
@@ -57,6 +56,14 @@ public class Case implements Affichable, Animation {
 
         g2d.drawImage(theme.getBlocImg(0), bx+x*Aire.LARG_IMG, by+y*Aire.LONG_IMG, Aire.LARG_IMG, Aire.LONG_IMG, null);
 
+        if (objets.size() != 0) {
+            objets.getFirst().afficher(g2d, theme, bx, by);
+        }
+
+    }
+
+    public void afficher_obj(Graphics2D g2d, Theme theme, int bx, int by) {
+        // Affiche uniqement l'objet avec l'indice z le plus grand
         if (objets.size() != 0) {
             objets.getFirst().afficher(g2d, theme, bx, by);
         }
