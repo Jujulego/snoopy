@@ -64,7 +64,9 @@ public class Aire extends JPanel implements KeyListener {
         
         // Chargement des images
         coeur_plein = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur1.png");
-        coeur_vide = Toolkit.getDefaultToolkit().getImage("images/theme/"+theme.getNumTheme()+"/coeur/coeur0.png");
+        coeur_vide = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur0.png");
+
+
     }
 
     // Méthodes
@@ -223,10 +225,13 @@ public class Aire extends JPanel implements KeyListener {
 
             case KeyEvent.VK_LEFT:  // GAUCHE
                 snoopy.deplacer(carte, -1, 0);
+                theme=new Theme(1);
+
                 break;
 
             case KeyEvent.VK_RIGHT: // DROITE
                 snoopy.deplacer(carte, 1, 0);
+                theme=new Theme(2);
                 break;
 
             case KeyEvent.VK_A: // Attaque !!!

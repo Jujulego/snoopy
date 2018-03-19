@@ -7,12 +7,13 @@ import java.util.NoSuchElementException;
 /**
  * Gestion d'une case. Permet la présence de plusieurs objets au même endroit
  */
-public class Case implements Affichable {
+public class Case implements Affichable, Animation {
     // Attributs
     private int x;
     private int y;
 
     private LinkedList<Objet> objets = new LinkedList<>();
+    private double etat = 1.0;
 
     // Constructeur
     public Case(int x, int y) {
@@ -31,12 +32,38 @@ public class Case implements Affichable {
         }
     }
 
+    // Méthodes
+    @Override
+    public void animer(Carte carte) {
+        etat++;
+        etat%=60;
+    }
+
+    @Override
+    public boolean animation() {
+        return true;
+    }
+
+
+
+
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affiche uniqement l'objet avec l'indice z le plus grand
+        int num_anim=0;
+
+        /*if (animation()) {
+            num_anim = (int) Math.floor(etat * 10) % theme.getNbImgBloc();
+        }*/
+
+        //g2d.drawImage(theme.getBlocImg(num_anim), bx, by, Aire.LARG_IMG, Aire.LONG_IMG, null);
+
+        g2d.drawImage(theme.getBlocImg(), bx, by, Aire.LARG_IMG, Aire.LONG_IMG, null);
+
         if (objets.size() != 0) {
             objets.getFirst().afficher(g2d, theme, bx, by);
         }
+
     }
 
     /**

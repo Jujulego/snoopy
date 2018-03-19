@@ -16,11 +16,14 @@ public class BlocPiege extends Bloc {
 
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
+
+
         g2d.setColor(new Color(0xFF991D));
         g2d.fillRect(
                 bx + getX() * Aire.LARG_IMG + MARGE, by + getY() * Aire.LONG_IMG + MARGE,
                 Aire.LARG_IMG - 2 * MARGE, Aire.LONG_IMG - 2 * MARGE
         );
+
     }
 
     public void toucher(Carte carte, Snoopy snoopy) {

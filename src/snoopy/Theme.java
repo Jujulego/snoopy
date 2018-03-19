@@ -17,6 +17,8 @@ public class Theme {
     private HashMap<Direction,ArrayList<Image>> perso = new HashMap<>();
     private ArrayList<Image> img_oiseau=new ArrayList<>();
     private int num_theme=0;
+    private ArrayList<Image> img_bloc=new ArrayList<>();
+
 
     //1er= direction: 0=haut   1=bas,   2=gauche,   3=droite;
 
@@ -51,6 +53,7 @@ public class Theme {
             z++;
         }
         z=0;
+
         while(  new File("images/theme"+num_theme+"/perso3/anim"+z+".png").exists()  )
         {
             perso.get(Direction.DROITE).add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/perso3/anim"+z+".png"));
@@ -58,6 +61,7 @@ public class Theme {
             z++;
         }
         z=0;
+
         ///////////////////Chargement des oiseaux
         while(  new File("images/theme"+num_theme+"/oizo/anim"+z+".png").exists()  )
         {
@@ -76,12 +80,23 @@ public class Theme {
     }
 
 
+    public Image getBlocImg()
+    {
+        return img_bloc.get(0);
+    }
+
+
+
     public int getNbImgPerso(Direction direction) {
         return perso.get(direction).size();
     }
     public int getNbImgOiseau()
     {
         return img_oiseau.size();
+    }
+
+    public int getNbImgBloc() {
+        return img_bloc.size();
     }
 
     public int getNumTheme()
