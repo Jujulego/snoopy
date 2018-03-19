@@ -10,9 +10,10 @@ import java.util.concurrent.TimeUnit;
 
 public class Menu extends JPanel {
     // Attributs
-    private int perso_x = 400;
-    private int perso_y = 100;
-    private int num_anim;
+    private int perso_x = -130;
+    private int oiseau_x = -50;
+    private int numAnimPerso;
+    private int numAnimOiseau;
     private Theme theme;
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
@@ -83,7 +84,8 @@ public class Menu extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Snoopy !
-        g2d.drawImage(theme.getPersoImg(Direction.GAUCHE, num_anim), perso_x, perso_y, null);
+        g2d.drawImage(theme.getPersoImg(Direction.DROITE, numAnimPerso), perso_x, 100, 50, 50, null);
+        g2d.drawImage(theme.getOiseauImg(numAnimOiseau), oiseau_x,  100, 50, 50, null);
 
         // Titre
         g2d.setFont(new Font ("Plain", Font.BOLD,50));
@@ -96,12 +98,18 @@ public class Menu extends JPanel {
     }
 
     private synchronized void animer() {
-        perso_x -= 2;
-        if (perso_x <= -50) {
-            perso_x = 400;
+        perso_x += 2;
+        if (perso_x > 480) {
+            perso_x = -50;
         }
 
-        num_anim = (num_anim + 1) % theme.getNbImgPerso(Direction.GAUCHE);
+        oiseau_x += 2;
+        if (oiseau_x > 400) {
+            oiseau_x = -130;
+        }
+
+        numAnimPerso = (numAnimPerso + 1) % theme.getNbImgPerso(Direction.DROITE);
+        numAnimOiseau = (numAnimOiseau + 1) % theme.getNbImgOiseau();
 
         repaint();
     }
@@ -125,7 +133,8 @@ public class Menu extends JPanel {
 
         theme = new Theme(num);
         lblTheme.setText(theme.getNomTheme());
-        num_anim = 0;
+        numAnimPerso = 0;
+        numAnimOiseau = 0;
 
         for (ChgThemeListener listener : listeners) {
             listener.chgTheme(theme);
