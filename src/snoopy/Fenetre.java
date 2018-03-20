@@ -6,13 +6,14 @@ import java.awt.event.ActionEvent;
 public class Fenetre extends JFrame implements Aire.FinListener {
     // Enumération
     private enum Etat {
-        MENU, JEU, PERDU
+        MENU, JEU, PERDU, VICTOIRE
     }
 
     // Attributs
     private Etat etat = null;
     private Menu menu;
     private Perdu perdu;
+    private Victoire victoire;
     private Aire aire = null;
     private Theme theme = new Theme(Theme.SNOOPY);
 
@@ -29,13 +30,22 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 
         retourMenu();
 
-        menu.addChgThemeListener((Theme theme) -> this.theme = theme);
+        menu.addChgThemeListener((Theme theme) -> {
+            this.theme = theme;
+            perdu.setTheme(theme);
+        });
 
         // Setup perdu
-        perdu = new Perdu();
+        perdu = new Perdu(theme);
 
         perdu.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
         perdu.getBtnRecommencer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
+
+        // Setup victoire
+        victoire = new Victoire();
+
+        victoire.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
+        //victoire.getBtnContinuer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
     }
 
     // Méthodes
@@ -65,6 +75,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 
         // Arrêt du menu
         menu.stop();
+        perdu.stop();
 
         // Création de la carte
         Carte carte = new Carte(5, 5);
@@ -85,7 +96,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         aire = new Aire(carte, snoopy, theme);
         aire.ajouterBalle(new Balle(
                 (int) (2.5 * Aire.LARG_IMG), (int) (0.5 * Aire.LONG_IMG),
-                -2, 2
+                -4, 4
         ));
         aire.ajouterFinListener(this);
 
@@ -97,9 +108,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 
     @Override
     public void perdu() {
-        if (etat == Etat.PERDU) {
-            return;
-        }
+        if (etat == Etat.PERDU) return;
         etat = Etat.PERDU;
 
         // Arrêt de l'aire
@@ -107,15 +116,29 @@ public class Fenetre extends JFrame implements Aire.FinListener {
             aire.stop();
         }
 
-        //
+        // Perdu !!!!
         setContentPane(perdu);
         setMinimumSize(perdu.getMinimumSize());
         setSize(perdu.getMinimumSize());
         perdu.requestFocus();
+
+        perdu.lancer();
     }
 
     @Override
     public void gagne() {
-        retourMenu();
+        if (etat == Etat.VICTOIRE) return;
+        etat = Etat.VICTOIRE;
+
+        // Arrêt de l'aire
+        if (aire != null) {
+            aire.stop();
+        }
+
+        // Victoire !!!!
+        setContentPane(victoire);
+        setMinimumSize(victoire.getMinimumSize());
+        setSize(victoire.getMinimumSize());
+        victoire.requestFocus();
     }
 }
