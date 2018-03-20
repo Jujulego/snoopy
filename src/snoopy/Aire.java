@@ -36,6 +36,7 @@ public class Aire extends JPanel implements KeyListener {
     private String timerString;
     
     // - animation
+    private boolean pause = false;
     private LinkedList<Balle> balles = new LinkedList<>();
     private LinkedList<Animation> animations = new LinkedList<>();
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
@@ -65,8 +66,6 @@ public class Aire extends JPanel implements KeyListener {
         // Chargement des images
         coeur_plein = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur1.png");
         coeur_vide = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur0.png");
-
-
     }
 
     // Méthodes
@@ -115,12 +114,14 @@ public class Aire extends JPanel implements KeyListener {
      */
     private void animer() {
         // Evolution des animation
-        for (Animation a : animations) {
-            a.animer(carte);
-        }
+        if (!pause) {
+            for (Animation a : animations) {
+                a.animer(carte);
+            }
 
-        etat++;
-        etat%=60;
+            etat++;
+            etat %= 60;
+        }
 
         // Rafraichissement de l'ecran
         repaint();
@@ -128,15 +129,15 @@ public class Aire extends JPanel implements KeyListener {
     
     // Décompte de 60 secondes
     public void clock() {
-       //Chaque seconde il change l'état d'une variable de Air
-       if(timer==0) {
-           //Si on arrive à 0, Snoopy perd une vie
-           snoopy.tuer();
-           timer=60;
-
-       }
-       else if(timer<=60)
-           timer--;
+        if (!pause) {
+            // Chaque seconde il change l'état d'une variable de Air
+            if (timer == 0) {
+                //Si on arrive à 0, Snoopy perd une vie
+                snoopy.tuer();
+                timer = 60;
+            } else if (timer <= 60)
+                timer--;
+        }
     }
 
     public void stop() {
@@ -201,6 +202,10 @@ public class Aire extends JPanel implements KeyListener {
 		g2d.drawString(timerString, LARG_IMG*2, 20);
     }
 
+    public void setTheme(Theme theme) {
+        this.theme = theme;
+    }
+
     @Override
     public void keyTyped(KeyEvent keyEvent) {
         // Ignoré
@@ -216,24 +221,23 @@ public class Aire extends JPanel implements KeyListener {
         // Lancement d'une animation de déplacement
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.VK_UP:    // HAUT
-                snoopy.deplacer(carte, 0, -1);
+                if (!pause) snoopy.deplacer(carte, 0, -1);
                 break;
 
             case KeyEvent.VK_DOWN:  // BAS
-                snoopy.deplacer(carte, 0, 1);
+                if (!pause) snoopy.deplacer(carte, 0, 1);
                 break;
 
             case KeyEvent.VK_LEFT:  // GAUCHE
-                snoopy.deplacer(carte, -1, 0);
-
+                if (!pause) snoopy.deplacer(carte, -1, 0);
                 break;
 
             case KeyEvent.VK_RIGHT: // DROITE
-                snoopy.deplacer(carte, 1, 0);
+                if (!pause) snoopy.deplacer(carte, 1, 0);
                 break;
 
             case KeyEvent.VK_A: // Attaque !!!
-                if (snoopy.getVies() == 0) {
+                if (pause || snoopy.getVies() == 0) {
                     break;
                 }
 
@@ -253,12 +257,11 @@ public class Aire extends JPanel implements KeyListener {
                 }
 
                 break;
-        }
-    }
 
-    public void SetTheme(int a)
-    {
-        theme = new Theme (a);
+            case KeyEvent.VK_P:
+                pause = !pause;
+                break;
+        }
     }
 
     @Override

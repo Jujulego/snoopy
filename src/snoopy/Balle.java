@@ -64,19 +64,38 @@ public class Balle implements Animation, Affichable {
         }
 
         // Rebond sur les blocs
+        boolean rebond_x = false, rebond_y = false;
         Case case_suiv = carte.getCase(
-                ((x + dx) / Aire.LARG_IMG),
-                ((y + dy) / Aire.LONG_IMG)
+                ((x + (dx * RAYON)/Math.abs(dx)) / Aire.LARG_IMG),
+                y / Aire.LONG_IMG
         );
-
         if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
-            if (x / Aire.LARG_IMG != (x + dx) / Aire.LARG_IMG) {
-                dx *= -1;
-            }
+            rebond_x = true;
+        }
 
-            if (y / Aire.LONG_IMG != (y + dy) / Aire.LONG_IMG) {
-                dy *= -1;
-            }
+        case_suiv = carte.getCase(
+                x / Aire.LARG_IMG,
+                ((y + (dy * RAYON)/Math.abs(dy)) / Aire.LONG_IMG)
+        );
+        if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
+            rebond_y = true;
+        }
+
+        case_suiv = carte.getCase(
+                ((x + (dx * RAYON)/Math.abs(dx)) / Aire.LARG_IMG),
+                ((y + (dy * RAYON)/Math.abs(dy)) / Aire.LONG_IMG)
+        );
+        if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
+            rebond_x = true;
+            rebond_y = true;
+        }
+
+        if (rebond_x && x / Aire.LARG_IMG != (x + dx) / Aire.LARG_IMG) {
+            dx *= -1;
+        }
+
+        if (rebond_y && y / Aire.LONG_IMG != (y + dy) / Aire.LONG_IMG) {
+            dy *= -1;
         }
     }
 
