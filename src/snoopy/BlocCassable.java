@@ -9,8 +9,7 @@ public class BlocCassable extends Bloc implements Animation {
     }
     private boolean anim=false;
     private int num_anim=0;
-    private int prec_anim=0;
-    private double etat=1.0;
+    private double prec_anim=0;
 
     // Méthodes
     @Override
@@ -21,13 +20,20 @@ public class BlocCassable extends Bloc implements Animation {
 
     @Override
     public void animer(Carte carte, Theme theme) {
-        if(num_anim==theme.getNbImageAnimBloc())anim=false;
-        else
-        {
-            //prec_anim=
-           // num_anim = (int)
-        }
+        if (anim) {
+            System.out.println(anim);
+            prec_anim += 0.7;
 
+            if (prec_anim >= 1) {
+                num_anim++;
+                prec_anim = 0.0;
+            }
+
+            if (num_anim >= theme.getNbImageAnimBloc()) {
+                anim = false;
+                carte.enlever(this);
+            }
+        }
     }
 
     @Override
@@ -44,20 +50,17 @@ public class BlocCassable extends Bloc implements Animation {
                 Aire.LARG_IMG - 2 * MARGE, Aire.LONG_IMG - 2 * MARGE
         );*/
 
-        if(animation())
-        {
+        if (anim) {
+            System.out.println(num_anim);
             g2d.drawImage(theme.getAnimBlocImg(num_anim),bx + getX() * Aire.LARG_IMG , by + getY() * Aire.LONG_IMG , Aire.LARG_IMG, Aire.LONG_IMG, null);
-        }
-        else
-        {
+        } else {
             g2d.drawImage(theme.getBlocImg(0),bx + getX() * Aire.LARG_IMG , by + getY() * Aire.LONG_IMG , Aire.LARG_IMG, Aire.LONG_IMG, null);
         }
 
     }
 
     public void casser(Carte carte) {
-        carte.enlever(this);
-        anim=true;
-
+        anim = true;
+        num_anim = 0;
     }
 }

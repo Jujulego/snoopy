@@ -256,11 +256,6 @@ public class Aire extends JPanel implements KeyListener {
         }
     }
 
-    public void SetTheme(int a)
-    {
-        theme = new Theme (a);
-    }
-
     @Override
     public void keyReleased(KeyEvent keyEvent) {
         // Ignoré
