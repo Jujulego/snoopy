@@ -24,8 +24,6 @@ public class BlocPiege extends Bloc {
                 Aire.LARG_IMG - 2 * MARGE, Aire.LONG_IMG - 2 * MARGE
         );*/
         g2d.drawImage(theme.getBlocImg(1),bx + getX() * Aire.LARG_IMG , by + getY() * Aire.LONG_IMG , Aire.LARG_IMG, Aire.LONG_IMG, null);
-
-
     }
 
     public void toucher(Carte carte, Snoopy snoopy) {

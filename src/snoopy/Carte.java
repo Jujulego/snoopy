@@ -15,6 +15,8 @@ public class Carte implements Affichable {
     private int tx;
     private int ty;
 
+    private int nbOiseaux = 0;
+
     // Constructeur
     public Carte(int tx, int ty) {
         // Création de la matrice
@@ -82,6 +84,10 @@ public class Carte implements Affichable {
      */
     public void ajouter(Objet obj) {
         cases[obj.getY()][obj.getX()].ajouter(obj);
+
+        if (obj instanceof Oiseau) {
+            ++nbOiseaux;
+        }
     }
 
     /**
@@ -125,5 +131,9 @@ public class Carte implements Affichable {
     }
     public int getTy() {
         return ty;
+    }
+
+    public int getNbOiseaux() {
+        return nbOiseaux;
     }
 }

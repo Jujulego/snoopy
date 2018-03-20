@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -43,7 +44,8 @@ public class Aire extends JPanel implements KeyListener {
     private LinkedList<Animation> animations = new LinkedList<>();
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
-    public int etat = 1;
+    private int etat = 0;
+    private ArrayList<FinListener> listeners = new ArrayList<>();
 
     // Constructeur
     public Aire(Carte carte, Snoopy snoopy, Theme theme) {
@@ -79,6 +81,10 @@ public class Aire extends JPanel implements KeyListener {
     public void ajouterBalle(Balle balle) {
         animations.add(balle);
         balles.add(balle);
+    }
+
+    public void ajouterFinListener(FinListener listener) {
+        listeners.add(listener);
     }
 
     public static int ajouterDirX(int x, Direction direction) {
@@ -123,11 +129,29 @@ public class Aire extends JPanel implements KeyListener {
         // Evolution des animation
         if (!pause) {
             for (Animation a : animations) {
-                a.animer(carte);
+                if (a.animation()) a.animer(carte);
             }
 
             etat++;
             etat %= 60;
+
+            // Touche ?
+            for (Balle balle : balles) {
+                if (!balle.estAuBord(5)) {
+                    if (pointDedans(snoopy, balle)) {
+
+                        if (!balle.getTouche()) {
+                            balle.setTouche(true);
+
+                            // On tue snoopy
+                            snoopy.tuer();
+                            tuer();
+                        }
+                    } else if (balle.getTouche()) {
+                        balle.setTouche(false);
+                    }
+                }
+            }
         }
 
         // Rafraichissement de l'ecran
@@ -141,6 +165,8 @@ public class Aire extends JPanel implements KeyListener {
             if (timer == 0) {
                 //Si on arrive à 0, Snoopy perd une vie
                 snoopy.tuer();
+                tuer();
+
                 timer = 60;
             } else if (timer <= 60) {
                 timer--;
@@ -150,6 +176,24 @@ public class Aire extends JPanel implements KeyListener {
 
     public void stop() {
         scheduler.shutdown();
+    }
+
+    private void tuer() {
+        // Fin du jeu ?
+        if (snoopy.getVies() == 0) {
+            for (FinListener listener : listeners) {
+                listener.perdu();
+            }
+        }
+    }
+
+    private void fin() {
+        // Fin du jeu ?
+        if (snoopy.getOiseaux() == carte.getNbOiseaux()) {
+            for (FinListener listener : listeners) {
+                listener.gagne();
+            }
+        }
     }
 
     /**
@@ -168,19 +212,6 @@ public class Aire extends JPanel implements KeyListener {
         // Balles
         for (Balle balle : balles) {
             balle.afficher(g2d, theme, MARGE_X_CARTE, MARGE_Y_CARTE);
-
-            // Touche ?
-            if (!balle.estAuBord(5)) {
-                if (pointDedans(snoopy, balle)) {
-
-                    if (!balle.getTouche()) {
-                        balle.setTouche(true);
-                        snoopy.tuer();
-                    }
-                } else if (balle.getTouche()) {
-                    balle.setTouche(false);
-                }
-            }
         }
 
         // Coeurs
@@ -193,10 +224,8 @@ public class Aire extends JPanel implements KeyListener {
 
         // Oiseaux gagnés
         for (int i = 0; i < snoopy.getOiseaux(); ++i) {
-            int num_anim=0;
-
-            float a=(etat*theme.getNbImgOiseau()/Aire.FPS);
-            num_anim = (int) Math.floor(a) % theme.getNbImgOiseau();
+            float a = (etat*theme.getNbImgOiseau()/Aire.FPS);
+            int num_anim = (int) Math.floor(a) % theme.getNbImgOiseau();
 
 
             g2d.drawImage(theme.getOiseauImg(num_anim), i*25+10, 3, 20, 20, null);
@@ -241,19 +270,35 @@ public class Aire extends JPanel implements KeyListener {
         // Lancement d'une animation de déplacement
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.VK_UP:    // HAUT
-                if (!pause) snoopy.deplacer(carte, 0, -1);
+                if (!pause) {
+                    snoopy.deplacer(carte, 0, -1);
+                    tuer();
+                    fin();
+                }
                 break;
 
             case KeyEvent.VK_DOWN:  // BAS
-                if (!pause) snoopy.deplacer(carte, 0, 1);
+                if (!pause) {
+                    snoopy.deplacer(carte, 0, 1);
+                    tuer();
+                    fin();
+                }
                 break;
 
             case KeyEvent.VK_LEFT:  // GAUCHE
-                if (!pause) snoopy.deplacer(carte, -1, 0);
+                if (!pause) {
+                    snoopy.deplacer(carte, -1, 0);
+                    tuer();
+                    fin();
+                }
                 break;
 
             case KeyEvent.VK_RIGHT: // DROITE
-                if (!pause) snoopy.deplacer(carte, 1, 0);
+                if (!pause) {
+                    snoopy.deplacer(carte, 1, 0);
+                    tuer();
+                    fin();
+                }
                 break;
 
             case KeyEvent.VK_A: // Attaque !!!
@@ -273,6 +318,7 @@ public class Aire extends JPanel implements KeyListener {
                         ((BlocCassable) objet).casser(carte);
                     } else if (objet instanceof BlocPiege) {
                         ((BlocPiege) objet).toucher(carte, snoopy);
+                        tuer();
                     }
                 }
 
@@ -287,5 +333,11 @@ public class Aire extends JPanel implements KeyListener {
     @Override
     public void keyReleased(KeyEvent keyEvent) {
         // Ignoré
+    }
+
+    // Listenner
+    public interface FinListener {
+        void perdu();
+        void gagne();
     }
 }

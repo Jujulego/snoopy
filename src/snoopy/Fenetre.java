@@ -3,15 +3,16 @@ package snoopy;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-public class Fenetre extends JFrame {
+public class Fenetre extends JFrame implements Aire.FinListener {
     // Enumération
     private enum Etat {
-        MENU, JEU
+        MENU, JEU, PERDU
     }
 
     // Attributs
     private Etat etat = null;
     private Menu menu;
+    private Perdu perdu;
     private Aire aire = null;
     private Theme theme = new Theme(Theme.SNOOPY);
 
@@ -29,6 +30,12 @@ public class Fenetre extends JFrame {
         retourMenu();
 
         menu.addChgThemeListener((Theme theme) -> this.theme = theme);
+
+        // Setup perdu
+        perdu = new Perdu();
+
+        perdu.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
+        perdu.getBtnRecommencer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
     }
 
     // Méthodes
@@ -80,10 +87,35 @@ public class Fenetre extends JFrame {
                 (int) (2.5 * Aire.LARG_IMG), (int) (0.5 * Aire.LONG_IMG),
                 -2, 2
         ));
+        aire.ajouterFinListener(this);
 
         setContentPane(aire);
         setMinimumSize(aire.getMinimumSize());
         setSize(aire.getMinimumSize());
         aire.requestFocus();
+    }
+
+    @Override
+    public void perdu() {
+        if (etat == Etat.PERDU) {
+            return;
+        }
+        etat = Etat.PERDU;
+
+        // Arrêt de l'aire
+        if (aire != null) {
+            aire.stop();
+        }
+
+        //
+        setContentPane(perdu);
+        setMinimumSize(perdu.getMinimumSize());
+        setSize(perdu.getMinimumSize());
+        perdu.requestFocus();
+    }
+
+    @Override
+    public void gagne() {
+        retourMenu();
     }
 }

@@ -116,7 +116,8 @@ public class Menu extends JPanel {
 
     public void lancer() {
         // Animation !
-        scheduler.scheduleAtFixedRate(this::animer, 0, 50, TimeUnit.MILLISECONDS);
+        scheduler = new ScheduledThreadPoolExecutor(1);
+        scheduler.scheduleAtFixedRate(this::animer, 0, 1000/30, TimeUnit.MILLISECONDS);
     }
 
     public void stop() {
