@@ -30,32 +30,39 @@ public class Aire extends JPanel implements KeyListener {
     private Image coeur_plein;
     private Image coeur_vide;
     private Theme theme;
-    
-    //Clock
-    private int timer=60;
+
+    private int base_score;
+
+    // - clock
+    private int timer = 60;
     private String timerString;
-    
+
     // - animation
     private boolean pause = false;
     private LinkedList<Balle> balles = new LinkedList<>();
     private LinkedList<Animation> animations = new LinkedList<>();
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
-    public int etat=1;
+    public int etat = 1;
 
     // Constructeur
+    public Aire(Carte carte, Snoopy snoopy, Theme theme) {
+        this(carte, snoopy, theme, 0);
+    }
+
     /**
      * @param carte  carte à afficher
      * @param snoopy personnage à controller
      */
-    public Aire(Carte carte, Snoopy snoopy, Theme theme) {
+    public Aire(Carte carte, Snoopy snoopy, Theme theme, int base_score) {
         this.carte = carte;
         this.snoopy = snoopy;
         this.theme = theme;
+        this.base_score = base_score;
 
         // Paramètres
         setDoubleBuffered(true);
-        setMinimumSize(new Dimension(carte.getTx() * LARG_IMG + 1, carte.getTy() * LONG_IMG + MARGE_Y_CARTE + 38));
+        setMinimumSize(new Dimension(carte.getTx() * LARG_IMG + 1, carte.getTy() * LONG_IMG + MARGE_Y_CARTE + 62));
         addKeyListener(this);
 
         // Scheduler
@@ -135,8 +142,9 @@ public class Aire extends JPanel implements KeyListener {
                 //Si on arrive à 0, Snoopy perd une vie
                 snoopy.tuer();
                 timer = 60;
-            } else if (timer <= 60)
+            } else if (timer <= 60) {
                 timer--;
+            }
         }
     }
 
@@ -194,16 +202,28 @@ public class Aire extends JPanel implements KeyListener {
             g2d.drawImage(theme.getOiseauImg(num_anim), i*25+10, 3, 20, 20, null);
         }
         
-        //Affichage de l'horloge
+        // Affichage de l'horloge
 		g2d.setColor(Color.black);
 		g2d.setFont(new Font ("Plain", Font.BOLD,LARG_IMG/3));
 		
 		timerString = String.valueOf(timer);
 		g2d.drawString(timerString, LARG_IMG*2, 20);
+
+		// Pause
+        if (pause) {
+            g2d.drawString("PAUSE", 5, getHeight()-5);
+        }
+
+        // Score
+        g2d.drawString(String.valueOf(getScore()), getWidth() - 50, getHeight() - 5);
     }
 
     public void setTheme(Theme theme) {
         this.theme = theme;
+    }
+
+    public int getScore() {
+        return base_score + (timer * 100);
     }
 
     @Override
