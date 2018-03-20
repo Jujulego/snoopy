@@ -116,7 +116,7 @@ public class Aire extends JPanel implements KeyListener {
     private void animer() {
         // Evolution des animation
         for (Animation a : animations) {
-            a.animer(carte);
+            a.animer(carte, theme );
         }
 
         etat++;

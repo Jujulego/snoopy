@@ -41,7 +41,7 @@ public class Balle implements Animation, Affichable {
     }
 
     @Override
-    public void animer(Carte carte) {
+    public void animer(Carte carte, Theme theme) {
         // Déplacement
         x += dx;
         y += dy;

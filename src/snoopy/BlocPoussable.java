@@ -35,7 +35,7 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
     }
 
     @Override
-    public synchronized void animer(Carte carte) {
+    public synchronized void animer(Carte carte, Theme theme) {
         if (etat < 1.0) {
             etat += 5.0/Aire.FPS;
 
@@ -57,7 +57,7 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
                 x + MARGE, y + MARGE,
                 Aire.LARG_IMG - 2*MARGE, Aire.LONG_IMG - 2*MARGE
         );*/
-        g2d.drawImage(theme.getBlocImg(2),x, y, Aire.LARG_IMG, Aire.LONG_IMG, null);
+        g2d.drawImage(theme.getBlocImg(1),x, y, Aire.LARG_IMG, Aire.LONG_IMG, null);
 
     }
 
