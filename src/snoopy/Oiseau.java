@@ -31,24 +31,14 @@ public class Oiseau extends Objet implements Animation {
 
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
-        int num_anim=0;
-
         float a=(etat*theme.getNbImgOiseau()/Aire.FPS);
-        num_anim = (int) Math.floor(a) % theme.getNbImgOiseau();
+        int num_anim = (int) Math.floor(a) % theme.getNbImgOiseau();
 
-
-        g2d.drawImage(theme.getOiseauImg(num_anim), bx + getX() * Aire.LARG_IMG, by + getY() * Aire.LONG_IMG, Aire.LARG_IMG, Aire.LONG_IMG, null);
-
-
-        /*
-
-        g2d.setColor(Color.blue);
-        g2d.fillOval(
-                bx + getX() * Aire.LARG_IMG + (Aire.LARG_IMG - 30)/2,
-                by + getY() * Aire.LONG_IMG + (Aire.LONG_IMG - 30)/2,
-                30, 30
+        g2d.drawImage(theme.getOiseauImg(num_anim),
+                bx + getX() * Aire.LARG_IMG, by + getY() * Aire.LONG_IMG,
+                Aire.LARG_IMG, Aire.LONG_IMG,
+                null
         );
-        */
     }
 
     @Override

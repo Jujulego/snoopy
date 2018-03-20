@@ -129,7 +129,7 @@ public class Aire extends JPanel implements KeyListener {
         // Evolution des animation
         if (!pause) {
             for (Animation a : animations) {
-                if (a.animation()) a.animer(carte);
+                if (a.animation()) a.animer(carte, theme);
             }
 
             etat++;
@@ -315,7 +315,7 @@ public class Aire extends JPanel implements KeyListener {
                     Objet objet = case_.getObjet();
 
                     if (objet instanceof BlocCassable) {
-                        ((BlocCassable) objet).casser(carte);
+                        ((BlocCassable) objet).casser();
                     } else if (objet instanceof BlocPiege) {
                         ((BlocPiege) objet).toucher(carte, snoopy);
                         tuer();

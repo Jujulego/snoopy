@@ -51,13 +51,11 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
     }
 
     private void dessiner(Graphics2D g2d, int x, int y, Theme theme) {
-        g2d.setColor(new Color(0x592901));
-        /*g2d.fillRect(
-                x + MARGE, y + MARGE,
-                Aire.LARG_IMG - 2*MARGE, Aire.LONG_IMG - 2*MARGE
-        );*/
-        g2d.drawImage(theme.getBlocImg(1),x, y, Aire.LARG_IMG, Aire.LONG_IMG, null);
-
+        g2d.drawImage(theme.getBlocImg(1),
+                x, y,
+                Aire.LARG_IMG, Aire.LONG_IMG,
+                null
+        );
     }
 
     @Override
