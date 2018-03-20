@@ -14,7 +14,7 @@ public class Oiseau extends Objet implements Animation {
 
     // Méthodes
     @Override
-    public void animer(Carte carte) {
+    public void animer(Carte carte, Theme theme) {
         etat++;
         etat%=60;
     }

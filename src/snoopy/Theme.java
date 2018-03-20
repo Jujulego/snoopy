@@ -17,10 +17,11 @@ public class Theme {
     private HashMap<Direction,ArrayList<Image>> perso = new HashMap<>();
     private ArrayList<Image> img_oiseau=new ArrayList<>();
     private int num_theme=0;
+    private ArrayList<Image> anim_bloc=new ArrayList<>();
     private ArrayList<Image> img_bloc=new ArrayList<>();
     //bloc 0 =case vide     1=pégé    2=poussable
 
-    //1er= direction: 0=haut   1=bas,   2=gauche,   3=droite;
+    private ArrayList<Image> img_case=new ArrayList<>();
 
 
 
@@ -62,18 +63,33 @@ public class Theme {
         }
         z=0;
 
-        ///////////////////Chargement des oiseaux
+        //Chargement des oiseaux
         while(  new File("images/theme"+num_theme+"/oizo/anim"+z+".png").exists()  )
         {
             img_oiseau.add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/oizo/anim"+z+".png"));
             z++;
         }
+        z=0;
+        //Chargement des cases
+        while(  new File("images/theme"+num_theme+"/case/case"+z+".png").exists()  )
+        {
+            img_case.add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/case/case"+z+".png"));
+            z++;
+        }
 
         z=0;
-        ///////////////////Chargement des blocs
-        while(  new File("images/theme"+num_theme+"/bloc/bloc"+z+".png").exists()  )
+        //Chargement des blocs
+        while(  new File("images/bloc/bloc"+z+".png").exists()  )
         {
-            img_bloc.add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/bloc/bloc"+z+".png"));
+            img_bloc.add(Toolkit.getDefaultToolkit().getImage("images/bloc/bloc"+z+".png"));
+            z++;
+        }
+
+        z=0;
+        //Chargement de la cinématique de destruction
+        while(  new File("images/anim_bloc/anim"+z+".png").exists()  )
+        {
+            anim_bloc.add(Toolkit.getDefaultToolkit().getImage("images/anim_bloc/anim"+z+".png"));
             z++;
         }
 
@@ -88,10 +104,19 @@ public class Theme {
         return img_oiseau.get(num_anim);
     }
 
-
     public Image getBlocImg(int num_bloc)
     {
         return img_bloc.get(num_bloc);
+    }
+
+    public Image getAnimBlocImg(int num_anim)
+    {
+        return anim_bloc.get(num_anim);
+    }
+
+    public Image getCaseImg(int num_anim)
+    {
+        return img_case.get(num_anim);
     }
 
 
@@ -103,9 +128,9 @@ public class Theme {
     {
         return img_oiseau.size();
     }
-
-    public int getNbImgBloc() {
-        return img_bloc.size();
+    public int getNbImageAnimBloc()
+    {
+        return anim_bloc.size();
     }
 
     public int getNumTheme()

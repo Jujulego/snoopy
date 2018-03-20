@@ -34,7 +34,7 @@ public class Case implements Affichable, Animation {
 
     // Méthodes
     @Override
-    public void animer(Carte carte) {
+    public void animer(Carte carte, Theme theme) {
         etat++;
         etat%=60;
     }
@@ -54,7 +54,7 @@ public class Case implements Affichable, Animation {
 
         //g2d.drawImage(theme.getBlocImg(num_anim), bx, by, Aire.LARG_IMG, Aire.LONG_IMG, null);
 
-        g2d.drawImage(theme.getBlocImg(0), bx+x*Aire.LARG_IMG, by+y*Aire.LONG_IMG, Aire.LARG_IMG, Aire.LONG_IMG, null);
+        g2d.drawImage(theme.getCaseImg(0), bx+x*Aire.LARG_IMG, by+y*Aire.LONG_IMG, Aire.LARG_IMG, Aire.LONG_IMG, null);
 
         if (objets.size() != 0) {
             objets.getFirst().afficher(g2d, theme, bx, by);

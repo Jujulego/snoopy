@@ -9,8 +9,9 @@ public interface Animation {
      * Ne permet pas de rafraichir l'affichage.
      * Appelée régulièrement.
      * @param carte
+     * @param theme
      */
-    void animer(Carte carte);
+    void animer(Carte carte, Theme theme);
 
     /**
      * Indique si une animation est en cours
