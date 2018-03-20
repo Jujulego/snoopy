@@ -76,6 +76,12 @@ public class Carte implements Affichable {
                 c.afficher(g2d, theme, bx, by);
             }
         }
+
+        for (Case[] ligne : cases) {
+            for (Case c : ligne) {
+                c.afficher_obj(g2d, theme, bx, by);
+            }
+        }
     }
 
     /**
