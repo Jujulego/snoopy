@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
 
 public class Perdu extends JPanel {
     // Attributs
-    private int y = 270;
-    private float dy = -8.5f;
-    private float ay = 0.2f;
+    private float y = 20.0f;
+    private float dy = 0.0f;
+    private final float ay = 0.2f;
 
     private Theme theme;
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
@@ -67,8 +67,8 @@ public class Perdu extends JPanel {
         g2d.drawString("PERDU", 100, 70);
 
         // Oiseaux
-        Image oiseau = theme.getOiseauImg((y/5) % theme.getNbImgOiseau());
-        g2d.drawImage(oiseau, 25, y, 50, 50, null);
+        Image oiseau = theme.getOiseauImg(((int) y/5) % theme.getNbImgOiseau());
+        g2d.drawImage(oiseau, 25, (int) y, 50, 50, null);
 
         // Calcul du symétrique
         BufferedImage boiseau = new BufferedImage(oiseau.getWidth(null), oiseau.getHeight(null), BufferedImage.TYPE_INT_ARGB);
@@ -78,7 +78,7 @@ public class Perdu extends JPanel {
         ty.translate(-oiseau.getWidth(null), 0);
         AffineTransformOp op = new AffineTransformOp(ty, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 
-        g2d.drawImage(op.filter(boiseau, null), 325, y, 50, 50, null);
+        g2d.drawImage(op.filter(boiseau, null), 325, (int) y, 50, 50, null);
     }
 
     private void animer() {
@@ -89,7 +89,7 @@ public class Perdu extends JPanel {
         // Rebonds
         if (y > getHeight() - 50) {
             y = getHeight() - 50;
-            dy = -8.5f;
+            dy = -dy;
         }
 
         repaint();

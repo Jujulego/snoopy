@@ -91,7 +91,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
 
         g2d.drawImage(theme.getPersoImg(direction, num_anim),
                 x, y,
-                Aire.LARG_IMG, Aire.LONG_IMG,
+                Moteur.LARG_IMG, Moteur.LONG_IMG,
                 null
         );
     }
@@ -115,7 +115,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         }
 
         // Affichage !
-        dessiner(g2d,theme, bx + (int) (x * Aire.LARG_IMG), by + (int) (y * Aire.LONG_IMG));
+        dessiner(g2d,theme, bx + (int) (x * Moteur.LARG_IMG), by + (int) (y * Moteur.LONG_IMG));
     }
 
     @Override

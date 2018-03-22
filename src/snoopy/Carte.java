@@ -63,11 +63,11 @@ public class Carte implements Affichable {
         // Grille
         g2d.setColor(Color.black);
         for (int i = 0; i <= tx; ++i) {
-            g2d.drawLine(bx + i * Aire.LARG_IMG, by, bx + i * Aire.LARG_IMG, by + ty * Aire.LONG_IMG);
+            g2d.drawLine(bx + i * Moteur.LARG_IMG, by, bx + i * Moteur.LARG_IMG, by + ty * Moteur.LONG_IMG);
         }
 
         for (int i = 0; i <= ty; ++i) {
-            g2d.drawLine(bx, by + i * Aire.LONG_IMG, bx + tx * Aire.LARG_IMG, by + i * Aire.LONG_IMG);
+            g2d.drawLine(bx, by + i * Moteur.LONG_IMG, bx + tx * Moteur.LARG_IMG, by + i * Moteur.LONG_IMG);
         }
 
         // Affichage des cases

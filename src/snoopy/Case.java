@@ -49,12 +49,11 @@ public class Case implements Affichable, Animation {
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affiche uniqement l'objet avec l'indice z le plus grand
-
-        //g2d.drawImage(theme.getBlocImg(0), bx, by, Aire.LARG_IMG, Aire.LONG_IMG, null);
-
-        //g2d.drawImage(theme.getBlocImg(num_anim), bx, by, Aire.LARG_IMG, Aire.LONG_IMG, null);
-
-        g2d.drawImage(theme.getCaseImg(0), bx+x*Aire.LARG_IMG, by+y*Aire.LONG_IMG, Aire.LARG_IMG, Aire.LONG_IMG, null);
+        g2d.drawImage(theme.getCaseImg(0),
+                bx+x*Moteur.LARG_IMG, by+y*Moteur.LONG_IMG,
+                Moteur.LARG_IMG, Moteur.LONG_IMG,
+                null
+        );
 
         if (objets.size() != 0) {
             objets.getFirst().afficher(g2d, theme, bx, by);

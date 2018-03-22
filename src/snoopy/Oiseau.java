@@ -35,8 +35,8 @@ public class Oiseau extends Objet implements Animation {
         int num_anim = (int) Math.floor(a) % theme.getNbImgOiseau();
 
         g2d.drawImage(theme.getOiseauImg(num_anim),
-                bx + getX() * Aire.LARG_IMG, by + getY() * Aire.LONG_IMG,
-                Aire.LARG_IMG, Aire.LONG_IMG,
+                bx + getX() * Moteur.LARG_IMG, by + getY() * Moteur.LONG_IMG,
+                Moteur.LARG_IMG, Moteur.LONG_IMG,
                 null
         );
     }

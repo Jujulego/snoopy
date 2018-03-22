@@ -26,10 +26,10 @@ public class Balle implements Animation, Affichable {
 
     // Méthodes
     public boolean estAuBordX(int marge) {
-        return (x + marge) / Aire.LARG_IMG != (x - marge) / Aire.LARG_IMG;
+        return (x + marge) / Moteur.LARG_IMG != (x - marge) / Moteur.LARG_IMG;
     }
     public boolean estAuBordY(int marge) {
-        return (y + marge) / Aire.LONG_IMG != (y - marge) / Aire.LONG_IMG;
+        return (y + marge) / Moteur.LONG_IMG != (y - marge) / Moteur.LONG_IMG;
     }
     public boolean estAuBord(int marge) {
         return estAuBordX(marge) || estAuBordY(marge);
@@ -50,51 +50,51 @@ public class Balle implements Animation, Affichable {
         if (x <= RAYON) {
             x = RAYON;
             dx = -dx;
-        } else if (x + RAYON >= carte.getTx() * Aire.LARG_IMG) {
-            x = carte.getTx() * Aire.LARG_IMG - RAYON;
+        } else if (x + RAYON >= carte.getTx() * Moteur.LARG_IMG) {
+            x = carte.getTx() * Moteur.LARG_IMG - RAYON;
             dx = -dx;
         }
 
         if (y <= RAYON) {
             y = RAYON;
             dy = -dy;
-        } else if (y + RAYON >= carte.getTy() * Aire.LONG_IMG) {
-            y = carte.getTy() * Aire.LONG_IMG - RAYON;
+        } else if (y + RAYON >= carte.getTy() * Moteur.LONG_IMG) {
+            y = carte.getTy() * Moteur.LONG_IMG - RAYON;
             dy = -dy;
         }
 
         // Rebond sur les blocs
         boolean rebond_x = false, rebond_y = false;
         Case case_suiv = carte.getCase(
-                ((x + (dx * RAYON)/Math.abs(dx)) / Aire.LARG_IMG),
-                y / Aire.LONG_IMG
+                ((x + (dx * RAYON)/Math.abs(dx)) / Moteur.LARG_IMG),
+                y / Moteur.LONG_IMG
         );
         if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
             rebond_x = true;
         }
 
         case_suiv = carte.getCase(
-                x / Aire.LARG_IMG,
-                ((y + (dy * RAYON)/Math.abs(dy)) / Aire.LONG_IMG)
+                x / Moteur.LARG_IMG,
+                ((y + (dy * RAYON)/Math.abs(dy)) / Moteur.LONG_IMG)
         );
         if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
             rebond_y = true;
         }
 
         case_suiv = carte.getCase(
-                ((x + (dx * RAYON)/Math.abs(dx)) / Aire.LARG_IMG),
-                ((y + (dy * RAYON)/Math.abs(dy)) / Aire.LONG_IMG)
+                ((x + (dx * RAYON)/Math.abs(dx)) / Moteur.LARG_IMG),
+                ((y + (dy * RAYON)/Math.abs(dy)) / Moteur.LONG_IMG)
         );
         if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
             rebond_x = true;
             rebond_y = true;
         }
 
-        if (rebond_x && x / Aire.LARG_IMG != (x + dx) / Aire.LARG_IMG) {
+        if (rebond_x && x / Moteur.LARG_IMG != (x + dx) / Moteur.LARG_IMG) {
             dx *= -1;
         }
 
-        if (rebond_y && y / Aire.LONG_IMG != (y + dy) / Aire.LONG_IMG) {
+        if (rebond_y && y / Moteur.LONG_IMG != (y + dy) / Moteur.LONG_IMG) {
             dy *= -1;
         }
     }

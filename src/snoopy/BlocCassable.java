@@ -44,15 +44,15 @@ public class BlocCassable extends Bloc implements Animation {
         if (anim_casse) {
             // Affiche l'animation de destruction
             g2d.drawImage(theme.getAnimBlocImg(num_anim),
-                    bx + getX() * Aire.LARG_IMG , by + getY() * Aire.LONG_IMG ,
-                    Aire.LARG_IMG, Aire.LONG_IMG,
+                    bx + getX() * Moteur.LARG_IMG , by + getY() * Moteur.LONG_IMG ,
+                    Moteur.LARG_IMG, Moteur.LONG_IMG,
                     null
             );
         } else {
             // Affiche le bloc
             g2d.drawImage(theme.getBlocImg(0),
-                    bx + getX() * Aire.LARG_IMG , by + getY() * Aire.LONG_IMG ,
-                    Aire.LARG_IMG, Aire.LONG_IMG,
+                    bx + getX() * Moteur.LARG_IMG , by + getY() * Moteur.LONG_IMG ,
+                    Moteur.LARG_IMG, Moteur.LONG_IMG,
                     null
             );
         }
