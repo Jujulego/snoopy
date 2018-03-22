@@ -1,100 +1,106 @@
 package snoopy;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.*;
 
 
 public class Theme {
-
+    // Constantes
     public static final int SOKOBAN = 1;
     public static final int DRUCKER = 2;
     public static final int SNOOPY = 3;
 
-    private HashMap<Direction,ArrayList<Image>> perso = new HashMap<>();
-    private ArrayList<Image> img_oiseau=new ArrayList<>();
+    // Attributs
     private int num_theme=0;
-    private ArrayList<Image> anim_bloc=new ArrayList<>();
-    private ArrayList<Image> img_bloc=new ArrayList<>();
-    //bloc 0 =case vide     1=pégé    2=poussable
+    private HashMap<Direction,ArrayList<Image>> perso = new HashMap<>();
+    private ArrayList<Image> img_oiseau;
+    private ArrayList<Image> anim_bloc;
+    private ArrayList<Image> img_bloc; // bloc: 0=case vide   1=piégé   2=poussable
+    private ArrayList<Image> img_case;
 
-    private ArrayList<Image> img_case=new ArrayList<>();
+    private Image coeurPlein;
+    private Image coeurVide;
 
-
-
+    // Constructeur
     public Theme(int num_theme)
     {
-        perso.put(Direction.HAUT, new ArrayList<>());
-        perso.put(Direction.BAS, new ArrayList<>());
-        perso.put(Direction.GAUCHE, new ArrayList<>());
-        perso.put(Direction.DROITE, new ArrayList<>());
+        this.num_theme = num_theme;
 
-        this.num_theme=num_theme;
+        // Chargement images personnage
+        perso.put(Direction.HAUT,   chargerAnimation(cheminTheme("perso0/anim%d")));
+        perso.put(Direction.BAS,    chargerAnimation(cheminTheme("perso1/anim%d")));
+        perso.put(Direction.GAUCHE, chargerAnimation(cheminTheme("perso2/anim%d")));
+        perso.put(Direction.DROITE, chargerAnimation(cheminTheme("perso3/anim%d")));
 
-        int z=0;
-        /////////////////////////// Chargement animations snoopy haut, bas, gauche, droite
-        while(  new File("images/theme"+num_theme+"/perso0/anim"+z+".png").exists()  )
-        {
-            perso.get(Direction.HAUT).add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/perso0/anim"+z+".png"));
-            z++;
-        }
-        z=0;
-        while(  new File("images/theme"+num_theme+"/perso1/anim"+z+".png").exists()  )
-        {
-            perso.get(Direction.BAS).add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/perso1/anim"+z+".png"));
-            z++;
-        }
-        z=0;
-        while(  new File("images/theme"+num_theme+"/perso2/anim"+z+".png").exists()  )
-        {
-            perso.get(Direction.GAUCHE).add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/perso2/anim"+z+".png"));
-            z++;
-        }
-        z=0;
+        // Chargement des oiseaux
+        img_oiseau = chargerAnimation(cheminTheme("oizo/anim%d"));
 
-        while(  new File("images/theme"+num_theme+"/perso3/anim"+z+".png").exists()  )
-        {
-            perso.get(Direction.DROITE).add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/perso3/anim"+z+".png"));
+        // Chargement des cases
+        img_case = chargerAnimation(cheminTheme("case/case%d"));
 
-            z++;
-        }
-        z=0;
+        // Chargement des blocs
+        img_bloc = chargerAnimation("images/bloc/bloc%d.png");
 
-        //Chargement des oiseaux
-        while(  new File("images/theme"+num_theme+"/oizo/anim"+z+".png").exists()  )
-        {
-            img_oiseau.add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/oizo/anim"+z+".png"));
-            z++;
-        }
-        z=0;
-        //Chargement des cases
-        while(  new File("images/theme"+num_theme+"/case/case"+z+".png").exists()  )
-        {
-            img_case.add(Toolkit.getDefaultToolkit().getImage("images/theme"+num_theme+"/case/case"+z+".png"));
-            z++;
-        }
+        // Chargement de la cinématique de destruction
+        anim_bloc = chargerAnimation("images/anim_bloc/anim%d.png");
 
-        z=0;
-        //Chargement des blocs
-        while(  new File("images/bloc/bloc"+z+".png").exists()  )
-        {
-            img_bloc.add(Toolkit.getDefaultToolkit().getImage("images/bloc/bloc"+z+".png"));
-            z++;
-        }
-
-        z=0;
-        //Chargement de la cinématique de destruction
-        while(  new File("images/anim_bloc/anim"+z+".png").exists()  )
-        {
-            anim_bloc.add(Toolkit.getDefaultToolkit().getImage("images/anim_bloc/anim"+z+".png"));
-            z++;
-        }
-
+        // Chargment coeurs
+        coeurPlein = chargerImage(cheminTheme("coeur/coeur1"));
+        coeurVide = chargerImage(cheminTheme("coeur/coeur0"));
     }
 
+    // Méthodes
+
+    /**
+     * Génère le chemin vers une image/animation spécifique au thème actuel
+     *
+     * @param img partie du chemin spécifique à l'image
+     * @return chemin vers l'image/l'animation
+     *
+     * @see this.chargerAnimation
+     * @see this.chargerImage
+     */
+    private String cheminTheme(String img) {
+        return String.format("images/theme%d/%s.png", num_theme, img);
+    }
+
+    /**
+     * Charge une animation dans un tableau
+     *
+     * @param fmt chemin vers l'animation. Doit contenir un "%d" qui sera remplacé par un numéro.
+     *            ex : "images/theme3/perso0/anim%d.png"
+     * @return le tableau contenant les images des animations
+     */
+    private ArrayList<Image> chargerAnimation(String fmt) {
+        ArrayList<Image> liste = new ArrayList<>();
+        int z = 0;
+
+        while (true) {
+            String fichier = String.format(fmt, z);
+
+            if (new File(fichier).exists()) {
+                liste.add(chargerImage(String.format(fmt, z)));
+                ++z;
+            } else {
+                break;
+            }
+        }
+
+        return liste;
+    }
+
+    /**
+     * Charge l'image demandée
+     *
+     * @param chemin chemin vers l'image
+     * @return l'image
+     */
+    private Image chargerImage(String chemin) {
+        return Toolkit.getDefaultToolkit().getImage(chemin);
+    }
+
+    // Accès aux images
     public Image getPersoImg(Direction direction, int num_anim)
     {
         return perso.get(direction).get(num_anim);
@@ -103,24 +109,28 @@ public class Theme {
     {
         return img_oiseau.get(num_anim);
     }
-
     public Image getBlocImg(int num_bloc)
     {
         return img_bloc.get(num_bloc);
     }
-
     public Image getAnimBlocImg(int num_anim)
     {
         return anim_bloc.get(num_anim);
     }
-
     public Image getCaseImg(int num_anim)
     {
         return img_case.get(num_anim);
     }
 
+    public Image getCoeurPlein() {
+        return coeurPlein;
+    }
 
+    public Image getCoeurVide() {
+        return coeurVide;
+    }
 
+    // le nombre d'images par animations
     public int getNbImgPerso(Direction direction) {
         return perso.get(direction).size();
     }
@@ -133,11 +143,21 @@ public class Theme {
         return anim_bloc.size();
     }
 
+    /**
+     * Renvoie le numéro du thème
+     *
+     * @return le numéro du thème
+     */
     public int getNumTheme()
     {
         return num_theme;
     }
 
+    /**
+     * Renvoie le nom du thème
+     *
+     * @return le nom du thème
+     */
     public String getNomTheme() {
         switch (num_theme) {
             case SOKOBAN:

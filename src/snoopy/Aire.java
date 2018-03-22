@@ -26,10 +26,7 @@ public class Aire extends JPanel implements KeyListener {
     // Attributs
     // - jeu
     private Carte carte;   // Carte affichée
-    private Snoopy snoopy; // Le personnage controllé
-
-    private Image coeur_plein;
-    private Image coeur_vide;
+    private Snoopy snoopy; // Le personnage controlé
     private Theme theme;
 
     private int base_score;
@@ -71,10 +68,6 @@ public class Aire extends JPanel implements KeyListener {
         animations.addAll(carte.objetsAnimes());
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/FPS, TimeUnit.MILLISECONDS);
         scheduler.scheduleAtFixedRate(this::clock, 0, 1, TimeUnit.SECONDS);
-        
-        // Chargement des images
-        coeur_plein = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur1.png");
-        coeur_vide = Toolkit.getDefaultToolkit().getImage("images/theme"+theme.getNumTheme()+"/coeur/coeur0.png");
     }
 
     // Méthodes
@@ -157,7 +150,7 @@ public class Aire extends JPanel implements KeyListener {
         // Rafraichissement de l'ecran
         repaint();
     }
-    
+
     // Décompte de 60 secondes
     public void clock() {
         if (!pause) {
@@ -216,7 +209,7 @@ public class Aire extends JPanel implements KeyListener {
 
         // Coeurs
         for (int i = 0; i < Snoopy.MAX_VIES; ++i) {
-            g2d.drawImage(i < snoopy.getVies() ? coeur_plein : coeur_vide,
+            g2d.drawImage(i < snoopy.getVies() ? theme.getCoeurPlein() : theme.getCoeurVide(),
                     carte.getTx() * LARG_IMG - 25*(Snoopy.MAX_VIES-i), 0,
                     25, 25, null
             );
