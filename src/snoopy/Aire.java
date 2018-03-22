@@ -24,6 +24,8 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
     private int etat = 0;
     private ArrayList<FinListener> listeners = new ArrayList<>();
 
+    private JLabel lbl_score = new JLabel("");
+
     // Constructeur
     public Aire(Moteur moteur, Theme theme) {
         this.moteur = moteur;
@@ -40,6 +42,18 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         // Moteur
         moteur.ajouterMoteurListener(this);
         moteur.lancer(1000/FPS);
+
+        // Score
+        setLayout(null);
+        Insets insets = getInsets();
+        Dimension taille;
+
+        add(lbl_score);
+        taille = lbl_score.getPreferredSize();
+        lbl_score.setBounds(
+                insets.right - taille.width - 5, insets.bottom - taille.height - 5,
+                taille.width, taille.height
+        );
     }
 
     // Méthodes
@@ -118,17 +132,17 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         
         // Affichage de l'horloge
 		g2d.setColor(Color.black);
-		g2d.setFont(new Font ("Plain", Font.BOLD,25));
+		g2d.setFont(new Font ("Plain", Font.BOLD,20));
 
 		g2d.drawString(String.valueOf(moteur.getTimer()), Moteur.LARG_IMG*2, 20);
 
 		// Pause
         if (moteur.isPause()) {
-            g2d.drawString("PAUSE", 5, getHeight()-5);
+            g2d.drawString("PAUSE", getWidth() - 80, getHeight() - 5);
         }
 
         // Score
-        g2d.drawString(String.valueOf(getScore()), getWidth() - 50, getHeight() - 5);
+        g2d.drawString(String.valueOf(moteur.getScore()), 5, getHeight() - 5);
     }
 
     public void setTheme(Theme theme) {
