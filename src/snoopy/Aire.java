@@ -229,7 +229,8 @@ public class Aire extends JPanel implements KeyListener {
 		g2d.setFont(new Font ("Plain", Font.BOLD,LARG_IMG/3));
 		
 		timerString = String.valueOf(timer);
-		g2d.drawString(timerString, LARG_IMG*2, 20);
+		//On affiche les numéros de l'horloge
+		g2d.drawString(timerString, LARG_IMG*2 +LARG_IMG/2-LARG_IMG/6, 20);
 
 		// Pause
         if (pause) {
