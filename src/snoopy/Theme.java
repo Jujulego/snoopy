@@ -86,6 +86,13 @@ public class Theme {
                 break;
             }
         }
+        z=0;
+        //Chargement de la cinématique d'explosion
+        while(  new File("images/anim_destruction/anim"+z+".png").exists()  )
+        {
+            anim_bloc.add(Toolkit.getDefaultToolkit().getImage("images/anim_destruction/anim"+z+".png"));
+            z++;
+        }
 
         return liste;
     }
@@ -141,6 +148,10 @@ public class Theme {
     public int getNbImageAnimBloc()
     {
         return anim_bloc.size();
+    }
+    public int getNbImageAnimExplo()
+    {
+        return anim_boom.size();
     }
 
     /**
