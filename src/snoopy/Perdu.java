@@ -86,7 +86,7 @@ public class Perdu extends JPanel {
         // Rebonds
         if (y > getHeight() - 50) {
             y = getHeight() - 50;
-            dy = -dy;
+            dy = -dy -0.02f;
         }
 
         repaint();
@@ -96,6 +96,9 @@ public class Perdu extends JPanel {
         // Animation !
         scheduler = new ScheduledThreadPoolExecutor(1);
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/30, TimeUnit.MILLISECONDS);
+
+        y = 0.0f;
+        dy = 0.0f;
     }
 
     public void stop() {

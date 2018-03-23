@@ -3,6 +3,8 @@ package snoopy;
 import java.awt.*;
 
 public class BlocPiege extends Bloc implements Animation {
+    // Attributs
+    private boolean explose=false;
     private boolean anim=false;
     private int num_anim=0;
     private double prec_anim=0;
@@ -66,10 +68,14 @@ public class BlocPiege extends Bloc implements Animation {
 
     }
 
-    public void toucher(Carte carte, Snoopy snoopy) {
-        snoopy.tuer();
-        anim=true;
-        num_anim=0;
-    }
+    public void toucher(Snoopy snoopy) {
+        if (!explose) {
+            snoopy.tuer();
+            explose = true;
 
+            // On lance l'animation !
+            anim=true;
+            num_anim=0;
+        }
+    }
 }
