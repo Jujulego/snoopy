@@ -105,18 +105,29 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         g2d.clearRect(0, 0, getWidth(), getHeight());
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // Centre
+        int centre_x = getWidth()/2;
+        int centre_y = getHeight()/2;
+
+        Carte carte = moteur.getCarte();
+        int larg_carte = carte.getTx()*Moteur.LARG_IMG;
+        int long_carte = carte.getTy()*Moteur.LONG_IMG;
+
+        int carte_x = centre_x-larg_carte/2;
+        int carte_y = centre_y-long_carte/2;
+
         // Objets
-        moteur.getCarte().afficher(g2d, theme, MARGE_X_CARTE, MARGE_Y_CARTE);
+        carte.afficher(g2d, theme, carte_x, carte_y);
 
         // Balles
         for (Balle balle : moteur.getBalles()) {
-            balle.afficher(g2d, theme, MARGE_X_CARTE, MARGE_Y_CARTE);
+            balle.afficher(g2d, theme, carte_x, carte_y);
         }
 
         // Coeurs
         for (int i = 0; i < Snoopy.MAX_VIES; ++i) {
             g2d.drawImage(i < moteur.getSnoopy().getVies() ? theme.getCoeurPlein() : theme.getCoeurVide(),
-                    moteur.getCarte().getTx() * Moteur.LARG_IMG - 25*(Snoopy.MAX_VIES-i), 0,
+                    carte_x + larg_carte - 25*(Snoopy.MAX_VIES-i), carte_y - MARGE_Y_CARTE,
                     25, 25, null
             );
         }
@@ -126,23 +137,29 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
             float a = (etat*theme.getNbImgOiseau()/Aire.FPS);
             int num_anim = (int) Math.floor(a) % theme.getNbImgOiseau();
 
-
-            g2d.drawImage(theme.getOiseauImg(num_anim), i*25+10, 3, 20, 20, null);
+            g2d.drawImage(theme.getOiseauImg(num_anim),
+                    carte_x+i*25+10, carte_y - MARGE_Y_CARTE + 3,
+                    20, 20,
+                    null
+            );
         }
         
         // Affichage de l'horloge
 		g2d.setColor(Color.black);
 		g2d.setFont(new Font ("Plain", Font.BOLD,20));
 
-		g2d.drawString(String.valueOf(moteur.getTimer()), Moteur.LARG_IMG*2, 20);
+		g2d.drawString(
+		        String.valueOf(moteur.getTimer()),
+                carte_x+larg_carte/2-15, carte_y - 3
+        );
 
 		// Pause
         if (moteur.isPause()) {
-            g2d.drawString("PAUSE", getWidth() - 80, getHeight() - 5);
+            g2d.drawString("PAUSE", carte_x+larg_carte-75, carte_y+long_carte+20);
         }
 
         // Score
-        g2d.drawString(String.valueOf(moteur.getScore()), 5, getHeight() - 5);
+        g2d.drawString(String.valueOf(moteur.getScore()), carte_x + 5, carte_y+long_carte+20);
     }
 
     public void setTheme(Theme theme) {

@@ -1,5 +1,6 @@
 package snoopy;
 
+import java.util.Scanner;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -8,6 +9,7 @@ public class Console {
     // Attributs
     private int tx, ty;
     private char[][] buffer;
+    private Scanner scanner = new Scanner(System.in);
 
     private Moteur moteur;
 
@@ -88,9 +90,17 @@ public class Console {
         }
     }
 
+    public void clavier() {
+        while (true) {
+            String ligne = scanner.nextLine();
+            print(ligne, 0, moteur.getCarte().getTy()*2);
+        }
+    }
+
     public void lancer() {
-         scheduler = new ScheduledThreadPoolExecutor(1);
+         scheduler = new ScheduledThreadPoolExecutor(2);
          scheduler.scheduleAtFixedRate(this::afficher, 0, 1000/25, TimeUnit.MILLISECONDS);
+         scheduler.schedule(this::clavier, 0, TimeUnit.MILLISECONDS);
     }
 
     public void arreter() {

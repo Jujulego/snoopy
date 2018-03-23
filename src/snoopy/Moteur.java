@@ -67,11 +67,11 @@ public class Moteur {
                     }
                 }
             }
+        }
 
-            // Listeners
-            for (MoteurListener listener : listeners) {
-                listener.animer();
-            }
+        // Listeners
+        for (MoteurListener listener : listeners) {
+            listener.animer();
         }
     }
 

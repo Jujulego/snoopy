@@ -60,16 +60,6 @@ public class Carte implements Affichable {
 
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
-        // Grille
-        g2d.setColor(Color.black);
-        for (int i = 0; i <= tx; ++i) {
-            g2d.drawLine(bx + i * Moteur.LARG_IMG, by, bx + i * Moteur.LARG_IMG, by + ty * Moteur.LONG_IMG);
-        }
-
-        for (int i = 0; i <= ty; ++i) {
-            g2d.drawLine(bx, by + i * Moteur.LONG_IMG, bx + tx * Moteur.LARG_IMG, by + i * Moteur.LONG_IMG);
-        }
-
         // Affichage des cases
         for (Case[] ligne : cases) {
             for (Case c : ligne) {
@@ -82,6 +72,13 @@ public class Carte implements Affichable {
                 c.afficher_obj(g2d, theme, bx, by);
             }
         }
+
+        // Grille
+        g2d.setColor(Color.black);
+        g2d.drawLine(bx, by, bx, by + ty * Moteur.LONG_IMG);
+        g2d.drawLine(bx + tx * Moteur.LARG_IMG, by, bx + tx * Moteur.LARG_IMG, by + ty * Moteur.LONG_IMG);
+        g2d.drawLine(bx, by, bx + tx * Moteur.LARG_IMG, by);
+        g2d.drawLine(bx, by + ty * Moteur.LONG_IMG, bx + tx * Moteur.LARG_IMG, by + ty * Moteur.LONG_IMG);
     }
 
     /**

@@ -86,7 +86,7 @@ public class Perdu extends JPanel {
         // Rebonds
         if (y > getHeight() - 50) {
             y = getHeight() - 50;
-            dy = -dy -0.02f;
+            dy = -dy+ay;
         }
 
         repaint();
