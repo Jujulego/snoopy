@@ -91,13 +91,15 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         carte.ajouter(new BlocPoussable(2, 1));
         carte.ajouter(new BlocCassable(0,2));
         carte.ajouter(new BlocPiege(2, 4));
+        carte.ajouter(new BlocCassable(0,3));
+        carte.ajouter(new BlocPiege(3, 4));
 
         // Création de l'aire de jeu
         aire = new Aire(carte, snoopy, theme);
-        aire.ajouterBalle(new Balle(
+       /* aire.ajouterBalle(new Balle(
                 (int) (2.5 * Aire.LARG_IMG), (int) (0.5 * Aire.LONG_IMG),
                 -4, 4
-        ));
+        ));*/
         aire.ajouterFinListener(this);
 
         setContentPane(aire);

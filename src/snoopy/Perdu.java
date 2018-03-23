@@ -67,18 +67,15 @@ public class Perdu extends JPanel {
         g2d.drawString("PERDU", 100, 70);
 
         // Oiseaux
-        Image oiseau = theme.getOiseauImg((y/5) % theme.getNbImgOiseau());
+        BufferedImage oiseau = theme.getOiseauImg((y/5) % theme.getNbImgOiseau());
         g2d.drawImage(oiseau, 25, y, 50, 50, null);
 
         // Calcul du symétrique
-        BufferedImage boiseau = new BufferedImage(oiseau.getWidth(null), oiseau.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        boiseau.getGraphics().drawImage(oiseau, 0, 0, null);
-
         AffineTransform ty = AffineTransform.getScaleInstance(-1, 1);
         ty.translate(-oiseau.getWidth(null), 0);
         AffineTransformOp op = new AffineTransformOp(ty, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 
-        g2d.drawImage(op.filter(boiseau, null), 325, y, 50, 50, null);
+        g2d.drawImage(op.filter(oiseau, null), 325, y, 50, 50, null);
     }
 
     private void animer() {

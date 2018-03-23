@@ -30,7 +30,7 @@ public class BlocPiege extends Bloc implements Animation {
                 prec_anim = 0.0;
             }
 
-            if (num_anim >= theme.getNbImageAnimBloc()) {
+            if (num_anim >= theme.getNbImageAnimBoom()) {
                 anim = false;
                 carte.enlever(this);
             }
@@ -47,17 +47,29 @@ public class BlocPiege extends Bloc implements Animation {
 
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
-        g2d.drawImage(theme.getBlocImg(0),
-                bx + getX() * Aire.LARG_IMG , by + getY() * Aire.LONG_IMG,
-                Aire.LARG_IMG, Aire.LONG_IMG,
-                null
-        );
+        if(anim)
+        {
+            g2d.drawImage(theme.getBoomImg(num_anim),
+                    bx + getX() * Aire.LARG_IMG , by + getY() * Aire.LONG_IMG,
+                    Aire.LARG_IMG, Aire.LONG_IMG,
+                    null
+            );
+        }
+        else
+        {
+            g2d.drawImage(theme.getBlocImg(0),
+                    bx + getX() * Aire.LARG_IMG , by + getY() * Aire.LONG_IMG,
+                    Aire.LARG_IMG, Aire.LONG_IMG,
+                    null
+            );
+        }
+
     }
 
     public void toucher(Carte carte, Snoopy snoopy) {
         snoopy.tuer();
-        carte.enlever(this);
         anim=true;
+        num_anim=0;
     }
 
 }
