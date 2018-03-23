@@ -153,7 +153,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
             }
         } else if (!case_.accessible()) { // La case n'est pas accessible !
             if (obj instanceof BlocPiege) { // Bouum !
-                ((BlocPiege) obj).toucher(carte, this);
+                ((BlocPiege) obj).toucher(this);
             }
 
             return false;
