@@ -2,6 +2,7 @@ package snoopy;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Fenetre extends JFrame implements Aire.FinListener {
     // Enumération
@@ -33,6 +34,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         menu.addChgThemeListener((Theme theme) -> {
             this.theme = theme;
             perdu.setTheme(theme);
+            victoire.setTheme(theme);
         });
 
         // Setup perdu
@@ -42,7 +44,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         perdu.getBtnRecommencer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
 
         // Setup victoire
-        victoire = new Victoire();
+        victoire = new Victoire(theme);
 
         victoire.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
         //victoire.getBtnContinuer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
@@ -78,7 +80,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         perdu.stop();
 
         // Création de la carte
-        Carte carte = new Carte(5, 5);
+        Carte carte = new Carte(20, 10);
 
         Snoopy snoopy = new Snoopy(2, 2);
         carte.ajouter(snoopy);
@@ -90,7 +92,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 
         carte.ajouter(new BlocPoussable(2, 1));
         carte.ajouter(new BlocCassable(0,2));
+        carte.ajouter(new BlocPiege(1, 4));
         carte.ajouter(new BlocPiege(2, 4));
+        carte.ajouter(new BlocPiege(3, 4));
 
         // Création de l'aire de jeu
         Moteur moteur = new Moteur(carte, snoopy, theme, 0);

@@ -102,8 +102,8 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
     protected void paintComponent(Graphics graphics) {
         // Options
         Graphics2D g2d = (Graphics2D) graphics;
-        g2d.clearRect(0, 0, getWidth(), getHeight());
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.clearRect(0, 0, getWidth(), getHeight());
 
         // Centre
         int centre_x = getWidth()/2;

@@ -9,7 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class Menu extends JPanel {
+public class Menu extends PanneauSol {
     // Attributs
     private int balle_x = -150;
     private float balle_y = -80;
@@ -20,7 +20,6 @@ public class Menu extends JPanel {
     private int numAnimExplo;
     private int numAnimPerso;
     private int numAnimOiseau;
-    private Theme theme;
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
     private ArrayList<ChgThemeListener> listeners = new ArrayList<>();
@@ -33,21 +32,18 @@ public class Menu extends JPanel {
 
     // Constructeur
     public Menu(Theme theme) {
-        this.theme = theme;
+        super(theme);
         lblTheme.setText(theme.getNomTheme());
 
-        // Paramètres
-        setLayout(null);
-        setDoubleBuffered(true);
-        setMinimumSize(new Dimension(400, 320));
-        setSize(400, 320);
-
         // Boutons
+        setLayout(null);
         add(btnJouer);
         add(lblTheme);
         add(btnThemeP);
         add(btnThemeM);
+
         positionBoutons();
+
         btnThemeM.addActionListener((ActionEvent event) -> chgTheme(-1));
         btnThemeP.addActionListener((ActionEvent event) -> chgTheme(1));
     }
@@ -62,7 +58,7 @@ public class Menu extends JPanel {
         add(btnJouer);
         taille = btnJouer.getPreferredSize();
         btnJouer.setBounds(
-                (getWidth() - taille.width)/2 + insets.left, getHeight()/2 + 15 + insets.top,
+                (getWidth() - taille.width)/2 + insets.left, getSol() + 15 + insets.top,
                 taille.width, taille.height
         );
 
@@ -70,35 +66,35 @@ public class Menu extends JPanel {
         Dimension tailleT = lblTheme.getPreferredSize();
         tailleT.width = 80;
         lblTheme.setBounds(
-                (getWidth() - tailleT.width)/2 + insets.left, getHeight()/2 + 110 + insets.top,
+                (getWidth() - tailleT.width)/2 + insets.left, getSol() + 80 + insets.top,
                 tailleT.width, tailleT.height
         );
         lblTheme.setHorizontalAlignment(SwingConstants.CENTER);
 
         taille = btnThemeM.getPreferredSize();
         btnThemeM.setBounds(
-                (getWidth() - 50 - taille.width)/2 - taille.width + insets.left, getHeight()/2 + 105 + insets.top,
+                (getWidth() - 50 - taille.width)/2 - taille.width + insets.left, getSol() + 75 + insets.top,
                 taille.width, taille.height
         );
 
         taille = btnThemeP.getPreferredSize();
         btnThemeP.setBounds(
-                (getWidth() + 50 + taille.width)/2 + insets.left, getHeight()/2 + 105 + insets.top,
+                (getWidth() + 50 + taille.width)/2 + insets.left, getSol() + 75 + insets.top,
                 taille.width, taille.height
         );
     }
 
     @Override
     protected synchronized void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);
+
         // Initialisation
         Graphics2D g2d = (Graphics2D) graphics;
-        g2d.clearRect(0, 0, getWidth(), getHeight());
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Mur
-        int long_ = Moteur.LONG_IMG*4/5;
-        int larg  = Moteur.LARG_IMG*4/5;
-        int x = 0, y = getHeight()/2-long_;
+        int long_ = Moteur.LONG_IMG * 4/5;
+        int larg  = Moteur.LARG_IMG * 4/5;
+        int x = 0, y = getSol()-long_;
 
         while (x < getWidth()) {
             g2d.drawImage(theme.getBlocImg((x / larg) % 2),
@@ -107,9 +103,9 @@ public class Menu extends JPanel {
                     null
             );
 
-            if ((x / larg) % 2 == 0) {
+            if ((x / larg) % 2 == 0 && numAnimExplo >= 0) {
                 g2d.drawImage(theme.getBoomImg(numAnimExplo),
-                        x, y - long_,
+                        x + larg/2, y - long_,
                         larg, long_,
                         null
                 );
@@ -119,26 +115,23 @@ public class Menu extends JPanel {
         }
 
         // Snoopy !
-        g2d.drawImage(theme.getBalleImg(), balle_x, (int) balle_y + getHeight()/2, 2*Balle.RAYON, 2*Balle.RAYON, null);
-        g2d.drawImage(theme.getPersoImg(Direction.DROITE, numAnimPerso), perso_x, getHeight()/2-50, 50, 50, null);
-        g2d.drawImage(theme.getOiseauImg(numAnimOiseau), oiseau_x,  getHeight()/2-50, 50, 50, null);
+        g2d.drawImage(theme.getBalleImg(),
+                balle_x, (int) balle_y + getSol(),
+                2*Balle.RAYON, 2*Balle.RAYON,
+                null
+        );
 
-        // Sol
-        x = 0;
-        y = getHeight()/2;
-        while (y < getHeight()) {
-            g2d.drawImage(theme.getCaseImg(0),
-                    x, y,
-                    Moteur.LARG_IMG, Moteur.LONG_IMG,
-                    null
-            );
-            x += Moteur.LARG_IMG;
+        g2d.drawImage(theme.getPersoImg(Direction.DROITE, numAnimPerso),
+                perso_x, getSol()-50,
+                50, 50,
+                null
+        );
 
-            if (x > getWidth()) {
-                x = 0;
-                y += Moteur.LONG_IMG;
-            }
-        }
+        g2d.drawImage(theme.getOiseauImg(numAnimOiseau),
+                oiseau_x, getSol()-50,
+                50, 50,
+                null
+        );
 
         // Titre
         g2d.setFont(new Font ("Plain", Font.BOLD,50));
@@ -146,6 +139,7 @@ public class Menu extends JPanel {
 
         g2d.drawString("Snoopy", getWidth()/2-100, 60);
 
+        // Boutons
         positionBoutons();
 
         // On force la synchronisation de l'écran
@@ -174,7 +168,11 @@ public class Menu extends JPanel {
             oiseau_x = -50;
         }
 
-        numAnimExplo = (numAnimExplo + 1) % theme.getNbImageAnimBoom();
+        numAnimExplo++;// = (numAnimExplo + 1) % theme.getNbImageAnimBoom();
+        if (numAnimExplo == theme.getNbImageAnimBoom()) {
+            numAnimExplo = -6;
+        }
+
         numAnimPerso = (numAnimPerso + 1) % theme.getNbImgPerso(Direction.DROITE);
         numAnimOiseau = (numAnimOiseau + 1) % theme.getNbImgOiseau();
 
