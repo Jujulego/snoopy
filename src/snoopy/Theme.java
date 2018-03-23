@@ -23,6 +23,7 @@ public class Theme {
     private ArrayList<BufferedImage> img_bloc; // bloc: 0=case vide   1=piégé   2=poussable
     private ArrayList<BufferedImage> img_case;
 
+    private BufferedImage balle;
     private BufferedImage coeurPlein;
     private BufferedImage coeurVide;
 
@@ -51,6 +52,9 @@ public class Theme {
 
         //Chargement de la cinématique du boom boom
         anim_boom = chargerAnimation("images/anim_destruction/anim%d.png");
+
+        //Chargement balle
+        balle = chargerImage(cheminTheme("balle/balle"));
 
         // Chargment coeurs
         coeurPlein = chargerImage(cheminTheme("coeur/coeur1"));
@@ -146,10 +150,13 @@ public class Theme {
     public BufferedImage getCoeurPlein() {
         return coeurPlein;
     }
-
     public BufferedImage getCoeurVide() {
         return coeurVide;
     }
+    public BufferedImage getBalleImg() {
+        return balle;
+    }
+
 
     // le nombre d'images par animations
     public int getNbImgPerso(Direction direction) {

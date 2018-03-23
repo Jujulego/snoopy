@@ -106,12 +106,12 @@ public class Balle implements Animation, Affichable {
 
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
-        g2d.setColor(Color.yellow);
-        g2d.fillOval(
-                bx + x - RAYON,
-                by + y - RAYON,
-                RAYON*2, RAYON*2
+        g2d.drawImage(theme.getBalleImg(),
+                bx + x - RAYON , by + y - RAYON ,
+                2*RAYON, 2*RAYON,
+                null
         );
+
     }
 
     // - accesseurs
