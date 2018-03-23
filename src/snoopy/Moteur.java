@@ -138,10 +138,14 @@ public class Moteur {
             Objet objet = case_.getObjet();
 
             if (objet instanceof BlocCassable) {
-                ((BlocCassable) objet).casser();
+                if (!((BlocCassable) objet).animation()) {
+                    ((BlocCassable) objet).casser();
+                }
             } else if (objet instanceof BlocPiege) {
-                ((BlocPiege) objet).toucher(carte, snoopy);
-                mort(); // Fin ?
+                if (!((BlocPiege) objet).animation()) {
+                    ((BlocPiege) objet).toucher(carte, snoopy);
+                    mort(); // Fin ?
+                }
             }
         }
     }

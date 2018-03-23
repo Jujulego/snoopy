@@ -42,7 +42,7 @@ public class BlocCassable extends Bloc implements Animation {
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         if (anim_casse) {
-            // Affiche l'animation de destruction
+            // Affiche l'animation de desaparition
             g2d.drawImage(theme.getAnimBlocImg(num_anim),
                     bx + getX() * Moteur.LARG_IMG , by + getY() * Moteur.LONG_IMG ,
                     Moteur.LARG_IMG, Moteur.LONG_IMG,

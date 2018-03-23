@@ -1,7 +1,10 @@
 package snoopy;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -13,14 +16,15 @@ public class Theme {
 
     // Attributs
     private int num_theme=0;
-    private HashMap<Direction,ArrayList<Image>> perso = new HashMap<>();
-    private ArrayList<Image> img_oiseau;
-    private ArrayList<Image> anim_bloc;
-    private ArrayList<Image> img_bloc; // bloc: 0=case vide   1=piégé   2=poussable
-    private ArrayList<Image> img_case;
+    private HashMap<Direction,ArrayList<BufferedImage>> perso = new HashMap<>();
+    private ArrayList<BufferedImage> img_oiseau;
+    private ArrayList<BufferedImage> anim_bloc;
+    private ArrayList<BufferedImage> anim_boom;
+    private ArrayList<BufferedImage> img_bloc; // bloc: 0=case vide   1=piégé   2=poussable
+    private ArrayList<BufferedImage> img_case;
 
-    private Image coeurPlein;
-    private Image coeurVide;
+    private BufferedImage coeurPlein;
+    private BufferedImage coeurVide;
 
     // Constructeur
     public Theme(int num_theme)
@@ -42,8 +46,11 @@ public class Theme {
         // Chargement des blocs
         img_bloc = chargerAnimation("images/bloc/bloc%d.png");
 
-        // Chargement de la cinématique de destruction
+        // Chargement de la cinématique de désaparition
         anim_bloc = chargerAnimation("images/anim_bloc/anim%d.png");
+
+        //Chargement de la cinématique du boom boom
+        anim_boom = chargerAnimation("images/anim_destruction/anim%d.png");
 
         // Chargment coeurs
         coeurPlein = chargerImage(cheminTheme("coeur/coeur1"));
@@ -72,15 +79,15 @@ public class Theme {
      *            ex : "images/theme3/perso0/anim%d.png"
      * @return le tableau contenant les images des animations
      */
-    private ArrayList<Image> chargerAnimation(String fmt) {
-        ArrayList<Image> liste = new ArrayList<>();
+    private ArrayList<BufferedImage> chargerAnimation(String fmt) {
+        ArrayList<BufferedImage> liste = new ArrayList<>();
         int z = 0;
 
         while (true) {
             String fichier = String.format(fmt, z);
 
             if (new File(fichier).exists()) {
-                liste.add(chargerImage(String.format(fmt, z)));
+                liste.add(chargerImage(fichier));
                 ++z;
             } else {
                 break;
@@ -96,37 +103,51 @@ public class Theme {
      * @param chemin chemin vers l'image
      * @return l'image
      */
-    private Image chargerImage(String chemin) {
-        return Toolkit.getDefaultToolkit().getImage(chemin);
+    private BufferedImage chargerImage(String chemin) {
+        try {
+            Image img = ImageIO.read(new File(chemin));
+            BufferedImage bimg = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+            bimg.getGraphics().drawImage(img, 0, 0, null);
+
+            return bimg;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     // Accès aux images
-    public Image getPersoImg(Direction direction, int num_anim)
+    public BufferedImage getPersoImg(Direction direction, int num_anim)
     {
         return perso.get(direction).get(num_anim);
     }
-    public Image getOiseauImg(int num_anim)
+    public BufferedImage getOiseauImg(int num_anim)
     {
         return img_oiseau.get(num_anim);
     }
-    public Image getBlocImg(int num_bloc)
+    public BufferedImage getBlocImg(int num_bloc)
     {
         return img_bloc.get(num_bloc);
     }
-    public Image getAnimBlocImg(int num_anim)
+    public BufferedImage getAnimBlocImg(int num_anim)
     {
         return anim_bloc.get(num_anim);
     }
-    public Image getCaseImg(int num_anim)
+    public BufferedImage getCaseImg(int num_anim)
     {
         return img_case.get(num_anim);
     }
+    public BufferedImage getBoomImg(int num_anim)
+    {
+        return anim_boom.get(num_anim);
+    }
 
-    public Image getCoeurPlein() {
+    public BufferedImage getCoeurPlein() {
         return coeurPlein;
     }
 
-    public Image getCoeurVide() {
+    public BufferedImage getCoeurVide() {
         return coeurVide;
     }
 
@@ -141,6 +162,10 @@ public class Theme {
     public int getNbImageAnimBloc()
     {
         return anim_bloc.size();
+    }
+    public int getNbImageAnimBoom()
+    {
+        return anim_boom.size();
     }
 
     /**
