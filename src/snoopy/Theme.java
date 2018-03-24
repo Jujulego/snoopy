@@ -178,6 +178,17 @@ public class Theme {
     }
 
     /**
+     * Calcule le symétrique d'une image
+     */
+    public BufferedImage symetriqueX(BufferedImage img) {
+        AffineTransform ty = AffineTransform.getScaleInstance(-1, 1);
+        ty.translate(-img.getWidth(), 0);
+        AffineTransformOp op = new AffineTransformOp(ty, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+
+        return op.filter(img, null);
+    }
+
+    /**
      * Renvoie le numéro du thème
      *
      * @return le numéro du thème

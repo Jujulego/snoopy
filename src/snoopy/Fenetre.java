@@ -78,6 +78,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         // Arrêt du menu
         menu.stop();
         perdu.stop();
+        victoire.stop();
 
         // Création de la carte
         Carte carte = new Carte(20, 10);
@@ -146,5 +147,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         setMinimumSize(victoire.getMinimumSize());
         setSize(victoire.getMinimumSize());
         victoire.requestFocus();
+
+        victoire.lancer();
     }
 }

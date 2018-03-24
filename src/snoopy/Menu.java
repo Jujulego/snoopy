@@ -5,26 +5,33 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class Menu extends PanneauSol {
     // Attributs
-    private int balle_x = -150;
+    private int oiseau_x = -50;
+    private int perso_x = -130;
+    private int balle_x = -190;
+
     private float balle_y = -80;
     private float balle_dy = 0;
     private float balle_ay = 0.2f;
-    private int perso_x = -110;
-    private int oiseau_x = -50;
-    private int numAnimExplo;
+
     private int numAnimPerso;
     private int numAnimOiseau;
-    private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+    private static Random random = new Random();
+    private ArrayList<Integer> numAnimExplo = new ArrayList<>();
+    private ScheduledExecutorService scheduler;
 
     private ArrayList<ChgThemeListener> listeners = new ArrayList<>();
 
     private JButton btnJouer = new JButton("Jouer");
+    private JButton btnCharger = new JButton("Charger");
+    private JButton btnMDP = new JButton("Mot de passe");
 
     private JLabel lblTheme = new JLabel("");
     private JButton btnThemeM = new JButton("<<");
@@ -38,6 +45,8 @@ public class Menu extends PanneauSol {
         // Boutons
         setLayout(null);
         add(btnJouer);
+        add(btnCharger);
+        add(btnMDP);
         add(lblTheme);
         add(btnThemeP);
         add(btnThemeM);
@@ -55,10 +64,23 @@ public class Menu extends PanneauSol {
         Dimension taille;
 
         // - jouer
-        add(btnJouer);
         taille = btnJouer.getPreferredSize();
         btnJouer.setBounds(
                 (getWidth() - taille.width)/2 + insets.left, getSol() + 15 + insets.top,
+                taille.width, taille.height
+        );
+
+        // - charger
+        taille = btnCharger.getPreferredSize();
+        btnCharger.setBounds(
+                (getWidth() - taille.width)/2 + insets.left, getSol() + 55 + insets.top,
+                taille.width, taille.height
+        );
+
+        // - mot de passe
+        taille = btnMDP.getPreferredSize();
+        btnMDP.setBounds(
+                (getWidth() - taille.width)/2 + insets.left, getSol() + 95 + insets.top,
                 taille.width, taille.height
         );
 
@@ -66,20 +88,20 @@ public class Menu extends PanneauSol {
         Dimension tailleT = lblTheme.getPreferredSize();
         tailleT.width = 80;
         lblTheme.setBounds(
-                (getWidth() - tailleT.width)/2 + insets.left, getSol() + 80 + insets.top,
+                (getWidth() - tailleT.width)/2 + insets.left, getSol() + 140 + insets.top,
                 tailleT.width, tailleT.height
         );
         lblTheme.setHorizontalAlignment(SwingConstants.CENTER);
 
         taille = btnThemeM.getPreferredSize();
         btnThemeM.setBounds(
-                (getWidth() - 50 - taille.width)/2 - taille.width + insets.left, getSol() + 75 + insets.top,
+                (getWidth() - 50 - taille.width)/2 - taille.width + insets.left, getSol() + 135 + insets.top,
                 taille.width, taille.height
         );
 
         taille = btnThemeP.getPreferredSize();
         btnThemeP.setBounds(
-                (getWidth() + 50 + taille.width)/2 + insets.left, getSol() + 75 + insets.top,
+                (getWidth() + 50 + taille.width)/2 + insets.left, getSol() + 135 + insets.top,
                 taille.width, taille.height
         );
     }
@@ -92,8 +114,8 @@ public class Menu extends PanneauSol {
         Graphics2D g2d = (Graphics2D) graphics;
 
         // Mur
-        int long_ = Moteur.LONG_IMG * 4/5;
-        int larg  = Moteur.LARG_IMG * 4/5;
+        int long_ = (int) (Moteur.LONG_IMG * 4/5.0);
+        int larg  = (int) (Moteur.LARG_IMG * 4/5.0);
         int x = 0, y = getSol()-long_;
 
         while (x < getWidth()) {
@@ -103,12 +125,21 @@ public class Menu extends PanneauSol {
                     null
             );
 
-            if ((x / larg) % 2 == 0 && numAnimExplo >= 0) {
-                g2d.drawImage(theme.getBoomImg(numAnimExplo),
-                        x + larg/2, y - long_,
-                        larg, long_,
-                        null
-                );
+            if (x < getWidth() - larg && (x / larg) % 2 == 0) {
+                int i = (x / (2*larg));
+
+                if (numAnimExplo.size() <= i) {
+                    numAnimExplo.add(random.nextInt(theme.getNbImageAnimBoom()+6)-6);
+
+                }
+
+                if (numAnimExplo.get(i) >= 0) {
+                    g2d.drawImage(theme.getBoomImg(numAnimExplo.get(i)),
+                            x + larg / 2, y - long_,
+                            larg, long_,
+                            null
+                    );
+                }
             }
 
             x += larg;
@@ -149,7 +180,7 @@ public class Menu extends PanneauSol {
     private synchronized void animer() {
         balle_x += 2;
         if (balle_x > getWidth()) {
-            balle_x = perso_x - 40;
+            balle_x = perso_x-60;
         }
 
         balle_dy += balle_ay;
@@ -160,7 +191,7 @@ public class Menu extends PanneauSol {
 
         perso_x += 2;
         if (perso_x > getWidth()) {
-            perso_x = oiseau_x-60;
+            perso_x = oiseau_x-80;
         }
 
         oiseau_x += 2;
@@ -168,9 +199,14 @@ public class Menu extends PanneauSol {
             oiseau_x = -50;
         }
 
-        numAnimExplo++;// = (numAnimExplo + 1) % theme.getNbImageAnimBoom();
-        if (numAnimExplo == theme.getNbImageAnimBoom()) {
-            numAnimExplo = -6;
+        for (int i = 0; i < numAnimExplo.size(); ++i) {
+            Integer num = numAnimExplo.get(i)+1;
+
+            if (num == theme.getNbImageAnimBoom()) {
+                num = -random.nextInt(6);
+            }
+
+            numAnimExplo.set(i, num);
         }
 
         numAnimPerso = (numAnimPerso + 1) % theme.getNbImgPerso(Direction.DROITE);

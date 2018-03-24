@@ -55,7 +55,7 @@ public class Perdu extends PanneauSol {
     }
 
     private ArrayList<OiseauMouv> oiseaux = new ArrayList<>();
-    private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+    private ScheduledExecutorService scheduler;
 
     private JButton btnRecommencer = new JButton("Recommencer");
     private JButton btnMenu = new JButton("Retourner au Menu");
@@ -123,12 +123,7 @@ public class Perdu extends PanneauSol {
                     null
             );
 
-            // Calcul du symétrique
-            AffineTransform ty = AffineTransform.getScaleInstance(-1, 1);
-            ty.translate(-img.getWidth(null), 0);
-            AffineTransformOp op = new AffineTransformOp(ty, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-
-            g2d.drawImage(op.filter(img, null),
+            g2d.drawImage(theme.symetriqueX(img),
                     getWidth() / 2 + 125 + i * 75, oiseau.getY() + getSol(),
                     50, 50,
                     null
@@ -164,7 +159,9 @@ public class Perdu extends PanneauSol {
     }
 
     public void stop() {
-        scheduler.shutdown();
+        if (scheduler != null) {
+            scheduler.shutdown();
+        }
     }
 
     // Accesseurs
