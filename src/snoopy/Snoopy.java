@@ -27,8 +27,6 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     public Snoopy(int x, int y) {
         super(x, y, 1);
 
-
-
         // On initialise la position précédante à la position de départ
         ox = x;
         oy = y;
@@ -82,7 +80,12 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         return etat < 1.0;
     }
 
-    private void dessiner(Graphics2D g2d,Theme theme, int x, int y) {
+    @Override
+    public boolean estBloquant() {
+        return false;
+    }
+
+    private void dessiner(Graphics2D g2d, Theme theme, int x, int y) {
         int num_anim=0;
         if (animation()) {
             int nb = theme.getNbImgPerso(direction);

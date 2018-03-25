@@ -40,6 +40,11 @@ public class BlocCassable extends Bloc implements Animation {
     }
 
     @Override
+    public boolean estBloquant() {
+        return !anim_casse;
+    }
+
+    @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         if (anim_casse) {
             // Affiche l'animation de desaparition

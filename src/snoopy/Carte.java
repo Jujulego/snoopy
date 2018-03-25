@@ -94,8 +94,8 @@ public class Carte implements Affichable {
     }
 
     /**
-     * Enlève un objet Ã  une case
-     * @param obj objet Ã  enlever
+     * Enlève un objet à une case
+     * @param obj objet à enlever
      */
     public void enlever(Objet obj) {
         cases[obj.getY()][obj.getX()].enlever(obj);
@@ -117,8 +117,8 @@ public class Carte implements Affichable {
     }
 
     /**
-     * Renvoie la case aux coordonnÃ©es données
-     * @return renvoie une case ou null si la coordonnÃ©e n'existe pas
+     * Renvoie la case aux coordonnées données
+     * @return renvoie une case ou null si la coordonnée n'existe pas
      */
     public Case getCase(int x, int y) {
         try {

@@ -72,7 +72,7 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         etat %= 60;
 
         // Rafraichissement de l'ecran
-        repaint();
+        SwingUtilities.invokeLater(this::repaint);
     }
 
     public void stop() {
@@ -119,6 +119,16 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         // Objets
         carte.afficher(g2d, theme, carte_x, carte_y);
 
+        // Conseils
+        Moteur.Mouvement conseil = moteur.conseil();
+
+        g2d.setColor(Color.green);
+        g2d.fillOval(
+                (int) ((conseil.x + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
+                (int) ((conseil.y + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
+                20, 20
+        );
+
         // Balles
         for (Balle balle : moteur.getBalles()) {
             balle.afficher(g2d, theme, carte_x, carte_y);
@@ -156,6 +166,8 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
 		// Pause
         if (moteur.isPause()) {
             g2d.drawString("PAUSE", carte_x+larg_carte-75, carte_y+long_carte+20);
+        } else if (moteur.isAuto()) {
+            g2d.drawString("AUTO",  carte_x+larg_carte-75, carte_y+long_carte+20);
         }
 
         // Score
@@ -178,31 +190,40 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
 
     @Override
     public void keyPressed(KeyEvent keyEvent) {
-        // Lancement d'une animation de déplacement
+        // Modes
         switch (keyEvent.getKeyCode()) {
-            case KeyEvent.VK_UP:    // HAUT
-                moteur.deplacerSnoopy(0, -1);
+            case KeyEvent.VK_O: // Automatique ;)
+                moteur.auto();
                 break;
 
-            case KeyEvent.VK_DOWN:  // BAS
-                moteur.deplacerSnoopy(0, 1);
-                break;
-
-            case KeyEvent.VK_LEFT:  // GAUCHE
-                moteur.deplacerSnoopy(-1, 0);
-                break;
-
-            case KeyEvent.VK_RIGHT: // DROITE
-                moteur.deplacerSnoopy(1, 0);
-                break;
-
-            case KeyEvent.VK_A: // Attaque !!!
-                moteur.attaquer();
-                break;
-
-            case KeyEvent.VK_P:
+            case KeyEvent.VK_P: // Pause ...
                 moteur.pause();
                 break;
+        }
+
+        // Controle du jeu (ignoré en mode auto)
+        if (!moteur.isAuto()) {
+            switch (keyEvent.getKeyCode()) {
+                case KeyEvent.VK_UP:    // HAUT
+                    moteur.deplacerSnoopy(0, -1);
+                    break;
+
+                case KeyEvent.VK_DOWN:  // BAS
+                    moteur.deplacerSnoopy(0, 1);
+                    break;
+
+                case KeyEvent.VK_LEFT:  // GAUCHE
+                    moteur.deplacerSnoopy(-1, 0);
+                    break;
+
+                case KeyEvent.VK_RIGHT: // DROITE
+                    moteur.deplacerSnoopy(1, 0);
+                    break;
+
+                case KeyEvent.VK_A: // Attaque !!!
+                    moteur.attaquer();
+                    break;
+            }
         }
     }
 

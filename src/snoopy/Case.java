@@ -44,8 +44,6 @@ public class Case implements Affichable, Animation {
         return true;
     }
 
-
-
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affiche uniqement l'objet avec l'indice z le plus grand
@@ -109,13 +107,11 @@ public class Case implements Affichable, Animation {
         return objets;
     }
 
-
     public Objet getObjet() {
-        try {
-        	Objet obj = objets.getFirst();
-            return obj;
-        } catch (NoSuchElementException err) {
+        if (objets.size() == 0) {
             return null;
         }
+
+        return objets.getFirst();
     }
 }
