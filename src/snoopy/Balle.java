@@ -1,6 +1,7 @@
 package snoopy;
 
 import java.awt.*;
+import java.util.LinkedList;
 
 public class Balle implements Animation, Affichable {
     // Constantes
@@ -97,6 +98,46 @@ public class Balle implements Animation, Affichable {
         if (rebond_y && y / Moteur.LONG_IMG != (y + dy) / Moteur.LONG_IMG) {
             dy *= -1;
         }
+    }
+
+    /**
+     * Renvoie la liste des case traversées par la balle dans "delta" frames
+     *
+     * @param carte etat de la carte
+     * @param delta nombre de frames à évaluer
+     * @return les cases qui seront traversées en l'etat
+     */
+    public LinkedList<Case> prevision(Carte carte, int delta) {
+        LinkedList<Case> cases = new LinkedList<>();
+
+        // Déjà la case actuelle !
+        cases.addFirst(carte.getCase(
+                x / Moteur.LARG_IMG,
+                y / Moteur.LONG_IMG
+        ));
+
+        // Copie !
+        Balle balle = new Balle(x, y, dx, dy);
+        for (int i = 0; i < delta; ++i) {
+            // Mouvement de la balle
+            balle.animer(carte, null); // le theme n'est pas utilisé !
+
+            Case ncase = carte.getCase(balle.x / Moteur.LARG_IMG, balle.y / Moteur.LONG_IMG);
+            boolean presente = false;
+
+            for (Case case_ : cases) {
+                if (case_.getX() == ncase.getX() && case_.getY() == ncase.getY()) {
+                    presente = true;
+                    break;
+                }
+            }
+
+            if (!presente) {
+                cases.addFirst(ncase);
+            }
+        }
+
+        return cases;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package snoopy;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -13,10 +12,10 @@ public class Moteur {
     public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
     public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
 
-    public static final int VAL_OISEAU      = 25;
-    public static final double VAL_PX_BALLE = 0.1;
-    public static final int VAL_CASE_OISEAU = 5;
+    public static final double VAL_PX_BALLE = 0.05;
+    public static final int VAL_CASE_OISEAU = 4;
     public static final int MAX_DEPL = 200;
+    public static final int PREVISIONS = 5;
 
     // Attributs
     // - jeu
@@ -27,6 +26,7 @@ public class Moteur {
     private int timer = 60; // Timer
     private LinkedList<Balle> balles = new LinkedList<>(); // gestion des balles
     private int attente = 0;
+    private int duree_depl = 0;
 
     // - animation
     private Theme theme;
@@ -191,11 +191,20 @@ public class Moteur {
      * @param check_poussees indique s'il faut prendre en compte les possibilités de poussées
      * @param check_casse indique s'il faut prendre en compte les possibilités de casse
      * @param check_balles indique s'il faut prendre en compte les balles
+     * @param previsions positions futures des balles (si déjà calculées)
      * @return la liste des déplacements possibles
      */
-    public LinkedList<Direction> directionsPossibles(int x, int y, boolean check_poussees, boolean check_casse, boolean check_balles) {
+    public LinkedList<Direction> directionsPossibles(int x, int y, boolean check_poussees, boolean check_casse, boolean check_balles, LinkedList<Case> previsions) {
         // Création de l'objet
         LinkedList<Direction> liste = new LinkedList<>();
+
+        // Prévision des balles
+        if (previsions == null) {
+            previsions = new LinkedList<>();
+            for (Balle balle : balles) {
+                previsions.addAll(balle.prevision(carte, duree_depl * PREVISIONS));
+            }
+        }
 
         // Remplissage
         for (Direction dir : Direction.values()) {
@@ -227,14 +236,11 @@ public class Moteur {
             if (check_balles) {
                 // Check balles !
                 boolean echec = false;
-                for (Balle balle : balles) {
-                    // Check à l'instant t
-                    if ((nx == balle.getX() / LARG_IMG) && (ny == balle.getY() / LONG_IMG)) {
+                for (Case c : previsions) {
+                    if (c.getX() == nx && c.getY() == ny) {
                         echec = true;
                         break;
                     }
-
-                    //TODO: check à l'instant t+1 et t+2
                 }
 
                 if (echec) {
@@ -258,7 +264,7 @@ public class Moteur {
      * @return la liste des déplacements possibles
      */
     public LinkedList<Direction> directionsPossibles(boolean check_poussees, boolean check_casse, boolean check_balles) {
-        return directionsPossibles(snoopy.getX(), snoopy.getY(), check_poussees, check_casse, check_balles);
+        return directionsPossibles(snoopy.getX(), snoopy.getY(), check_poussees, check_casse, check_balles, null);
     }
 
     /**
@@ -266,9 +272,10 @@ public class Moteur {
      *
      * @param dep_x point de départ
      * @param dep_y point de départ
+     * @param previsions positions futures des balles (si déjà calculées)
      * @return distance à parcourir jusqu'à l'oiseau le plus proche
      */
-    private int distanceOiseau(int dep_x, int dep_y) {
+    private int distanceOiseau(int dep_x, int dep_y, LinkedList<Case> previsions) {
         // Cas de base
         if (snoopy.getOiseaux() == carte.getNbOiseaux()) {
             return 0;
@@ -297,7 +304,7 @@ public class Moteur {
 
             // Directions
             directions = directionsPossibles(coord.x, coord.y,
-                    false, false, false
+                    false, false, false, previsions
             );
             for (Direction dir : directions) {
                 CoordDist ncoord = coord.ajouter(dir);
@@ -316,6 +323,7 @@ public class Moteur {
                 // Ajout à la file sauf si déjà traité
                 if (!marques.contains(ncoord)) {
                     file.addFirst(ncoord);
+                    marques.add(ncoord);
                 }
             }
         }
@@ -333,21 +341,20 @@ public class Moteur {
     public double heuristique(int x, int y) {
         double heu = 0;
 
-        // 1er critère : le nombre d'oiseaux récupéré
-        heu += snoopy.getOiseaux() * VAL_OISEAU;
-
-        // 2eme critère : distance aux balles
-        double snoopy_x = (x + 0.5) * LARG_IMG;
-        double snoopy_y = (y + 0.5) * LONG_IMG;
-
+        // 1er critère : distance aux balles
+        LinkedList<Case> previsions = new LinkedList<>();
         for (Balle balle : balles) {
-            heu += Math.sqrt(
-                    Math.pow(snoopy_x - balle.getX(), 2) + Math.pow(snoopy_y - balle.getY(), 2)
-            ) * VAL_PX_BALLE;
+            previsions.addAll(balle.prevision(carte, duree_depl * PREVISIONS));
         }
 
-        // 3eme critère : distance jusqu'à l'oiseau le plus proche
-        heu += (MAX_DEPL - distanceOiseau(x, y)) * VAL_CASE_OISEAU;
+        for (Case c : previsions) {
+            if (c.getX() == x && c.getY() == y) {
+                return 0; // Faut bouger de la !!!
+            }
+        }
+
+        // 2eme critère : distance jusqu'à l'oiseau le plus proche
+        heu += (MAX_DEPL - distanceOiseau(x, y, previsions)) * VAL_CASE_OISEAU;
 
         return heu;
     }
@@ -504,8 +511,10 @@ public class Moteur {
      */
     public void lancer(int freq) {
         scheduler = new ScheduledThreadPoolExecutor(1);
-        scheduler.scheduleAtFixedRate(this::animer, 0, freq, TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(this::animer, 0, 1000/freq, TimeUnit.MILLISECONDS);
         scheduler.scheduleAtFixedRate(this::clock, 0, 1, TimeUnit.SECONDS);
+
+        duree_depl = freq/Snoopy.DUREE_DEPL;
     }
 
     /**
@@ -569,6 +578,20 @@ public class Moteur {
         }
 
         // Méthodes
+        @Override
+        public int hashCode() {
+            return x<<32 + y;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Coord) {
+                return ((Coord) o).x == x && ((Coord) o).y == y;
+            }
+
+            return false;
+        }
+
         public Coord ajouter(Direction dir) {
             return new Coord(
                     ajouterDirX(x, dir),
@@ -605,11 +628,6 @@ public class Moteur {
         }
 
         // Méthodes
-        @Override
-        public int hashCode() {
-            return x<<32 + y;
-        }
-
         public int getX() {
             return x;
         }

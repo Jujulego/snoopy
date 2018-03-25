@@ -18,7 +18,7 @@ public class Console {
     // Constructeur
     public Console(Moteur moteur) {
         this.moteur = moteur;
-        moteur.lancer(1000/60);
+        moteur.lancer(30);
 
         // Création buffer
         tx = moteur.getCarte().getTx()*3 + 1;
