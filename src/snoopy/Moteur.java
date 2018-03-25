@@ -605,6 +605,11 @@ public class Moteur {
         }
 
         // Méthodes
+        @Override
+        public int hashCode() {
+            return x<<32 + y;
+        }
+
         public int getX() {
             return x;
         }
