@@ -81,7 +81,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         victoire.stop();
 
         // Création de la carte
-        Carte carte = new Carte(5, 5);
+        Carte carte = new Carte(20, 10);
 
         Snoopy snoopy = new Snoopy(2, 2);
         carte.ajouter(snoopy);
@@ -95,9 +95,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 
                 carte.ajouter(new BlocPoussable(x+2, y+1));
                 carte.ajouter(new BlocCassable(x,y+2));
-                carte.ajouter(new BlocPiege(x+1, y+4));
                 carte.ajouter(new BlocPiege(x+2, y+4));
-                carte.ajouter(new BlocPiege(x+3, y+4));
             }
 
         // Création de l'aire de jeu

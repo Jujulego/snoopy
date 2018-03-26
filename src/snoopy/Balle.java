@@ -66,36 +66,44 @@ public class Balle implements Animation, Affichable {
 
         // Rebond sur les blocs
         boolean rebond_x = false, rebond_y = false;
+        int rx = dx < 0 ? -1 : 1;
+        int ry = dy < 0 ? -1 : 1;
+
+        // Case à côté (x)
         Case case_suiv = carte.getCase(
-                ((x + (dx * RAYON)/Math.abs(dx)) / Moteur.LARG_IMG),
+                ((x + RAYON * rx + dx) / Moteur.LARG_IMG),
                 y / Moteur.LONG_IMG
         );
         if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
             rebond_x = true;
         }
 
+        // Case à côté (y)
         case_suiv = carte.getCase(
                 x / Moteur.LARG_IMG,
-                ((y + (dy * RAYON)/Math.abs(dy)) / Moteur.LONG_IMG)
+                ((y + RAYON * ry + dy) / Moteur.LONG_IMG)
         );
         if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
             rebond_y = true;
         }
 
-        case_suiv = carte.getCase(
-                ((x + (dx * RAYON)/Math.abs(dx)) / Moteur.LARG_IMG),
-                ((y + (dy * RAYON)/Math.abs(dy)) / Moteur.LONG_IMG)
-        );
-        if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
-            rebond_x = true;
-            rebond_y = true;
+        // Case en diagonale
+        if (!rebond_x && ! rebond_y) {
+            case_suiv = carte.getCase(
+                    ((x + RAYON * rx + dx) / Moteur.LARG_IMG),
+                    ((y + RAYON * ry + dy) / Moteur.LONG_IMG)
+            );
+            if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
+                rebond_x = true;
+                rebond_y = true;
+            }
         }
 
-        if (rebond_x && x / Moteur.LARG_IMG != (x + dx) / Moteur.LARG_IMG) {
+        if (rebond_x && (x + RAYON * rx) / Moteur.LARG_IMG != (x + RAYON * rx + dx) / Moteur.LARG_IMG) {
             dx *= -1;
         }
 
-        if (rebond_y && y / Moteur.LONG_IMG != (y + dy) / Moteur.LONG_IMG) {
+        if (rebond_y && (y + RAYON * ry) / Moteur.LONG_IMG != (y + RAYON * ry + dy) / Moteur.LONG_IMG) {
             dy *= -1;
         }
     }
