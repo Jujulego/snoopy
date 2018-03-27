@@ -1,7 +1,9 @@
 package snoopy;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -12,7 +14,6 @@ public class Moteur {
     public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
     public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
 
-    public static final double VAL_PX_BALLE = 0.05;
     public static final int VAL_CASE_OISEAU = 4;
     public static final int MAX_DEPL = 200;
     public static final int PREVISIONS = 5;
@@ -56,6 +57,7 @@ public class Moteur {
     private void animer() {
         // Evolution des animation
         if (!pause) {
+            // Mouvements
             for (Animation a : animations) {
                 if (a.animation()) a.animer(carte, theme);
             }
@@ -74,6 +76,43 @@ public class Moteur {
                         }
                     } else if (balle.getTouche()) {
                         balle.setTouche(false);
+                    }
+                }
+            }
+        }
+
+        // Téléportation
+        for (int x = 0; x < carte.getTx(); ++x) {
+            for (int y = 0; y < carte.getTy(); ++y) {
+                Case case_ = carte.getCase(x, y);
+                Teleporteur tp = case_.getTeleporteur();
+
+                // Pas de téléporteur
+                if (tp == null || tp.getPaire() == null) {
+                    continue;
+                }
+
+                // Téléportation !!!
+                Teleporteur tp_arr = tp.getPaire();
+                Case case_arr = carte.getCase(tp_arr.getX(), tp_arr.getY());
+
+                // Il peu y avoir un bloc sur le téléporteur arrivée
+                if (!case_arr.accessible()) {
+                    continue;
+                }
+
+                for (Objet objet : case_.listeObjets()) {
+                    // On ne téléporte pas les objets en pleine animation
+                    if (objet instanceof Animation && ((Animation) objet).animation()) {
+                        continue;
+                    }
+
+                    // Téléportation !
+                    if (objet instanceof Teleportable && ((Teleportable) objet).teleportable()) {
+                        case_.enlever(objet);
+                        case_arr.ajouter(objet);
+
+                        ((Teleportable) objet).teleportation(tp_arr);
                     }
                 }
             }
@@ -306,15 +345,34 @@ public class Moteur {
             coord = file.getLast();
             file.removeLast();
 
+            Case case_ = carte.getCase(coord.x, coord.y);
+
+            // Téléportation
+            if (case_.getTeleporteur() != null && case_.getTeleporteur().getPaire() != null) {
+                Teleporteur tp = case_.getTeleporteur().getPaire();
+                case_ = carte.getCase(tp.getX(), tp.getY());
+
+                // Téléportation !!
+                coord.x = case_.getX();
+                coord.y = case_.getY();
+
+                // La case arrivée est déjà traitée !!!
+                if (marques.contains(coord)) {
+                    continue;
+                }
+                marques.add(coord);
+            }
+
             // Directions
             directions = directionsPossibles(coord.x, coord.y,
-                    false, false, false, previsions
+                    true, true, false, previsions
             );
             for (Direction dir : directions) {
                 CoordDist ncoord = coord.ajouter(dir);
+                case_ = carte.getCase(ncoord.x, ncoord.y);
 
                 // Oiseau ?
-                for (Objet obj : carte.getCase(ncoord.x, ncoord.y).listeObjets()) {
+                for (Objet obj : case_.listeObjets()) {
                     // La casse compte pour 1
                     if (obj instanceof BlocCassable) {
                         ncoord.distance++;

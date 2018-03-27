@@ -7,7 +7,7 @@ import java.util.LinkedList;
 /**
  * Représente Snoopy !!!
  */
-public class Snoopy extends Objet implements Deplacable, Animation {
+public class Snoopy extends Objet implements Deplacable, Animation, Teleportable {
     // Constantes
     public static final int MAX_VIES = 3;
     public static final int DUREE_DEPL = 5;
@@ -16,6 +16,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     private int vies = MAX_VIES;
     private Direction direction = Direction.BAS;
     private LinkedList<Oiseau> oiseaux = new LinkedList<>();
+    private Teleporteur dernier_teleporteur = null;
 
     // - animation
     private int ox; // position précédante
@@ -26,7 +27,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
 
     // Constructeur
     public Snoopy(int x, int y) {
-        super(x, y, 1);
+        super(x, y, 2);
 
         // On initialise la position précédante à la position de départ
         ox = x;
@@ -70,6 +71,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         if (etat < 1.0) {
             etat += ((double) DUREE_DEPL) / Aire.FPS;
 
+            // Fin de l'animation
             if (etat >= 1.0) {
                 etat = 1.0;
             }
@@ -182,7 +184,24 @@ public class Snoopy extends Objet implements Deplacable, Animation {
         setX(nx); setY(ny);
         carte.ajouter(this);
 
+        // Téléportation
+        dernier_teleporteur = null;
+
         return true;
+    }
+
+    @Override
+    public boolean teleportable() {
+        return dernier_teleporteur == null;
+    }
+
+    @Override
+    public synchronized void teleportation(Teleporteur teleporteur) {
+        dernier_teleporteur = teleporteur;
+        setX(teleporteur.getX());
+        setY(teleporteur.getY());
+        ox = teleporteur.getX();
+        oy = teleporteur.getY();
     }
 
     // - accesseurs

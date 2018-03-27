@@ -1,6 +1,7 @@
 package snoopy;
 
 import java.awt.*;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -10,6 +11,7 @@ public class Case implements Affichable, Animation {
     // Attributs
     private int x;
     private int y;
+    private Teleporteur teleporteur = null;
 
     private LinkedList<Objet> objets = new LinkedList<>();
     private double etat = 1.0;
@@ -53,7 +55,13 @@ public class Case implements Affichable, Animation {
         );
 
         if (objets.size() != 0) {
-            objets.getFirst().afficher(g2d, theme, bx, by);
+            int z = objets.getFirst().getZ();
+
+            Iterator<Objet> it = objets.iterator();
+            while (it.hasNext()) {
+                Objet obj = it.next();
+                obj.afficher(g2d, theme, bx, by);
+            }
         }
 
     }
@@ -91,6 +99,11 @@ public class Case implements Affichable, Animation {
 
         // Tri décroissant sur l'indice Z
         objets.sort((Objet obj1, Objet obj2) -> obj2.getZ() - obj1.getZ());
+
+        // Cas du teleporteur
+        if (objet instanceof Teleporteur) {
+            teleporteur = (Teleporteur) objet;
+        }
     }
 
     /**
@@ -98,7 +111,14 @@ public class Case implements Affichable, Animation {
      * @param objet l'objet à enlever
      */
     public synchronized void enlever(Objet objet) {
-        objets.remove(objet);
+        if (!objets.remove(objet)) {
+            return;
+        }
+
+        // Cas du téléporteur
+        if (objet instanceof Teleporteur) {
+            teleporteur = null;
+        }
     }
 
     // Accesseurs
@@ -112,6 +132,10 @@ public class Case implements Affichable, Animation {
         }
 
         return objets.getFirst();
+    }
+
+    public Teleporteur getTeleporteur() {
+        return teleporteur;
     }
 
     public int getX() {
