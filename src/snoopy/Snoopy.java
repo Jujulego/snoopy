@@ -10,6 +10,7 @@ import java.util.LinkedList;
 public class Snoopy extends Objet implements Deplacable, Animation {
     // Constantes
     public static final int MAX_VIES = 3;
+    public static final int DUREE_DEPL = 5;
 
     // Attributs
     private int vies = MAX_VIES;
@@ -21,7 +22,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     private int oy;
 
     private double etat = 1.0; // varie de 0 -> 1, représente l'avancement dans l'animation
-                               // Passe de 0 à 1, en 200ms de seconde
+                               // Passe de 0 à 1, en 400ms de seconde
 
     // Constructeur
     public Snoopy(int x, int y) {
@@ -67,7 +68,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     @Override
     public synchronized void animer(Carte carte, Theme theme) {
         if (etat < 1.0) {
-            etat += 5.0/Aire.FPS;
+            etat += ((double) DUREE_DEPL) / Aire.FPS;
 
             if (etat >= 1.0) {
                 etat = 1.0;
@@ -122,7 +123,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     }
 
     @Override
-    public boolean deplacer(Carte carte, int dx, int dy) {
+    public boolean deplacer(Carte carte, Theme theme, int dx, int dy) {
         // Il est mort !!!
         if (vies == 0) {
             return false;
@@ -156,7 +157,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
             }
         } else if (!case_.accessible()) { // La case n'est pas accessible !
             if (obj instanceof BlocPiege) { // Bouum !
-                ((BlocPiege) obj).toucher(this);
+                ((BlocPiege) obj).toucher(this, carte, theme.getNumTheme() == Theme.CONSOLE);
             }
 
             return false;

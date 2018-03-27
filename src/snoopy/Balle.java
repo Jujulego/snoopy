@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.LinkedList;
 
 public class Balle implements Animation, Affichable {
     // Constantes
@@ -69,38 +70,86 @@ public class Balle implements Animation, Affichable {
 
         // Rebond sur les blocs
         boolean rebond_x = false, rebond_y = false;
+        int rx = dx < 0 ? -1 : 1;
+        int ry = dy < 0 ? -1 : 1;
+
+        // Case à côté (x)
         Case case_suiv = carte.getCase(
-                ((x + (dx * RAYON)/Math.abs(dx)) / Moteur.LARG_IMG),
+                ((x + RAYON * rx + dx) / Moteur.LARG_IMG),
                 y / Moteur.LONG_IMG
         );
         if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
             rebond_x = true;
         }
 
+        // Case à côté (y)
         case_suiv = carte.getCase(
                 x / Moteur.LARG_IMG,
-                ((y + (dy * RAYON)/Math.abs(dy)) / Moteur.LONG_IMG)
+                ((y + RAYON * ry + dy) / Moteur.LONG_IMG)
         );
         if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
             rebond_y = true;
         }
 
-        case_suiv = carte.getCase(
-                ((x + (dx * RAYON)/Math.abs(dx)) / Moteur.LARG_IMG),
-                ((y + (dy * RAYON)/Math.abs(dy)) / Moteur.LONG_IMG)
-        );
-        if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
-            rebond_x = true;
-            rebond_y = true;
+        // Case en diagonale
+        if (!rebond_x && ! rebond_y) {
+            case_suiv = carte.getCase(
+                    ((x + RAYON * rx + dx) / Moteur.LARG_IMG),
+                    ((y + RAYON * ry + dy) / Moteur.LONG_IMG)
+            );
+            if (case_suiv != null && case_suiv.getObjet() instanceof Bloc) {
+                rebond_x = true;
+                rebond_y = true;
+            }
         }
 
-        if (rebond_x && x / Moteur.LARG_IMG != (x + dx) / Moteur.LARG_IMG) {
+        if (rebond_x && (x + RAYON * rx) / Moteur.LARG_IMG != (x + RAYON * rx + dx) / Moteur.LARG_IMG) {
             dx *= -1;
         }
 
-        if (rebond_y && y / Moteur.LONG_IMG != (y + dy) / Moteur.LONG_IMG) {
+        if (rebond_y && (y + RAYON * ry) / Moteur.LONG_IMG != (y + RAYON * ry + dy) / Moteur.LONG_IMG) {
             dy *= -1;
         }
+    }
+
+    /**
+     * Renvoie la liste des case traversées par la balle dans "delta" frames
+     *
+     * @param carte etat de la carte
+     * @param delta nombre de frames à évaluer
+     * @return les cases qui seront traversées en l'etat
+     */
+    public LinkedList<Case> prevision(Carte carte, int delta) {
+        LinkedList<Case> cases = new LinkedList<>();
+
+        // Déjà la case actuelle !
+        cases.addFirst(carte.getCase(
+                x / Moteur.LARG_IMG,
+                y / Moteur.LONG_IMG
+        ));
+
+        // Copie !
+        Balle balle = new Balle(x, y, dx, dy);
+        for (int i = 0; i < delta; ++i) {
+            // Mouvement de la balle
+            balle.animer(carte, null); // le theme n'est pas utilisé !
+
+            Case ncase = carte.getCase(balle.x / Moteur.LARG_IMG, balle.y / Moteur.LONG_IMG);
+            boolean presente = false;
+
+            for (Case case_ : cases) {
+                if (case_.getX() == ncase.getX() && case_.getY() == ncase.getY()) {
+                    presente = true;
+                    break;
+                }
+            }
+
+            if (!presente) {
+                cases.addFirst(ncase);
+            }
+        }
+
+        return cases;
     }
 
     @Override

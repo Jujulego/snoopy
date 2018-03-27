@@ -2,7 +2,6 @@ package snoopy;
 
 import java.awt.*;
 import java.util.LinkedList;
-import java.util.NoSuchElementException;
 
 /**
  * Gestion d'une case. Permet la présence de plusieurs objets au même endroit
@@ -45,7 +44,7 @@ public class Case implements Affichable, Animation {
     }
 
     @Override
-    public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
+    public synchronized void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affiche uniqement l'objet avec l'indice z le plus grand
         g2d.drawImage(theme.getCaseImg(0),
                 bx+x*Moteur.LARG_IMG, by+y*Moteur.LONG_IMG,
@@ -59,7 +58,7 @@ public class Case implements Affichable, Animation {
 
     }
 
-    public void afficher_obj(Graphics2D g2d, Theme theme, int bx, int by) {
+    public synchronized void afficher_obj(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affiche uniqement l'objet avec l'indice z le plus grand
         if (objets.size() != 0) {
             objets.getFirst().afficher(g2d, theme, bx, by);
@@ -73,7 +72,7 @@ public class Case implements Affichable, Animation {
      *
      * @return true si accessible, false sinon
      */
-    public boolean accessible() {
+    public synchronized boolean accessible() {
         for (Objet objet : objets) {
             if (objet.estBloquant()) {
                 return false;
@@ -87,7 +86,7 @@ public class Case implements Affichable, Animation {
      * Ajoute un objet à la case
      * @param objet l'objet à ajouter
      */
-    public void ajouter(Objet objet) {
+    public synchronized void ajouter(Objet objet) {
         objets.add(objet);
 
         // Tri décroissant sur l'indice Z
@@ -98,20 +97,28 @@ public class Case implements Affichable, Animation {
      * Enlève un objet à la case
      * @param objet l'objet à enlever
      */
-    public void enlever(Objet objet) {
+    public synchronized void enlever(Objet objet) {
         objets.remove(objet);
     }
 
     // Accesseurs
-    public LinkedList<Objet> listeObjets() {
+    public synchronized LinkedList<Objet> listeObjets() {
         return objets;
     }
 
-    public Objet getObjet() {
+    public synchronized Objet getObjet() {
         if (objets.size() == 0) {
             return null;
         }
 
         return objets.getFirst();
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 }

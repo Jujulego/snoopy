@@ -86,16 +86,17 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         Snoopy snoopy = new Snoopy(2, 2);
         carte.ajouter(snoopy);
 
-        carte.ajouter(new Oiseau(0, 0));
-        carte.ajouter(new Oiseau(0, 4));
-        carte.ajouter(new Oiseau(4, 0));
-        carte.ajouter(new Oiseau(4, 4));
+        for (int y = 0; y < carte.getTy(); y += 5)
+            for (int x = 0; x < carte.getTx(); x+=5) {
+                carte.ajouter(new Oiseau(x, y));
+                carte.ajouter(new Oiseau(x, y+4));
+                carte.ajouter(new Oiseau(x+4, y));
+                carte.ajouter(new Oiseau(x+4, y+4));
 
-        carte.ajouter(new BlocPoussable(2, 1));
-        carte.ajouter(new BlocCassable(0,2));
-        carte.ajouter(new BlocPiege(1, 4));
-        carte.ajouter(new BlocPiege(2, 4));
-        carte.ajouter(new BlocPiege(3, 4));
+                carte.ajouter(new BlocPoussable(x+2, y+1));
+                carte.ajouter(new BlocCassable(x,y+2));
+                carte.ajouter(new BlocPiege(x+2, y+4));
+            }
 
         // Création de l'aire de jeu
         Moteur moteur = new Moteur(carte, snoopy, theme, 0);

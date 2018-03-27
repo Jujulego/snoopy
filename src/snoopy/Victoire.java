@@ -2,6 +2,7 @@ package snoopy;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -9,7 +10,9 @@ import java.util.concurrent.TimeUnit;
 public class Victoire extends PanneauSol {
     // Attributs
     private int perso_x = -50;
+    private int perso_dx = 2;
     private int oiseau_x = -130;
+    private int oiseau_dx = 2;
 
     private int balle_x = 0;
     private int balle_dx = 2;
@@ -100,14 +103,19 @@ public class Victoire extends PanneauSol {
         );
 
         // Perso et Oiseau
-        g2d.drawImage(theme.symetriqueX(theme.getPersoImg(Direction.DROITE, numAnimPerso)),
-                getWidth() - perso_x, getSol()-50,
+        BufferedImage img = theme.getOiseauImg(numAnimOiseau);
+        if (oiseau_dx > 0) {
+            img = theme.symetriqueX(img);
+        }
+
+        g2d.drawImage(img,
+                getWidth() - oiseau_x, getSol()-50,
                 50, 50,
                 null
         );
 
-        g2d.drawImage(theme.symetriqueX(theme.getOiseauImg(numAnimOiseau)),
-                getWidth() - oiseau_x, getSol()-50,
+        g2d.drawImage(theme.symetriqueX(theme.getPersoImg(perso_dx > 0 ? Direction.DROITE : Direction.GAUCHE, numAnimPerso)),
+                getWidth() - perso_x, getSol()-50,
                 50, 50,
                 null
         );
@@ -126,15 +134,25 @@ public class Victoire extends PanneauSol {
     }
 
     private void animer() {
+        int larg  = (int) (Moteur.LARG_IMG * 4/5.0);
+
         // Mouvement du personnage et de l'oiseau
-        oiseau_x += 2;
-        if (oiseau_x > getWidth()+50) {
-            oiseau_x = perso_x-80;
+        oiseau_x += oiseau_dx;
+        if (oiseau_x + oiseau_dx > getWidth()) {
+            oiseau_x = perso_x + 80;
+            oiseau_dx = -oiseau_dx;
+
+        } else if (oiseau_dx < 0 && oiseau_x + oiseau_dx < 9*larg) {
+            oiseau_x = perso_x - 80;
+            oiseau_dx = -oiseau_dx;
         }
 
-        perso_x += 2;
-        if (perso_x > getWidth()+50) {
-            perso_x = -50;
+        perso_x += perso_dx;
+        if (perso_x + perso_dx > getWidth()) {
+            perso_dx = -perso_dx;
+
+        } else if (perso_dx < 0 && perso_x + perso_dx < 9*larg) {
+            perso_dx = -perso_dx;
         }
 
         // Balle

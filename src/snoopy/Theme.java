@@ -16,6 +16,8 @@ public class Theme {
     public static final int DRUCKER = 2;
     public static final int SNOOPY = 3;
 
+    public static final int CONSOLE = -1;
+
     // Attributs
     private int num_theme=0;
     private HashMap<Direction,ArrayList<BufferedImage>> perso = new HashMap<>();
@@ -33,6 +35,9 @@ public class Theme {
     public Theme(int num_theme)
     {
         this.num_theme = num_theme;
+        if (num_theme == CONSOLE) {
+            return;
+        }
 
         // Chargement images personnage
         perso.put(Direction.HAUT,   chargerAnimation(cheminTheme("perso0/anim%d")));
