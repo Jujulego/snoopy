@@ -94,7 +94,36 @@ public class Console {
     public void clavier() {
         while (true) {
             String ligne = scanner.nextLine();
-            print(ligne, 0, moteur.getCarte().getTy()*2);
+
+            switch (ligne.toLowerCase().toCharArray()[0]) {
+                case 'z': // Haut !
+                    moteur.deplacerSnoopy(0, -1);
+                    break;
+
+                case 'q': // Gauche !
+                    moteur.deplacerSnoopy(-1, 0);
+                    break;
+
+                case 's': // Bas !
+                    moteur.deplacerSnoopy(0, 1);
+                    break;
+
+                case 'd': // Droite !
+                    moteur.deplacerSnoopy(1, 0);
+                    break;
+
+                case 'a': // Attaque !
+                    moteur.attaquer();
+                    break;
+
+                case 'o': // Automatique
+                    moteur.auto();
+                    break;
+
+                case 'p': // Pause
+                    moteur.pause();
+                    break;
+            }
         }
     }
 
@@ -139,7 +168,7 @@ public class Console {
         carte.ajouter(new BlocPiege(2, 4));
 
         // Création de l'aire de jeu
-        Moteur moteur = new Moteur(carte, snoopy, new Theme(Theme.SNOOPY), 0);
+        Moteur moteur = new Moteur(carte, snoopy, new Theme(Theme.CONSOLE), 0);
         moteur.ajouterBalle(new Balle(
                 (int) (2.5 * Moteur.LARG_IMG), (int) (0.5 * Moteur.LONG_IMG),
                 -4, 4

@@ -123,7 +123,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
     }
 
     @Override
-    public boolean deplacer(Carte carte, int dx, int dy) {
+    public boolean deplacer(Carte carte, Theme theme, int dx, int dy) {
         // Il est mort !!!
         if (vies == 0) {
             return false;
@@ -157,7 +157,7 @@ public class Snoopy extends Objet implements Deplacable, Animation {
             }
         } else if (!case_.accessible()) { // La case n'est pas accessible !
             if (obj instanceof BlocPiege) { // Bouum !
-                ((BlocPiege) obj).toucher(this);
+                ((BlocPiege) obj).toucher(this, carte, theme.getNumTheme() == Theme.CONSOLE);
             }
 
             return false;

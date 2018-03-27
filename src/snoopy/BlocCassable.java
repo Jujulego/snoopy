@@ -63,8 +63,12 @@ public class BlocCassable extends Bloc implements Animation {
         }
     }
 
-    public void casser() {
-        anim_casse = true;
-        num_anim = 0;
+    public void casser(Carte carte, boolean console) {
+        if (console) {
+            carte.enlever(this);
+        } else {
+            anim_casse = true;
+            num_anim = 0;
+        }
     }
 }

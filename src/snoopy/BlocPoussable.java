@@ -113,4 +113,9 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
 
         return true;
     }
+
+    @Override
+    public boolean poussable() {
+        return poussable;
+    }
 }

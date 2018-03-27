@@ -21,7 +21,6 @@ public class BlocPiege extends Bloc implements Animation {
         return "T ";
     }
 
-
     @Override
     public void animer(Carte carte, Theme theme) {
         if (anim) {
@@ -45,8 +44,6 @@ public class BlocPiege extends Bloc implements Animation {
         return anim;
     }
 
-
-
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         if(anim)
@@ -68,14 +65,18 @@ public class BlocPiege extends Bloc implements Animation {
 
     }
 
-    public void toucher(Snoopy snoopy) {
+    public void toucher(Snoopy snoopy, Carte carte, boolean console) {
         if (!explose) {
             snoopy.tuer();
             explose = true;
 
-            // On lance l'animation !
-            anim=true;
-            num_anim=0;
+            if (console) {
+                carte.enlever(this);
+            } else {
+                // On lance l'animation !
+                anim = true;
+                num_anim = 0;
+            }
         }
     }
 }

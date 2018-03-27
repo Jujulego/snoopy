@@ -150,7 +150,7 @@ public class Moteur {
         }
 
         // Mouvement !
-        snoopy.deplacer(carte, dx, dy);
+        snoopy.deplacer(carte, theme, dx, dy);
 
         // Check fin
         mort();
@@ -175,9 +175,9 @@ public class Moteur {
             Objet objet = case_.getObjet();
 
             if (objet instanceof BlocCassable) {
-                ((BlocCassable) objet).casser();
+                ((BlocCassable) objet).casser(carte, theme.getNumTheme() == Theme.CONSOLE);
             } else if (objet instanceof BlocPiege) {
-                ((BlocPiege) objet).toucher(snoopy);
+                ((BlocPiege) objet).toucher(snoopy, carte, theme.getNumTheme() == Theme.CONSOLE);
                 mort(); // Fin ?
             }
         }
@@ -221,6 +221,10 @@ public class Moteur {
             Objet obj = case_.getObjet();
             if (check_poussees && obj instanceof Poussable) {
                 // Y a un poussable : peut on pousser ?
+                if (!((Poussable) obj).poussable()) {
+                    continue;
+                }
+
                 int px = ajouterDirX(nx, dir);
                 int py = ajouterDirY(ny, dir);
 
