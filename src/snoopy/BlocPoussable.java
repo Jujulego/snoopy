@@ -53,7 +53,7 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
     private void dessiner(Graphics2D g2d, int x, int y, Theme theme) {
         g2d.drawImage(theme.getBlocImg(1),
                 x, y,
-                Aire.LARG_IMG, Aire.LONG_IMG,
+                Moteur.LARG_IMG, Moteur.LONG_IMG,
                 null
         );
     }
@@ -77,7 +77,7 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
         }
 
         // Affichage !
-        dessiner(g2d, bx + (int) (x * Aire.LARG_IMG), by + (int) (y * Aire.LONG_IMG), theme);
+        dessiner(g2d, bx + (int) (x * Moteur.LARG_IMG), by + (int) (y * Moteur.LONG_IMG), theme);
 
     }
 
@@ -112,5 +112,10 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
         carte.ajouter(this);
 
         return true;
+    }
+
+    @Override
+    public boolean poussable() {
+        return poussable;
     }
 }

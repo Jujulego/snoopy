@@ -1,8 +1,8 @@
 package snoopy;
 
 import java.awt.*;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.NoSuchElementException;
 
 /**
  * Gestion d'une case. Permet la présence de plusieurs objets au même endroit
@@ -11,6 +11,7 @@ public class Case implements Affichable, Animation {
     // Attributs
     private int x;
     private int y;
+    private Teleporteur teleporteur = null;
 
     private LinkedList<Objet> objets = new LinkedList<>();
     private double etat = 1.0;
@@ -44,25 +45,28 @@ public class Case implements Affichable, Animation {
         return true;
     }
 
-
-
     @Override
-    public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
+    public synchronized void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affiche uniqement l'objet avec l'indice z le plus grand
-
-        //g2d.drawImage(theme.getBlocImg(0), bx, by, Aire.LARG_IMG, Aire.LONG_IMG, null);
-
-        //g2d.drawImage(theme.getBlocImg(num_anim), bx, by, Aire.LARG_IMG, Aire.LONG_IMG, null);
-
-        g2d.drawImage(theme.getCaseImg(0), bx+x*Aire.LARG_IMG, by+y*Aire.LONG_IMG, Aire.LARG_IMG, Aire.LONG_IMG, null);
+        g2d.drawImage(theme.getCaseImg(0),
+                bx+x*Moteur.LARG_IMG, by+y*Moteur.LONG_IMG,
+                Moteur.LARG_IMG, Moteur.LONG_IMG,
+                null
+        );
 
         if (objets.size() != 0) {
-            objets.getFirst().afficher(g2d, theme, bx, by);
+            int z = objets.getFirst().getZ();
+
+            Iterator<Objet> it = objets.iterator();
+            while (it.hasNext()) {
+                Objet obj = it.next();
+                obj.afficher(g2d, theme, bx, by);
+            }
         }
 
     }
 
-    public void afficher_obj(Graphics2D g2d, Theme theme, int bx, int by) {
+    public synchronized void afficher_obj(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affiche uniqement l'objet avec l'indice z le plus grand
         if (objets.size() != 0) {
             objets.getFirst().afficher(g2d, theme, bx, by);
@@ -76,7 +80,7 @@ public class Case implements Affichable, Animation {
      *
      * @return true si accessible, false sinon
      */
-    public boolean accessible() {
+    public synchronized boolean accessible() {
         for (Objet objet : objets) {
             if (objet.estBloquant()) {
                 return false;
@@ -90,33 +94,55 @@ public class Case implements Affichable, Animation {
      * Ajoute un objet à la case
      * @param objet l'objet à ajouter
      */
-    public void ajouter(Objet objet) {
+    public synchronized void ajouter(Objet objet) {
         objets.add(objet);
 
         // Tri décroissant sur l'indice Z
         objets.sort((Objet obj1, Objet obj2) -> obj2.getZ() - obj1.getZ());
+
+        // Cas du teleporteur
+        if (objet instanceof Teleporteur) {
+            teleporteur = (Teleporteur) objet;
+        }
     }
 
     /**
      * Enlève un objet à la case
      * @param objet l'objet à enlever
      */
-    public void enlever(Objet objet) {
-        objets.remove(objet);
+    public synchronized void enlever(Objet objet) {
+        if (!objets.remove(objet)) {
+            return;
+        }
+
+        // Cas du téléporteur
+        if (objet instanceof Teleporteur) {
+            teleporteur = null;
+        }
     }
 
     // Accesseurs
-    public LinkedList<Objet> listeObjets() {
+    public synchronized LinkedList<Objet> listeObjets() {
         return objets;
     }
 
-
-    public Objet getObjet() {
-        try {
-        	Objet obj = objets.getFirst();
-            return obj;
-        } catch (NoSuchElementException err) {
+    public synchronized Objet getObjet() {
+        if (objets.size() == 0) {
             return null;
         }
+
+        return objets.getFirst();
+    }
+
+    public Teleporteur getTeleporteur() {
+        return teleporteur;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 }

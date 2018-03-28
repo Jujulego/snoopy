@@ -2,6 +2,7 @@ package snoopy;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,6 +42,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         menu.addChgThemeListener((Theme theme) -> {
             this.theme = theme;
             perdu.setTheme(theme);
+            victoire.setTheme(theme);
         });
 
         // Setup perdu
@@ -50,7 +52,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         perdu.getBtnRecommencer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
 
         // Setup victoire
-        victoire = new Victoire();
+        victoire = new Victoire(theme);
 
         victoire.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
         //victoire.getBtnContinuer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
@@ -90,6 +92,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         // Arrêt du menu
         menu.stop();
         perdu.stop();
+        victoire.stop();
         
        
         //Ouverture fichier 
@@ -153,12 +156,43 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     			
     		}
 
+        // Création de la carte
+        Carte carte = new Carte(20, 10);
+
+        Snoopy snoopy = new Snoopy(2, 2);
+        carte.ajouter(snoopy);
+
+        for (int y = 0; y < carte.getTy(); y += 5) {
+            for (int x = 0; x < carte.getTx(); x += 5) {
+                carte.ajouter(new Oiseau(x, y));
+                carte.ajouter(new Oiseau(x, y + 4));
+                carte.ajouter(new Oiseau(x + 4, y));
+                carte.ajouter(new Oiseau(x + 4, y + 4));
+                carte.ajouter(new Oiseau(x + 2, y + 1));
+                carte.ajouter(new Oiseau(x, y + 2));
+
+                carte.ajouter(new BlocPoussable(x + 2, y + 1));
+                carte.ajouter(new BlocCassable(x, y + 2));
+                carte.ajouter(new BlocPiege(x + 2, y + 4));
+
+                Teleporteur tp1 = new Teleporteur(x + 1, y + 2);
+                Teleporteur tp2 = new Teleporteur(x + 3, y + 2, tp1);
+                tp1.setPaire(tp2);
+
+                carte.ajouter(tp1);
+                carte.ajouter(tp2);
+            }
+        }
+        carte.ajouter(new BadSnoopy(15, 8));
+
         // Création de l'aire de jeu
-        aire = new Aire(carte, snoopy, theme);
-        aire.ajouterBalle(new Balle(
-                (int) (2.5 * Aire.LARG_IMG), (int) (0.5 * Aire.LONG_IMG),
+        Moteur moteur = new Moteur(carte, snoopy, theme, 0);
+        moteur.ajouterBalle(new Balle(
+                (int) (2.5 * Moteur.LARG_IMG), (int) (0.5 * Moteur.LONG_IMG),
                 -4, 4
         ));
+
+        aire = new Aire(moteur, theme);
         aire.ajouterFinListener(this);
 
         setContentPane(aire);
@@ -206,5 +240,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         setMinimumSize(victoire.getMinimumSize());
         setSize(victoire.getMinimumSize());
         victoire.requestFocus();
+
+        victoire.lancer();
     }
 }

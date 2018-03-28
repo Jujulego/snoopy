@@ -5,91 +5,142 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class Perdu extends JPanel {
-    // Attributs
-    private int y = 270;
-    private float dy = -8.5f;
-    private float ay = 0.2f;
+public class Perdu extends PanneauSol {
+    // Constantes
+    private static final float OISEAUX_AY = 0.2f;
 
-    private Theme theme;
-    private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+    // Attributs
+    private class OiseauMouv {
+        // Attributs
+        private float y;
+        private float dy;
+        private int attente = 0;
+
+        // Méthodes
+        public void init(int y, int attente) {
+            this.y = y;
+            this.dy = 0;
+            this.attente = attente;
+        }
+
+        public void mouv() {
+            // Attente
+            if (attente != 0) {
+                attente--;
+                return;
+            }
+
+            // Evolution
+            dy += OISEAUX_AY;
+            y += dy;
+
+            // Rebonds
+            if (y + dy > -50) {
+                dy = -dy-OISEAUX_AY;
+            }
+        }
+
+        public int getY() {
+            return (int) y;
+        }
+
+        public boolean enAttente() {
+            return attente != 0;
+        }
+    }
+
+    private ArrayList<OiseauMouv> oiseaux = new ArrayList<>();
+    private ScheduledExecutorService scheduler;
 
     private JButton btnRecommencer = new JButton("Recommencer");
     private JButton btnMenu = new JButton("Retourner au Menu");
 
     // Constructeur
     public Perdu(Theme theme) {
-        this.theme = theme;
-
-        // Paramètres
-        setDoubleBuffered(true);
-        setMinimumSize(new Dimension(400, 320));
-        setSize(400, 320);
+        super(theme);
 
         // Ajout des boutons
         setLayout(null);
+        add(btnRecommencer);
+        add(btnMenu);
+        positionBoutons();
+
+        for (int i = 0; i < 5; ++i) {
+            oiseaux.add(new OiseauMouv());
+        }
+    }
+
+    // Méthodes
+    public void positionBoutons() {
+        // Boutons
         Insets insets = getInsets();
         Dimension taille;
 
         // - recommencer
-        add(btnRecommencer);
         taille = btnRecommencer.getPreferredSize();
         btnRecommencer.setBounds(
-                200 - taille.width/2 + insets.left, 180 + insets.top,
+                (getWidth() - taille.width)/2 + insets.left, getSol() + 15 + insets.top,
                 taille.width, taille.height
         );
 
         // - retourner au menu
-        add(btnMenu);
         taille = btnMenu.getPreferredSize();
         btnMenu.setBounds(
-                200 - taille.width/2 + insets.left, 225 + insets.top,
+                (getWidth() - taille.width)/2 + insets.left, getSol() + 75 + insets.top,
                 taille.width, taille.height
         );
     }
 
-    // Méthodes
     @Override
     protected void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);
+
         // Initialisation
         Graphics2D g2d = (Graphics2D) graphics;
-        g2d.clearRect(0, 0, getWidth(), getHeight());
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Perdu !!!!
         g2d.setColor(Color.black);
         g2d.setFont(new Font ("Plain", Font.BOLD,50));
 
-        g2d.drawString("PERDU", 100, 70);
+        g2d.drawString("PERDU", getWidth()/2-100, 70);
 
         // Oiseaux
-        Image oiseau = theme.getOiseauImg((y/5) % theme.getNbImgOiseau());
-        g2d.drawImage(oiseau, 25, y, 50, 50, null);
+        for (int i = 0; i < oiseaux.size(); ++i) {
+            OiseauMouv oiseau = oiseaux.get(i);
+            if (oiseau.enAttente()) {
+                continue;
+            }
 
-        // Calcul du symétrique
-        BufferedImage boiseau = new BufferedImage(oiseau.getWidth(null), oiseau.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        boiseau.getGraphics().drawImage(oiseau, 0, 0, null);
+            BufferedImage img = theme.getOiseauImg((-oiseau.getY() / 5) % theme.getNbImgOiseau());
+            g2d.drawImage(img,
+                    getWidth() / 2 - 175 - i * 75, oiseau.getY() + getSol(),
+                    50, 50,
+                    null
+            );
 
-        AffineTransform ty = AffineTransform.getScaleInstance(-1, 1);
-        ty.translate(-oiseau.getWidth(null), 0);
-        AffineTransformOp op = new AffineTransformOp(ty, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            g2d.drawImage(theme.symetriqueX(img),
+                    getWidth() / 2 + 125 + i * 75, oiseau.getY() + getSol(),
+                    50, 50,
+                    null
+            );
+        }
 
-        g2d.drawImage(op.filter(boiseau, null), 325, y, 50, 50, null);
+        // Boutons
+        positionBoutons();
+
+        // On force la synchronisation de l'écran
+        Toolkit.getDefaultToolkit().sync();
     }
 
     private void animer() {
-        // Evolution
-        dy += ay;
-        y += dy;
-
-        // Rebonds
-        if (y > getHeight() - 50) {
-            y = getHeight() - 50;
-            dy = -8.5f;
+        // Mouvement des oiseaux
+        for (OiseauMouv oiseau : oiseaux) {
+            oiseau.mouv();
         }
 
         repaint();
@@ -99,10 +150,18 @@ public class Perdu extends JPanel {
         // Animation !
         scheduler = new ScheduledThreadPoolExecutor(1);
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/30, TimeUnit.MILLISECONDS);
+
+        // Initialisation oiseaux
+        for (int i = 0; i < oiseaux.size(); ++i) {
+            OiseauMouv oiseau = oiseaux.get(i);
+            oiseau.init(-200, i*20);
+        }
     }
 
     public void stop() {
-        scheduler.shutdown();
+        if (scheduler != null) {
+            scheduler.shutdown();
+        }
     }
 
     // Accesseurs
@@ -112,9 +171,5 @@ public class Perdu extends JPanel {
 
     public JButton getBtnRecommencer() {
         return btnRecommencer;
-    }
-
-    public void setTheme(Theme theme) {
-        this.theme = theme;
     }
 }

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 /**
  * Gestion de la grille.
- * AccÃ¨s aux cases et gestion de l'affichage
+ * Accès aux cases et gestion de l'affichage
  */
 public class Carte implements Affichable {
     // Attributs
@@ -16,6 +16,7 @@ public class Carte implements Affichable {
     private int ty;
 
     private int nbOiseaux = 0;
+    private LinkedList<BadSnoopy> badSnoopies = new LinkedList<>();
 
     // Constructeur
     public Carte(int tx, int ty) {
@@ -60,16 +61,6 @@ public class Carte implements Affichable {
 
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
-        // Grille
-        g2d.setColor(Color.black);
-        for (int i = 0; i <= tx; ++i) {
-            g2d.drawLine(bx + i * Aire.LARG_IMG, by, bx + i * Aire.LARG_IMG, by + ty * Aire.LONG_IMG);
-        }
-
-        for (int i = 0; i <= ty; ++i) {
-            g2d.drawLine(bx, by + i * Aire.LONG_IMG, bx + tx * Aire.LARG_IMG, by + i * Aire.LONG_IMG);
-        }
-
         // Affichage des cases
         for (Case[] ligne : cases) {
             for (Case c : ligne) {
@@ -82,6 +73,13 @@ public class Carte implements Affichable {
                 c.afficher_obj(g2d, theme, bx, by);
             }
         }
+
+        // Grille
+        g2d.setColor(Color.black);
+        g2d.drawLine(bx, by, bx, by + ty * Moteur.LONG_IMG);
+        g2d.drawLine(bx + tx * Moteur.LARG_IMG, by, bx + tx * Moteur.LARG_IMG, by + ty * Moteur.LONG_IMG);
+        g2d.drawLine(bx, by, bx + tx * Moteur.LARG_IMG, by);
+        g2d.drawLine(bx, by + ty * Moteur.LONG_IMG, bx + tx * Moteur.LARG_IMG, by + ty * Moteur.LONG_IMG);
     }
 
     /**
@@ -93,12 +91,14 @@ public class Carte implements Affichable {
 
         if (obj instanceof Oiseau) {
             ++nbOiseaux;
+        } else if (obj instanceof BadSnoopy) {
+            badSnoopies.add((BadSnoopy) obj);
         }
     }
 
     /**
-     * Enlève un objet Ã  une case
-     * @param obj objet Ã  enlever
+     * Enlève un objet à une case
+     * @param obj objet à enlever
      */
     public void enlever(Objet obj) {
         cases[obj.getY()][obj.getX()].enlever(obj);
@@ -120,8 +120,8 @@ public class Carte implements Affichable {
     }
 
     /**
-     * Renvoie la case aux coordonnÃ©es données
-     * @return renvoie une case ou null si la coordonnÃ©e n'existe pas
+     * Renvoie la case aux coordonnées données
+     * @return renvoie une case ou null si la coordonnée n'existe pas
      */
     public Case getCase(int x, int y) {
         try {
@@ -141,5 +141,9 @@ public class Carte implements Affichable {
 
     public int getNbOiseaux() {
         return nbOiseaux;
+    }
+
+    public LinkedList<BadSnoopy> getBadSnoopies() {
+        return badSnoopies;
     }
 }

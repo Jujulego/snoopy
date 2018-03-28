@@ -6,186 +6,93 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * L'aire de jeu.
  * Gère les interactions et les animations
  */
-public class Aire extends JPanel implements KeyListener {
+public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
     // Constantes
-    public static final int FPS = 60;      // Fréquence de rafraichissement de l'écran
-    public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
-    public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
+    public static final int FPS = 30; // Fréquence de rafraichissement de l'écran
 
     public static final int MARGE_X_CARTE = 0;
     public static final int MARGE_Y_CARTE = 25;
 
     // Attributs
-    // - jeu
-    private Carte carte;   // Carte affichée
-    private Snoopy snoopy; // Le personnage controlé
+    private Moteur moteur;
     private Theme theme;
-
-    private int base_score;
-
-    // - clock
-    private int timer = 60;
-    private String timerString;
-
-    // - animation
-    private boolean pause = false;
-    private LinkedList<Balle> balles = new LinkedList<>();
-    private LinkedList<Animation> animations = new LinkedList<>();
-    private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
     private int etat = 0;
     private ArrayList<FinListener> listeners = new ArrayList<>();
 
-    // Constructeur
-    public Aire(Carte carte, Snoopy snoopy, Theme theme) {
-        this(carte, snoopy, theme, 0);
-    }
+    private JLabel lbl_score = new JLabel("");
 
-    /**
-     * @param carte  carte à afficher
-     * @param snoopy personnage à controller
-     */
-    public Aire(Carte carte, Snoopy snoopy, Theme theme, int base_score) {
-        this.carte = carte;
-        this.snoopy = snoopy;
+    // Constructeur
+    public Aire(Moteur moteur, Theme theme) {
+        this.moteur = moteur;
         this.theme = theme;
-        this.base_score = base_score;
 
         // Paramètres
         setDoubleBuffered(true);
-        setMinimumSize(new Dimension(carte.getTx() * LARG_IMG + 1, carte.getTy() * LONG_IMG + MARGE_Y_CARTE + 62));
+        setMinimumSize(new Dimension(
+                moteur.getCarte().getTx() * Moteur.LARG_IMG + 1,
+                moteur.getCarte().getTy() * Moteur.LONG_IMG + MARGE_Y_CARTE + 62
+        ));
         addKeyListener(this);
 
-        // Scheduler
-        animations.addAll(carte.objetsAnimes());
-        scheduler.scheduleAtFixedRate(this::animer, 0, 1000/FPS, TimeUnit.MILLISECONDS);
-        scheduler.scheduleAtFixedRate(this::clock, 0, 1, TimeUnit.SECONDS);
+        // Moteur
+        moteur.ajouterMoteurListener(this);
+        moteur.lancer(FPS);
+
+        // Score
+        setLayout(null);
+        Insets insets = getInsets();
+        Dimension taille;
+
+        add(lbl_score);
+        taille = lbl_score.getPreferredSize();
+        lbl_score.setBounds(
+                insets.right - taille.width - 5, insets.bottom - taille.height - 5,
+                taille.width, taille.height
+        );
     }
 
     // Méthodes
-    public void ajouterBalle(Balle balle) {
-        animations.add(balle);
-        balles.add(balle);
-    }
-
     public void ajouterFinListener(FinListener listener) {
         listeners.add(listener);
-    }
-
-    public static int ajouterDirX(int x, Direction direction) {
-        switch (direction) {
-            case DROITE:
-                return x+1;
-
-            case GAUCHE:
-                return x-1;
-
-            default:
-                return x;
-        }
-    }
-    public static int ajouterDirY(int y, Direction direction) {
-        switch (direction) {
-            case BAS:
-                return y+1;
-
-            case HAUT:
-                return y-1;
-
-            default:
-                return y;
-        }
-    }
-
-    public static boolean pointDedans(Objet obj, Balle balle) {
-        return pointDedans(obj.getX(), obj.getY(), balle.getX(), balle.getY());
-    }
-
-    public static boolean pointDedans(int casex, int casey, int ptx, int pty) {
-        return casex * LARG_IMG < ptx && ptx < (casex + 1) * LARG_IMG &&
-                casey * LONG_IMG < pty && pty < (casey + 1) * LONG_IMG;
     }
 
     /**
      * Gestion des animations et mise à jour de l'écran
      * Appelée FPS fois par secondes
      */
-    private void animer() {
-        // Evolution des animation
-        if (!pause) {
-            for (Animation a : animations) {
-                if (a.animation()) a.animer(carte, theme);
-            }
-
-            etat++;
-            etat %= 60;
-
-            // Touche ?
-            for (Balle balle : balles) {
-                if (!balle.estAuBord(5)) {
-                    if (pointDedans(snoopy, balle)) {
-
-                        if (!balle.getTouche()) {
-                            balle.setTouche(true);
-
-                            // On tue snoopy
-                            snoopy.tuer();
-                            tuer();
-                        }
-                    } else if (balle.getTouche()) {
-                        balle.setTouche(false);
-                    }
-                }
-            }
-        }
+    @Override
+    public void animer() {
+        // Evolution des animations
+        etat++;
+        etat %= 60;
 
         // Rafraichissement de l'ecran
-        repaint();
-    }
-
-    // Décompte de 60 secondes
-    public void clock() {
-        if (!pause) {
-            // Chaque seconde il change l'état d'une variable de Air
-            if (timer == 0) {
-                //Si on arrive à 0, Snoopy perd une vie
-                snoopy.tuer();
-                tuer();
-
-                timer = 60;
-            } else if (timer <= 60) {
-                timer--;
-            }
-        }
+        SwingUtilities.invokeLater(this::repaint);
     }
 
     public void stop() {
-        scheduler.shutdown();
+        moteur.stop();
     }
 
-    private void tuer() {
+    @Override
+    public void mort() {
         // Fin du jeu ?
-        if (snoopy.getVies() == 0) {
-            for (FinListener listener : listeners) {
-                listener.perdu();
-            }
+        for (FinListener listener : listeners) {
+            listener.perdu();
         }
     }
 
-    private void fin() {
+    @Override
+    public void fin() {
         // Fin du jeu ?
-        if (snoopy.getOiseaux() == carte.getNbOiseaux()) {
-            for (FinListener listener : listeners) {
-                listener.gagne();
-            }
+        for (FinListener listener : listeners) {
+            listener.gagne();
         }
     }
 
@@ -196,57 +103,94 @@ public class Aire extends JPanel implements KeyListener {
     protected void paintComponent(Graphics graphics) {
         // Options
         Graphics2D g2d = (Graphics2D) graphics;
-        g2d.clearRect(0, 0, getWidth(), getHeight());
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.clearRect(0, 0, getWidth(), getHeight());
+
+        // Centre
+        int centre_x = getWidth()/2;
+        int centre_y = getHeight()/2;
+
+        Carte carte = moteur.getCarte();
+        int larg_carte = carte.getTx()*Moteur.LARG_IMG;
+        int long_carte = carte.getTy()*Moteur.LONG_IMG;
+
+        int carte_x = centre_x-larg_carte/2;
+        int carte_y = centre_y-long_carte/2;
 
         // Objets
-        carte.afficher(g2d, theme, MARGE_X_CARTE, MARGE_Y_CARTE);
+        carte.afficher(g2d, theme, carte_x, carte_y);
+
+        // Conseils
+        Moteur.Mouvement conseil = moteur.conseil(null);
+
+        g2d.setColor(Color.green);
+        g2d.fillOval(
+                (int) ((conseil.x + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
+                (int) ((conseil.y + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
+                20, 20
+        );
 
         // Balles
-        for (Balle balle : balles) {
-            balle.afficher(g2d, theme, MARGE_X_CARTE, MARGE_Y_CARTE);
+        g2d.setColor(Color.red);
+        for (Case c : moteur.previsions()) {
+            g2d.fillOval(
+                    (int) ((c.getX() + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
+                    (int) ((c.getY() + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
+                    20, 20
+            );
+        }
+
+        for (Balle balle : moteur.getBalles()) {
+            balle.afficher(g2d, theme, carte_x, carte_y);
         }
 
         // Coeurs
         for (int i = 0; i < Snoopy.MAX_VIES; ++i) {
-            g2d.drawImage(i < snoopy.getVies() ? theme.getCoeurPlein() : theme.getCoeurVide(),
-                    carte.getTx() * LARG_IMG - 25*(Snoopy.MAX_VIES-i), 0,
+            g2d.drawImage(i < moteur.getSnoopy().getVies() ? theme.getCoeurPlein() : theme.getCoeurVide(),
+                    carte_x + larg_carte - 25*(Snoopy.MAX_VIES-i), carte_y - MARGE_Y_CARTE,
                     25, 25, null
             );
         }
 
         // Oiseaux gagnés
-        for (int i = 0; i < snoopy.getOiseaux(); ++i) {
+        for (int i = 0; i < moteur.getSnoopy().getOiseaux(); ++i) {
             float a = (etat*theme.getNbImgOiseau()/Aire.FPS);
             int num_anim = (int) Math.floor(a) % theme.getNbImgOiseau();
 
-
-            g2d.drawImage(theme.getOiseauImg(num_anim), i*25+10, 3, 20, 20, null);
+            g2d.drawImage(theme.getOiseauImg(num_anim),
+                    carte_x+i*25+10, carte_y - MARGE_Y_CARTE + 3,
+                    20, 20,
+                    null
+            );
         }
         
         // Affichage de l'horloge
 		g2d.setColor(Color.black);
-		g2d.setFont(new Font ("Plain", Font.BOLD,LARG_IMG/3));
-		
-		timerString = String.valueOf(timer);
-		//On affiche les num�ros de l'horloge
-		g2d.drawString(timerString, LARG_IMG*2 +LARG_IMG/2-LARG_IMG/6, 20);
+		g2d.setFont(new Font ("Plain", Font.BOLD,20));
+
+		g2d.drawString(
+		        String.valueOf(moteur.getTimer()),
+                carte_x+larg_carte/2-15, carte_y - 3
+        );
 
 		// Pause
-        if (pause) {
-            g2d.drawString("PAUSE", 5, getHeight()-5);
+        if (moteur.isPause()) {
+            g2d.drawString("PAUSE", carte_x+larg_carte-75, carte_y+long_carte+20);
+        } else if (moteur.isAuto()) {
+            g2d.drawString("AUTO",  carte_x+larg_carte-75, carte_y+long_carte+20);
         }
 
         // Score
-        g2d.drawString(String.valueOf(getScore()), getWidth() - 50, getHeight() - 5);
+        g2d.drawString(String.valueOf(moteur.getScore()), carte_x + 5, carte_y+long_carte+20);
     }
 
     public void setTheme(Theme theme) {
         this.theme = theme;
+        this.moteur.setTheme(theme);
     }
 
     public int getScore() {
-        return base_score + (timer * 100);
+        return moteur.getScore();
     }
 
     @Override
@@ -256,71 +200,40 @@ public class Aire extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent keyEvent) {
-        // Ignoré si animation en cours
-        if (snoopy.animation()) {
-            return;
+        // Modes
+        switch (keyEvent.getKeyCode()) {
+            case KeyEvent.VK_O: // Automatique ;)
+                moteur.auto();
+                break;
+
+            case KeyEvent.VK_P: // Pause ...
+                moteur.pause();
+                break;
         }
 
-        // Lancement d'une animation de déplacement
-        switch (keyEvent.getKeyCode()) {
-            case KeyEvent.VK_UP:    // HAUT
-                if (!pause) {
-                    snoopy.deplacer(carte, 0, -1);
-                    tuer();
-                    fin();
-                }
-                break;
-
-            case KeyEvent.VK_DOWN:  // BAS
-                if (!pause) {
-                    snoopy.deplacer(carte, 0, 1);
-                    tuer();
-                    fin();
-                }
-                break;
-
-            case KeyEvent.VK_LEFT:  // GAUCHE
-                if (!pause) {
-                    snoopy.deplacer(carte, -1, 0);
-                    tuer();
-                    fin();
-                }
-                break;
-
-            case KeyEvent.VK_RIGHT: // DROITE
-                if (!pause) {
-                    snoopy.deplacer(carte, 1, 0);
-                    tuer();
-                    fin();
-                }
-                break;
-
-            case KeyEvent.VK_A: // Attaque !!!
-                if (pause || snoopy.getVies() == 0) {
+        // Controle du jeu (ignoré en mode auto)
+        if (!moteur.isAuto()) {
+            switch (keyEvent.getKeyCode()) {
+                case KeyEvent.VK_UP:    // HAUT
+                    moteur.deplacerSnoopy(0, -1);
                     break;
-                }
 
-                Case case_ = carte.getCase(
-                        ajouterDirX(snoopy.getX(), snoopy.getDirection()),
-                        ajouterDirY(snoopy.getY(), snoopy.getDirection())
-                );
+                case KeyEvent.VK_DOWN:  // BAS
+                    moteur.deplacerSnoopy(0, 1);
+                    break;
 
-                if (case_ != null) {
-                    Objet objet = case_.getObjet();
+                case KeyEvent.VK_LEFT:  // GAUCHE
+                    moteur.deplacerSnoopy(-1, 0);
+                    break;
 
-                    if (objet instanceof BlocCassable) {
-                        ((BlocCassable) objet).casser();
-                    } else if (objet instanceof BlocPiege) {
-                        ((BlocPiege) objet).toucher(carte, snoopy);
-                        tuer();
-                    }
-                }
+                case KeyEvent.VK_RIGHT: // DROITE
+                    moteur.deplacerSnoopy(1, 0);
+                    break;
 
-                break;
-
-            case KeyEvent.VK_P:
-                pause = !pause;
-                break;
+                case KeyEvent.VK_A: // Attaque !!!
+                    moteur.attaquer();
+                    break;
+            }
         }
     }
 
