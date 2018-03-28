@@ -2,6 +2,12 @@ package snoopy;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class Fenetre extends JFrame implements Aire.FinListener {
     // Enumération
@@ -16,6 +22,8 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     private Victoire victoire;
     private Aire aire = null;
     private Theme theme = new Theme(Theme.SNOOPY);
+    
+    private ArrayList<String> al;
 
     // Constructeur
     public Fenetre() {
@@ -46,6 +54,12 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 
         victoire.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
         //victoire.getBtnContinuer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
+    
+        
+        /////////////////////////////
+    	al = new ArrayList<String>();
+    	//////////////////////////////
+    	
     }
 
     // Méthodes
@@ -76,21 +90,68 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         // Arrêt du menu
         menu.stop();
         perdu.stop();
-
-        // Création de la carte
-        Carte carte = new Carte(5, 5);
-
-        Snoopy snoopy = new Snoopy(2, 2);
-        carte.ajouter(snoopy);
-
-        carte.ajouter(new Oiseau(0, 0));
-        carte.ajouter(new Oiseau(0, 4));
-        carte.ajouter(new Oiseau(4, 0));
-        carte.ajouter(new Oiseau(4, 4));
-
-        carte.ajouter(new BlocPoussable(2, 1));
-        carte.ajouter(new BlocCassable(0,2));
-        carte.ajouter(new BlocPiege(2, 4));
+        
+       
+        //Ouverture fichier 
+        File file = new File("map.txt");
+    	BufferedReader buff = null;
+    	FileReader filereader;
+        
+    	//Déclaration variables 
+    	String line;
+    	String recup[];
+    	Carte carte = null;
+    	Snoopy snoopy = null;
+    	
+    	try {
+    		
+    		filereader = new FileReader(file);
+    		buff = new BufferedReader(filereader);
+    		
+    		//Première ligne = Taille de la map
+    		line = buff.readLine();
+    		recup = line.split(" ");
+    		int x = Integer.parseInt(recup[0]);
+    		int y = Integer.parseInt(recup[1]);
+    		
+    		//Création de la carte
+    		carte = new Carte(x,y);
+    		
+    		//Dexuième ligne = Coordonnées snoopy
+    		line = buff.readLine();
+    		recup = line.split(" ");
+    		
+    		snoopy = new Snoopy(Integer.parseInt(recup[0]),Integer.parseInt(recup[1]));
+       		carte.ajouter(snoopy); 		
+    		
+       		
+    		//Le reste = Tous les autres éléments de la map
+    		for(int i=0; i<x;i++) {
+    			
+    			//A chaque tour de boucle, une ligne est lue
+    			line = buff.readLine();
+    			    			
+    			//On décortique la ligne pour créer le perso adécuat 
+    			for(int j=0;j<y;j++) {
+    				
+    				switch(line.charAt(j)) {
+    					
+    				case 'o': //Oiseau
+    						carte.ajouter(new Oiseau(j,i));
+    						break;
+    					case 'C': //Bloc Cassable
+    						carte.ajouter(new BlocCassable(j, i));
+    						break;
+    					case 'P': //Piege
+    						carte.ajouter(new BlocPiege(j, i));
+    						break;
+    					case 'D': //Déplaçable
+    						carte.ajouter(new BlocPoussable(j, i));
+    						break;
+    				}
+    			}
+    			
+    		}
 
         // Création de l'aire de jeu
         aire = new Aire(carte, snoopy, theme);
@@ -104,8 +165,13 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         setMinimumSize(aire.getMinimumSize());
         setSize(aire.getMinimumSize());
         aire.requestFocus();
+        
+     } catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+     } 
     }
-
+    
     @Override
     public void perdu() {
         if (etat == Etat.PERDU) return;
