@@ -2,6 +2,11 @@ package snoopy;
 
 import java.awt.*;
 
+/**
+ * Bloc piégé : explose dès que Snoopy le touche
+ *
+ * @author julien
+ */
 public class BlocPiege extends Bloc implements Animation {
     // Attributs
     private boolean explose=false;
@@ -9,8 +14,13 @@ public class BlocPiege extends Bloc implements Animation {
     private int num_anim=0;
     private double prec_anim=0;
 
-
     // Constructeur
+    /**
+     * Construit le bloc
+     *
+     * @param x position dans la carte
+     * @param y position dans la carte
+     */
     public BlocPiege(int x, int y) {
         super(x, y);
     }
@@ -65,6 +75,13 @@ public class BlocPiege extends Bloc implements Animation {
 
     }
 
+    /**
+     * Fait exploser le bloc : lance l'animation si on est pas en console
+     *
+     * @param snoopy le personnage touché
+     * @param carte la carte
+     * @param console indique si on est en console
+     */
     public void toucher(Snoopy snoopy, Carte carte, boolean console) {
         if (!explose) {
             snoopy.tuer();

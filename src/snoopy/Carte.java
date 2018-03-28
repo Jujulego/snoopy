@@ -5,7 +5,9 @@ import java.util.LinkedList;
 
 /**
  * Gestion de la grille.
- * Accès aux cases et gestion de l'affichage
+ * Accès aux cases et gestion de l'affichage global
+ *
+ * @author julien
  */
 public class Carte implements Affichable {
     // Attributs
@@ -19,6 +21,12 @@ public class Carte implements Affichable {
     private LinkedList<BadSnoopy> badSnoopies = new LinkedList<>();
 
     // Constructeur
+    /**
+     * Construit une carte vide
+     *
+     * @param tx largeur de la carte
+     * @param ty longueur de la carte
+     */
     public Carte(int tx, int ty) {
         // Création de la matrice
         this.cases = new Case[ty][tx];
@@ -83,14 +91,17 @@ public class Carte implements Affichable {
     }
 
     /**
-     * Ajoute un objet à  une case
+     * Ajoute un objet à sa case.
+     * Compte les oiseaux et ajoute les BadSnoopies dans une liste
+     *
      * @param obj objet à  ajouter
      */
     public void ajouter(Objet obj) {
+        // Ajoute l'objet
         cases[obj.getY()][obj.getX()].ajouter(obj);
 
         if (obj instanceof Oiseau) {
-            ++nbOiseaux;
+            ++nbOiseaux; // compte des
         } else if (obj instanceof BadSnoopy) {
             badSnoopies.add((BadSnoopy) obj);
         }
@@ -98,12 +109,18 @@ public class Carte implements Affichable {
 
     /**
      * Enlève un objet à une case
+     *
      * @param obj objet à enlever
      */
     public void enlever(Objet obj) {
         cases[obj.getY()][obj.getX()].enlever(obj);
     }
 
+    /**
+     * Construit la liste des objets animés
+     *
+     * @return liste des animations
+     */
     public LinkedList<Animation> objetsAnimes() {
         LinkedList<Animation> animations = new LinkedList<>();
         for (Case[] ligne : cases) {
@@ -121,6 +138,7 @@ public class Carte implements Affichable {
 
     /**
      * Renvoie la case aux coordonnées données
+     *
      * @return renvoie une case ou null si la coordonnée n'existe pas
      */
     public Case getCase(int x, int y) {
@@ -138,11 +156,9 @@ public class Carte implements Affichable {
     public int getTy() {
         return ty;
     }
-
     public int getNbOiseaux() {
         return nbOiseaux;
     }
-
     public LinkedList<BadSnoopy> getBadSnoopies() {
         return badSnoopies;
     }

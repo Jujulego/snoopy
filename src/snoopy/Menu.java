@@ -11,11 +11,17 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Gestion du menu principal
+ *
+ * @author julien
+ */
 public class Menu extends PanneauSol {
     // Attributs
     private int oiseau_x = -50;
     private int perso_x = -130;
     private int balle_x = -190;
+    private int bad_x = -270;
 
     private float balle_y = -80;
     private float balle_dy = 0;
@@ -23,6 +29,7 @@ public class Menu extends PanneauSol {
 
     private int numAnimPerso;
     private int numAnimOiseau;
+    private int numAnimBad;
     private static Random random = new Random();
     private ArrayList<Integer> numAnimExplo = new ArrayList<>();
     private ScheduledExecutorService scheduler;
@@ -38,6 +45,12 @@ public class Menu extends PanneauSol {
     private JButton btnThemeP = new JButton(">>");
 
     // Constructeur
+
+    /**
+     * Construction du menu, des boutons.
+     *
+     * @param theme thème à utiliser
+     */
     public Menu(Theme theme) {
         super(theme);
         lblTheme.setText(theme.getNomTheme());
@@ -58,6 +71,9 @@ public class Menu extends PanneauSol {
     }
 
     // Méthodes
+    /**
+     * Postionne les boutons en fonction de la fenêtre
+     */
     private void positionBoutons() {
         // Boutons
         Insets insets = getInsets();
@@ -146,6 +162,12 @@ public class Menu extends PanneauSol {
         }
 
         // Snoopy !
+        g2d.drawImage(theme.getBadImg(Direction.DROITE, numAnimBad),
+                bad_x, getSol()-50,
+                50, 50,
+                null
+        );
+
         g2d.drawImage(theme.getBalleImg(),
                 balle_x, (int) balle_y + getSol(),
                 2*Balle.RAYON, 2*Balle.RAYON,
@@ -177,23 +199,36 @@ public class Menu extends PanneauSol {
         Toolkit.getDefaultToolkit().sync();
     }
 
+    /**
+     * Fais avancer les personnages sur le menu.
+     */
     private synchronized void animer() {
+        // bad snoopy
+        bad_x += 2;
+        if (bad_x > getWidth()) {
+            bad_x = balle_x-80;
+        }
+
+        // balle
         balle_x += 2;
         if (balle_x > getWidth()) {
             balle_x = perso_x-60;
         }
 
+        // - rebond
         balle_dy += balle_ay;
         balle_y += balle_dy;
         if (balle_y >= -2*Balle.RAYON) {
             balle_dy = -balle_dy-balle_ay;
         }
 
+        // personnage
         perso_x += 2;
         if (perso_x > getWidth()) {
             perso_x = oiseau_x-80;
         }
 
+        // oiseau
         oiseau_x += 2;
         if (oiseau_x > getWidth()) {
             oiseau_x = -50;
@@ -210,21 +245,31 @@ public class Menu extends PanneauSol {
         }
 
         numAnimPerso = (numAnimPerso + 1) % theme.getNbImgPerso(Direction.DROITE);
+        numAnimBad = (numAnimBad + 1) % theme.getNbImgBad(Direction.DROITE);
         numAnimOiseau = (numAnimOiseau + 1) % theme.getNbImgOiseau();
 
         repaint();
     }
 
+    /**
+     * Active les animations du menu
+     */
     public void lancer() {
         // Animation !
         scheduler = new ScheduledThreadPoolExecutor(1);
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/30, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Arrête les animations
+     */
     public void stop() {
         scheduler.shutdown();
     }
 
+    /**
+     * Evolution du thème
+     */
     private synchronized void chgTheme(int d) {
         int num = theme.getNumTheme() + d;
         if (num < Theme.SOKOBAN) {
@@ -253,6 +298,9 @@ public class Menu extends PanneauSol {
     }
 
     // Interface
+    /**
+     * Indique u, changement de thème
+     */
     public interface ChgThemeListener {
         void chgTheme(Theme theme);
     }

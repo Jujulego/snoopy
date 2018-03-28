@@ -1,6 +1,5 @@
 package snoopy;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -8,12 +7,18 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Moteur de jeu
+ * Gère les interactions entre les objets du jeu, leurs mouvements.
+ * IA
+ *
+ * @author julien
+ */
 public class Moteur {
     // Constantes
     public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
     public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
 
-    public static final int VAL_CASE_OISEAU = 4;
     public static final int MAX_DEPL = 200;
     public static final int PREVISIONS = 5;
 
@@ -41,6 +46,14 @@ public class Moteur {
     private LinkedList<MoteurListener> listeners = new LinkedList<>();
 
     // Constructeur
+    /**
+     * Initialisation du Moteur de jeu
+     *
+     * @param carte carte du niveau
+     * @param snoopy le personnage controlé
+     * @param theme theme de jeu
+     * @param base_score score de départ
+     */
     public Moteur(Carte carte, Snoopy snoopy, Theme theme, int base_score) {
         this.carte = carte;
         this.snoopy = snoopy;
@@ -402,7 +415,7 @@ public class Moteur {
      *
      * @param dep_x point de départ
      * @param dep_y point de départ
-     * @param previsions positions futures des balles (si déjà calculées)
+     * @param previsions positions futures des balles
      * @return distance à parcourir jusqu'à l'oiseau le plus proche
      */
     private int distanceOiseau(int dep_x, int dep_y, LinkedList<Case> previsions) {
@@ -487,7 +500,7 @@ public class Moteur {
      *
      * @param dep_x point de départ
      * @param dep_y point de départ
-     * @param previsions positions futures des balles (si déjà calculées)
+     * @param previsions positions futures des balles
      * @return distance à parcourir
      */
     private int distanceSnoopy(int dep_x, int dep_y, LinkedList<Case> previsions) {
@@ -565,6 +578,7 @@ public class Moteur {
      *
      * @param x point d'application de l'heuristique
      * @param y point d'application de l'heuristique
+     * @param previsions positions futures des balles
      * @return la valeur de l'heuristique
      */
     public int heuristique(int x, int y, LinkedList<Case> previsions) {
@@ -586,9 +600,11 @@ public class Moteur {
     /**
      * Conseil sur le mouvement à réaliser
      *
+     * @param previsions positions futures des balles (si déjà calculées)
+     * @param fake
      * @return Mouvement conseillé
      */
-    public Mouvement conseil(LinkedList<Case> previsions) {
+    public Mouvement conseil(LinkedList<Case> previsions, boolean fake) {
         // Prévision de la position des balles
         if (previsions == null) {
             previsions = previsions();
@@ -799,7 +815,10 @@ public class Moteur {
     }
 
     // Classes
-    private class Coord {
+    /**
+     * Stockage de coordonneées
+     */
+    public class Coord {
         // Attributs
         protected int x, y;
 
@@ -831,7 +850,11 @@ public class Moteur {
             );
         }
     }
-    private class CoordDist extends Coord {
+
+    /**
+     * Stockage de coordonneées et la distance pour les BFS
+     */
+    public class CoordDist extends Coord {
         // Attributs
         private int distance;
 
@@ -848,6 +871,12 @@ public class Moteur {
             return new CoordDist(coord.x, coord.y, distance+1);
         }
     }
+
+    /**
+     * Résultat de conseil
+     *
+     * @see Moteur#conseil(LinkedList, boolean)
+     */
     public class Mouvement extends Coord {
         // Attributs
         private Direction dir;

@@ -4,6 +4,11 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Gestion de la fenêtre, changements entre les panels
+ *
+ * @author julien
+ */
 public class Fenetre extends JFrame implements Aire.FinListener {
     // Enumération
     private enum Etat {
@@ -19,6 +24,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     private Theme theme = new Theme(Theme.SNOOPY);
 
     // Constructeur
+    /**
+     * Construit la fenêtre, intialise les panels
+     */
     public Fenetre() {
         // Paramètres
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,6 +59,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     }
 
     // Méthodes
+    /**
+     * Prépare à l'affichage du menu
+     */
     public void retourMenu() {
         // Gardien
         if (etat == Etat.MENU) return;
@@ -70,6 +81,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         menu.requestFocus();
     }
 
+    /**
+     * Prépare l'affichage du jeu
+     */
     public void lancerJeu() {
         // Gardien
         if (etat == Etat.JEU) return;
@@ -125,6 +139,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         aire.requestFocus();
     }
 
+    /**
+     * Affiche l'écran de perte
+     */
     @Override
     public void perdu() {
         if (etat == Etat.PERDU) return;
@@ -144,6 +161,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         perdu.lancer();
     }
 
+    /**
+     * Affiche l'écran de victoire
+     */
     @Override
     public void gagne() {
         if (etat == Etat.VICTOIRE) return;
