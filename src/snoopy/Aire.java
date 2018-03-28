@@ -22,6 +22,7 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
     // Attributs
     private Moteur moteur;
     private Theme theme;
+    private boolean debug = false;
 
     private int etat = 0;
     private ArrayList<FinListener> listeners = new ArrayList<>();
@@ -152,28 +153,45 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         // Objets
         carte.afficher(g2d, theme, carte_x, carte_y);
 
-        // Conseils
-        Moteur.Mouvement conseil = moteur.conseil(null);
-
-        g2d.setColor(Color.green);
-        g2d.fillOval(
-                (int) ((conseil.x + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
-                (int) ((conseil.y + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
-                20, 20
-        );
+        // Historique
+        if (debug) {
+            g2d.setColor(Color.blue);
+            for (int i = Moteur.ATTENTE_HISTORIQUE; i < moteur.getHistorique().size(); ++i) {
+                Moteur.Coord c = moteur.getHistorique().get(i);
+                g2d.fillOval(
+                        (int) ((c.x + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
+                        (int) ((c.y + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
+                        20, 20
+                );
+            }
+        }
 
         // Balles
-        g2d.setColor(Color.red);
-        for (Case c : moteur.previsions()) {
-            g2d.fillOval(
-                    (int) ((c.getX() + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
-                    (int) ((c.getY() + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
-                    20, 20
-            );
+        if (debug) {
+            g2d.setColor(Color.red);
+            for (Case c : moteur.previsions()) {
+                g2d.fillOval(
+                        (int) ((c.getX() + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
+                        (int) ((c.getY() + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
+                        20, 20
+                );
+            }
         }
 
         for (Balle balle : moteur.getBalles()) {
             balle.afficher(g2d, theme, carte_x, carte_y);
+        }
+
+        // Conseils
+        if (debug) {
+            Moteur.Mouvement conseil = moteur.conseil(null, true);
+
+            g2d.setColor(Color.green);
+            g2d.fillOval(
+                    (int) ((conseil.x + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
+                    (int) ((conseil.y + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
+                    20, 20
+            );
         }
 
         // Coeurs
@@ -257,6 +275,10 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
 
             case KeyEvent.VK_P: // Pause ...
                 moteur.pause();
+                break;
+
+            case KeyEvent.VK_D: // Debug
+                debug = !debug;
                 break;
         }
 

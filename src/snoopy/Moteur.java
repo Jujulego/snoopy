@@ -19,8 +19,14 @@ public class Moteur {
     public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
     public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
 
-    public static final int MAX_DEPL = 200;
-    public static final int PREVISIONS = 5;
+    private static final int VAL_CASE_OISEAU = 4;
+    private static final int MAX_DEPL = 200;
+    private static final int PREVISIONS = 2;
+
+    public static final int TAILLE_HISTORIQUE  = 10;
+    public static final int ATTENTE_HISTORIQUE = 4;
+    private static final double VAL_HISTORIQUE = 5;
+    private static final int MALUS_STABLE = 50;
 
     // Attributs
     // - jeu
@@ -35,6 +41,7 @@ public class Moteur {
     private boolean auto = false; // Mode automatique
     private int attente = 0;
     private int duree_depl = 0;
+    private LinkedList<Coord> historique = new LinkedList<>();
 
     // - animation
     private Theme theme;
@@ -67,7 +74,7 @@ public class Moteur {
 
     // Méthodes
     /**
-     * Gestion des animations et mise à jour de l'écran
+     * Gestion des animations et les mouvements automatiques
      * Appelée FPS fois par secondes
      */
     private void animer() {
@@ -143,7 +150,7 @@ public class Moteur {
         LinkedList<Case> previsions = previsions();
 
         if (!pause && auto && !snoopy.animation() && attente == 0) {
-            Mouvement mvt = conseil(previsions);
+            Mouvement mvt = conseil(previsions, false);
 
             if (mvt.dir != null) {
                 // Déplacement
@@ -216,7 +223,14 @@ public class Moteur {
                 int nx = ajouterDirX(x, dir);
                 int ny = ajouterDirY(y, dir);
 
-                previsions.add(carte.getCase(nx, ny));
+                Case case_ = carte.getCase(nx, ny);
+                previsions.add(case_);
+
+                // Cas de la téléportation
+                if (case_.getTeleporteur() != null && case_.getTeleporteur().getPaire() != null) {
+                    Teleporteur tp = case_.getTeleporteur().getPaire();
+                    previsions.add(carte.getCase(tp.getX(), tp.getY()));
+                }
             }
         }
 
@@ -270,7 +284,7 @@ public class Moteur {
                     int y = ajouterDirY(badSnoopy.getY(), dir);
 
                     int d = distanceSnoopy(x, y, previsions);
-                    if (d <= dist) {
+                    if (d < dist) {
                         dist = d;
                         dx = dir.dx();
                         dy = dir.dy();
@@ -613,14 +627,27 @@ public class Moteur {
         // Case actuelle
         LinkedList<Direction> directions = directionsPossibles(true, true, true);
         Mouvement conseil = new Mouvement(snoopy.getX(), snoopy.getY(), null);
-        int heu = heuristique(conseil.x, conseil.y, previsions);
-        if (heu == 0) heu = -1;
+        double heu = heuristique(conseil.x, conseil.y, previsions);
+        if (heu == 0) {
+            heu = -1;
+        } else {
+            heu -= MALUS_STABLE;
+        }
 
         // Mouvement
         for (Direction dir : directions) {
             int nx = Moteur.ajouterDirX(getSnoopy().getX(), dir);
             int ny = Moteur.ajouterDirY(getSnoopy().getY(), dir);
-            int nheu = heuristique(nx, ny, previsions);
+            double nheu = heuristique(nx, ny, previsions);
+
+            // Prise en compte de l'historique
+            for (int i = ATTENTE_HISTORIQUE; i < historique.size(); ++i) {
+                Coord c = historique.get(i);
+
+                if (c.x == nx && c.y == ny) {
+                    nheu -= (TAILLE_HISTORIQUE - i) * VAL_HISTORIQUE;
+                }
+            }
 
             if (nheu > heu) {
                 heu = nheu;
@@ -637,6 +664,14 @@ public class Moteur {
                         break;
                     }
                 }
+            }
+        }
+
+        // Historique
+        if (!fake) {
+            historique.addFirst(conseil);
+            if (historique.size() > TAILLE_HISTORIQUE) {
+                historique.removeLast();
             }
         }
 
@@ -770,6 +805,10 @@ public class Moteur {
      */
     public void stop() {
         scheduler.shutdown();
+    }
+
+    public LinkedList<Coord> getHistorique() {
+        return historique;
     }
 
     // Méthodes statiques
