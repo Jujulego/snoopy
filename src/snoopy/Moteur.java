@@ -25,7 +25,7 @@ public class Moteur {
 
     public static final int TAILLE_HISTORIQUE  = 10;
     public static final int ATTENTE_HISTORIQUE = 4;
-    private static final double VAL_HISTORIQUE = 5;
+    private static final double VAL_HISTORIQUE = 2;
     private static final int MALUS_STABLE = 50;
 
     // Attributs
@@ -124,7 +124,8 @@ public class Moteur {
                     continue;
                 }
 
-                for (Objet objet : case_.listeObjets()) {
+                // On fait un copie de la liste, car on va modifier l'original
+                for (Objet objet : new LinkedList<>(case_.listeObjets())) {
                     // On ne téléporte pas les objets en pleine animation
                     if (objet instanceof Animation && ((Animation) objet).animation()) {
                         continue;
@@ -353,10 +354,7 @@ public class Moteur {
 
         // Prévision des balles
         if (previsions == null) {
-            previsions = new LinkedList<>();
-            for (Balle balle : balles) {
-                previsions.addAll(balle.prevision(carte, duree_depl * PREVISIONS));
-            }
+            previsions = previsions();
         }
 
         // Remplissage
@@ -371,22 +369,26 @@ public class Moteur {
             }
 
             // Objet
-            Objet obj = case_.getObjet();
-            if (check_poussees && obj instanceof Poussable) {
-                // Y a un poussable : peut on pousser ?
-                if (!((Poussable) obj).poussable()) {
+            if (!case_.accessible()) {
+                Poussable poussable = case_.getPoussable();
+                Bloc obj = case_.getBloc();
+
+                if (check_poussees && poussable != null) { // Y a un poussable : peut on pousser ?
+                    if (!poussable.poussable()) {
+                        continue;
+                    }
+
+                    int px = ajouterDirX(nx, dir);
+                    int py = ajouterDirY(ny, dir);
+
+                    case_ = carte.getCase(px, py);
+                    if ((case_ == null) || !case_.accessible()) {
+                        continue;
+                    }
+                } else if (check_casse && (obj instanceof BlocCassable)) {
+                } else {
                     continue;
                 }
-
-                int px = ajouterDirX(nx, dir);
-                int py = ajouterDirY(ny, dir);
-
-                case_ = carte.getCase(px, py);
-                if ((case_ == null) || !case_.accessible()) {
-                    continue;
-                }
-            } else if (!(check_casse && obj instanceof BlocCassable) && !case_.accessible()) {
-                continue;
             }
 
             // Balles !!!!
@@ -506,7 +508,7 @@ public class Moteur {
             }
         }
 
-        return 0;
+        return Moteur.MAX_DEPL;
     }
 
     /**
@@ -540,23 +542,21 @@ public class Moteur {
 
             Case case_ = carte.getCase(coord.x, coord.y);
 
-            // Téléportation (sauf pt de départ)
-            if (dep_x != coord.x || dep_y != coord.y) {
-                if (case_.getTeleporteur() != null && case_.getTeleporteur().getPaire() != null) {
-                    Teleporteur tp = case_.getTeleporteur().getPaire();
-                    case_ = carte.getCase(tp.getX(), tp.getY());
+            // Téléportation
+            if (case_.getTeleporteur() != null && case_.getTeleporteur().getPaire() != null) {
+                Teleporteur tp = case_.getTeleporteur().getPaire();
+                case_ = carte.getCase(tp.getX(), tp.getY());
 
-                    if (case_.accessible()) {
-                        // Téléportation !!
-                        coord.x = case_.getX();
-                        coord.y = case_.getY();
+                if (case_.accessible()) {
+                    // Téléportation !!
+                    coord.x = case_.getX();
+                    coord.y = case_.getY();
 
-                        // La case arrivée est déjà traitée !!!
-                        if (marques.contains(coord)) {
-                            continue;
-                        }
-                        marques.add(coord);
+                    // La case arrivée est déjà traitée !!!
+                    if (marques.contains(coord)) {
+                        continue;
                     }
+                    marques.add(coord);
                 }
             }
 
@@ -584,7 +584,7 @@ public class Moteur {
             }
         }
 
-        return 0;
+        return Moteur.MAX_DEPL;
     }
 
     /**

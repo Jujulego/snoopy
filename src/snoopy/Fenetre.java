@@ -97,31 +97,26 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         // Création de la carte
         Carte carte = new Carte(20, 10);
 
-        Snoopy snoopy = new Snoopy(2, 2);
+        Snoopy snoopy = new Snoopy(2, 4);
         carte.ajouter(snoopy);
 
-        for (int y = 0; y < carte.getTy(); y += 5) {
-            for (int x = 0; x < carte.getTx(); x += 5) {
-                carte.ajouter(new Oiseau(x, y));
-                carte.ajouter(new Oiseau(x, y + 4));
-                carte.ajouter(new Oiseau(x + 4, y));
-                carte.ajouter(new Oiseau(x + 4, y + 4));
-                carte.ajouter(new Oiseau(x + 2, y + 1));
-                carte.ajouter(new Oiseau(x, y + 2));
+        carte.ajouter(new Oiseau(0, 0));
+        carte.ajouter(new Oiseau(19, 0));
+        carte.ajouter(new Oiseau(19, 9));
+        carte.ajouter(new Oiseau(0, 9));
 
-                carte.ajouter(new BlocPoussable(x + 2, y + 1));
-                carte.ajouter(new BlocCassable(x, y + 2));
-                carte.ajouter(new BlocPiege(x + 2, y + 4));
+        Teleporteur tp1 = new Teleporteur(4,4);
+        Teleporteur tp2 = new Teleporteur(16, 6, tp1);
+        tp1.setPaire(tp2);
 
-                Teleporteur tp1 = new Teleporteur(x + 1, y + 2);
-                Teleporteur tp2 = new Teleporteur(x + 3, y + 2, tp1);
-                tp1.setPaire(tp2);
+        carte.ajouter(tp1);
+        carte.ajouter(tp2);
 
-                carte.ajouter(tp1);
-                carte.ajouter(tp2);
-            }
+        carte.ajouter(new BadSnoopy(6, 4));
+
+        for (int x = 0; x < carte.getTx(); ++x) {
+            carte.ajouter(new Bloc(x, 5));
         }
-        carte.ajouter(new BadSnoopy(15, 8));
 
         // Création de l'aire de jeu
         Moteur moteur = new Moteur(carte, snoopy, theme, 0);

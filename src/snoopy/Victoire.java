@@ -158,7 +158,7 @@ public class Victoire extends PanneauSol {
             oiseau_x = perso_x + 80;
             oiseau_dx = -oiseau_dx;
 
-        } else if (oiseau_dx < 0 && oiseau_x + oiseau_dx < 9*larg) {
+        } else if (oiseau_dx < 0 && oiseau_x + oiseau_dx < 8*larg+50) {
             oiseau_x = perso_x - 80;
             oiseau_dx = -oiseau_dx;
         }
@@ -167,7 +167,7 @@ public class Victoire extends PanneauSol {
         if (perso_x + perso_dx > getWidth()) {
             perso_dx = -perso_dx;
 
-        } else if (perso_dx < 0 && perso_x + perso_dx < 9*larg) {
+        } else if (perso_dx < 0 && perso_x + perso_dx < 8*larg+50) {
             perso_dx = -perso_dx;
         }
 

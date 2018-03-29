@@ -139,6 +139,24 @@ public class Case implements Affichable, Animation {
 
         return objets.getFirst();
     }
+    public synchronized Bloc getBloc() {
+        for (Objet obj : objets) {
+            if (obj instanceof Bloc) {
+                return (Bloc) obj;
+            }
+        }
+
+        return null;
+    }
+    public synchronized Poussable getPoussable() {
+        for (Objet obj : objets) {
+            if (obj instanceof Poussable) {
+                return (Poussable) obj;
+            }
+        }
+
+        return null;
+    }
     public Teleporteur getTeleporteur() {
         return teleporteur;
     }
