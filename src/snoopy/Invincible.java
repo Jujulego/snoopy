@@ -3,6 +3,9 @@ package snoopy;
 import java.awt.*;
 
 public class Invincible extends Bonus {
+    // Constantes
+    public static final int DUREE = 128;
+
     // Constructeur
     public Invincible(int x, int y) {
         super(x, y);
@@ -10,8 +13,8 @@ public class Invincible extends Bonus {
 
     // Méthodes
     @Override
-    public void activer() {
-
+    public void activer(Perso perso) {
+        perso.activerInvicibilite();
     }
 
     @Override

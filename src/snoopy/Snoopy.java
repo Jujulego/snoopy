@@ -70,11 +70,20 @@ public class Snoopy extends Perso {
 
     @Override
     public boolean deplacable() {
-        return vies > 0; // Sauf si il est mort
+        if (etat == 1) {
+            return vies > 0;
+        }
+
+        return false; // Sauf si il est mort
     }
 
+    /**
+     * Enlève une vie à Snoopy, sauf si Snoopy est invincible
+     *
+     * @return true si snoopy est mort
+     */
     public boolean tuer() {
-        if (vies > 0) {
+        if (!estInvicible() && vies > 0) {
             vies--;
         }
 

@@ -169,7 +169,7 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         // Balles
         if (debug) {
             g2d.setColor(Color.red);
-            for (Case c : moteur.previsions()) {
+            for (Case c : moteur.previsions(moteur.bonusPauseActif())) {
                 g2d.fillOval(
                         (int) ((c.getX() + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
                         (int) ((c.getY() + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,

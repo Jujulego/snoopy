@@ -148,6 +148,15 @@ public class Case implements Affichable, Animation {
 
         return null;
     }
+    public synchronized Bonus getBonus() {
+        for (Objet obj : objets) {
+            if (obj instanceof Bonus) {
+                return (Bonus) obj;
+            }
+        }
+
+        return null;
+    }
     public synchronized Poussable getPoussable() {
         for (Objet obj : objets) {
             if (obj instanceof Poussable) {

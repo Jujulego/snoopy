@@ -3,6 +3,9 @@ package snoopy;
 import java.awt.*;
 
 public class Pause extends Bonus {
+    // Constantes
+    public static final int DUREE = 128;
+
     // Constructeur
     public Pause(int x, int y) {
         super(x, y);
@@ -10,8 +13,8 @@ public class Pause extends Bonus {
 
     // Méthodes
     @Override
-    public void activer() {
-
+    public void activer(Perso perso) {
+        perso.activerPause();
     }
 
     @Override

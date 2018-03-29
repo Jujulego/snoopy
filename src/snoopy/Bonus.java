@@ -7,7 +7,7 @@ public abstract class Bonus extends Objet {
     }
 
     // Méthodes abstraites
-    public abstract void activer();
+    public abstract void activer(Perso perso);
 
     // Methodes
     @Override
