@@ -502,16 +502,16 @@ public class Moteur {
      * @param y coordonée du point
      * @param check_poussees indique s'il faut prendre en compte les possibilités de poussées
      * @param check_casse indique s'il faut prendre en compte les possibilités de casse
-     * @param check_balles indique s'il faut prendre en compte les balles
+     * @param check_previsions indique s'il faut prendre en compte les prévisions
      * @param previsions positions futures des balles (si déjà calculées)
      * @return la liste des déplacements possibles
      */
-    public LinkedList<Direction> directionsPossibles(int x, int y, boolean check_poussees, boolean check_casse, boolean check_balles, LinkedList<Case> previsions) {
+    public LinkedList<Direction> directionsPossibles(int x, int y, boolean check_poussees, boolean check_casse, boolean check_previsions, LinkedList<Case> previsions) {
         // Création de l'objet
         LinkedList<Direction> liste = new LinkedList<>();
 
         // Prévision des balles
-        if (previsions == null) {
+        if (previsions == null && check_previsions) {
             previsions = previsions(bonusPauseActif());
         }
 
@@ -550,7 +550,7 @@ public class Moteur {
             }
 
             // Balles !!!!
-            if (check_balles) {
+            if (check_previsions) {
                 // Check balles !
                 boolean echec = false;
                 for (Case c : previsions) {
@@ -641,7 +641,7 @@ public class Moteur {
 
             // Directions
             directions = directionsPossibles(coord.x, coord.y,
-                    true, true, false, previsions
+                    true, true, true, previsions
             );
             for (Direction dir : directions) {
                 CoordDist ncoord = coord.ajouter(dir);
