@@ -10,6 +10,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Gestion de la fenêtre, changements entre les panels
+ *
+ * @author julien
+ */
 public class Fenetre extends JFrame implements Aire.FinListener {
     // Enumération
     private enum Etat {
@@ -27,6 +32,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     private ArrayList<String> al;
 
     // Constructeur
+    /**
+     * Construit la fenêtre, intialise les panels
+     */
     public Fenetre() {
         // Paramètres
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -65,6 +73,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     }
 
     // Méthodes
+    /**
+     * Prépare à l'affichage du menu
+     */
     public void retourMenu() {
         // Gardien
         if (etat == Etat.MENU) return;
@@ -84,6 +95,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         menu.requestFocus();
     }
 
+    /**
+     * Prépare l'affichage du jeu
+     */
     public void lancerJeu() {
         // Gardien
         if (etat == Etat.JEU) return;
@@ -159,31 +173,26 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         // Création de la carte
         Carte carte = new Carte(20, 10);
 
-        Snoopy snoopy = new Snoopy(2, 2);
+        Snoopy snoopy = new Snoopy(2, 4);
         carte.ajouter(snoopy);
 
-        for (int y = 0; y < carte.getTy(); y += 5) {
-            for (int x = 0; x < carte.getTx(); x += 5) {
-                carte.ajouter(new Oiseau(x, y));
-                carte.ajouter(new Oiseau(x, y + 4));
-                carte.ajouter(new Oiseau(x + 4, y));
-                carte.ajouter(new Oiseau(x + 4, y + 4));
-                carte.ajouter(new Oiseau(x + 2, y + 1));
-                carte.ajouter(new Oiseau(x, y + 2));
+        carte.ajouter(new Oiseau(0, 0));
+        carte.ajouter(new Oiseau(19, 0));
+        carte.ajouter(new Oiseau(19, 9));
+        carte.ajouter(new Oiseau(0, 9));
 
-                carte.ajouter(new BlocPoussable(x + 2, y + 1));
-                carte.ajouter(new BlocCassable(x, y + 2));
-                carte.ajouter(new BlocPiege(x + 2, y + 4));
+        Teleporteur tp1 = new Teleporteur(4,4);
+        Teleporteur tp2 = new Teleporteur(16, 6, tp1);
+        tp1.setPaire(tp2);
 
-                Teleporteur tp1 = new Teleporteur(x + 1, y + 2);
-                Teleporteur tp2 = new Teleporteur(x + 3, y + 2, tp1);
-                tp1.setPaire(tp2);
+        carte.ajouter(tp1);
+        carte.ajouter(tp2);
 
-                carte.ajouter(tp1);
-                carte.ajouter(tp2);
-            }
+        carte.ajouter(new BadSnoopy(6, 4));
+
+        for (int x = 0; x < carte.getTx(); ++x) {
+            carte.ajouter(new Bloc(x, 5));
         }
-        carte.ajouter(new BadSnoopy(15, 8));
 
         // Création de l'aire de jeu
         Moteur moteur = new Moteur(carte, snoopy, theme, 0);
@@ -205,7 +214,10 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 		e.printStackTrace();
      } 
     }
-    
+
+    /**
+     * Affiche l'écran de perte
+     */
     @Override
     public void perdu() {
         if (etat == Etat.PERDU) return;
@@ -225,6 +237,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         perdu.lancer();
     }
 
+    /**
+     * Affiche l'écran de victoire
+     */
     @Override
     public void gagne() {
         if (etat == Etat.VICTOIRE) return;

@@ -9,18 +9,20 @@ import java.util.LinkedList;
 
 /**
  * L'aire de jeu.
- * Gère les interactions et les animations
+ * Gère la zone de jeu graphique
+ *
+ * @author julien
  */
 public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
     // Constantes
     public static final int FPS = 30; // Fréquence de rafraichissement de l'écran
 
-    public static final int MARGE_X_CARTE = 0;
-    public static final int MARGE_Y_CARTE = 25;
+    public static final int MARGE_Y_CARTE = 25; // Marge au dessus de la carte
 
     // Attributs
     private Moteur moteur;
     private Theme theme;
+    private boolean debug = false;
 
     private int etat = 0;
     private ArrayList<FinListener> listeners = new ArrayList<>();
@@ -28,6 +30,14 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
     private JLabel lbl_score = new JLabel("");
 
     // Constructeur
+    /**
+     * Prépare l'aire de jeu.
+     *
+     * @param moteur moteur de jeu à utiliser
+     * @param theme thème à utiliser
+     *
+     * @author julien
+     */
     public Aire(Moteur moteur, Theme theme) {
         this.moteur = moteur;
         this.theme = theme;
@@ -58,6 +68,10 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
     }
 
     // Méthodes
+    /**
+     * Ajoute des listeners de fin de jeu
+     * @param listener
+     */
     public void ajouterFinListener(FinListener listener) {
         listeners.add(listener);
     }
@@ -76,10 +90,21 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         SwingUtilities.invokeLater(this::repaint);
     }
 
+    /**
+     * Arrête le moteur
+     * @see Moteur#stop()
+     */
     public void stop() {
         moteur.stop();
     }
 
+    /**
+     * Snoopy est mort !!!
+     * Appelle les listeners de fin de jeu
+     *
+     * @see FinListener#mort()
+     * @see Aire#fin()
+     */
     @Override
     public void mort() {
         // Fin du jeu ?
@@ -88,6 +113,13 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         }
     }
 
+    /**
+     * Snoopy à gagné !!!
+     * Appelle les listeners
+     *
+     * @see FinListener#fin()
+     * @see Aire#mort()
+     */
     @Override
     public void fin() {
         // Fin du jeu ?
@@ -97,7 +129,8 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
     }
 
     /**
-     * Affichage de la grille
+     * Affichage de la carte, de la barre de vie, les oiseaux récupérés
+     * le mode de jeu (PAUSE ou AUTO) et le score
      */
     @Override
     protected void paintComponent(Graphics graphics) {
@@ -120,28 +153,45 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         // Objets
         carte.afficher(g2d, theme, carte_x, carte_y);
 
-        // Conseils
-        Moteur.Mouvement conseil = moteur.conseil(null);
-
-        g2d.setColor(Color.green);
-        g2d.fillOval(
-                (int) ((conseil.x + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
-                (int) ((conseil.y + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
-                20, 20
-        );
+        // Historique
+        if (debug) {
+            g2d.setColor(Color.blue);
+            for (int i = Moteur.ATTENTE_HISTORIQUE; i < moteur.getHistorique().size(); ++i) {
+                Moteur.Coord c = moteur.getHistorique().get(i);
+                g2d.fillOval(
+                        (int) ((c.x + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
+                        (int) ((c.y + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
+                        20, 20
+                );
+            }
+        }
 
         // Balles
-        g2d.setColor(Color.red);
-        for (Case c : moteur.previsions()) {
-            g2d.fillOval(
-                    (int) ((c.getX() + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
-                    (int) ((c.getY() + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
-                    20, 20
-            );
+        if (debug) {
+            g2d.setColor(Color.red);
+            for (Case c : moteur.previsions()) {
+                g2d.fillOval(
+                        (int) ((c.getX() + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
+                        (int) ((c.getY() + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
+                        20, 20
+                );
+            }
         }
 
         for (Balle balle : moteur.getBalles()) {
             balle.afficher(g2d, theme, carte_x, carte_y);
+        }
+
+        // Conseils
+        if (debug) {
+            Moteur.Mouvement conseil = moteur.conseil(null, true);
+
+            g2d.setColor(Color.green);
+            g2d.fillOval(
+                    (int) ((conseil.x + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
+                    (int) ((conseil.y + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
+                    20, 20
+            );
         }
 
         // Coeurs
@@ -184,11 +234,23 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         g2d.drawString(String.valueOf(moteur.getScore()), carte_x + 5, carte_y+long_carte+20);
     }
 
+    /**
+     * Modifie le thème à utiliser
+     *
+     * @param theme nouveau thème
+     */
     public void setTheme(Theme theme) {
         this.theme = theme;
         this.moteur.setTheme(theme);
     }
 
+    /**
+     * Retourne le score
+     *
+     * @return score actuel
+     *
+     * @see Moteur#getScore()
+     */
     public int getScore() {
         return moteur.getScore();
     }
@@ -198,6 +260,11 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         // Ignoré
     }
 
+    /**
+     * Traitement des évenements claviers
+     *
+     * @param keyEvent
+     */
     @Override
     public void keyPressed(KeyEvent keyEvent) {
         // Modes
@@ -208,6 +275,10 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
 
             case KeyEvent.VK_P: // Pause ...
                 moteur.pause();
+                break;
+
+            case KeyEvent.VK_D: // Debug
+                debug = !debug;
                 break;
         }
 
@@ -242,9 +313,23 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         // Ignoré
     }
 
-    // Listenner
+    // Listener
+    /**
+     * Interface de fin de jeu
+     */
     public interface FinListener {
+        /**
+         * Appelée quand snoopy meurt
+         *
+         * @see Aire#mort()
+         */
         void perdu();
+
+        /**
+         * Appelée quand snoopy à récupéré tous les oiseaux
+         *
+         * @see Aire#fin()
+         */
         void gagne();
     }
 }

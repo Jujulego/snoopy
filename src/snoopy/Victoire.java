@@ -14,6 +14,9 @@ public class Victoire extends PanneauSol {
     private int oiseau_x = -130;
     private int oiseau_dx = 2;
 
+    private int bad_x = 0;
+    private int bad_dx = 2;
+
     private int balle_x = 0;
     private int balle_dx = 2;
 
@@ -22,6 +25,7 @@ public class Victoire extends PanneauSol {
     private float balle_ay = 0.2f;
 
     private int numAnimPerso;
+    private int numAnimBad;
     private int numAnimOiseau;
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
@@ -102,6 +106,12 @@ public class Victoire extends PanneauSol {
                 null
         );
 
+        g2d.drawImage(theme.getBadImg(bad_dx > 0 ? Direction.DROITE : Direction.GAUCHE, numAnimBad),
+                getWidth()-7*larg+bad_x, getSol()-2*long_,
+                larg, long_,
+                null
+        );
+
         // Perso et Oiseau
         BufferedImage img = theme.getOiseauImg(numAnimOiseau);
         if (oiseau_dx > 0) {
@@ -117,6 +127,12 @@ public class Victoire extends PanneauSol {
         g2d.drawImage(theme.symetriqueX(theme.getPersoImg(perso_dx > 0 ? Direction.DROITE : Direction.GAUCHE, numAnimPerso)),
                 getWidth() - perso_x, getSol()-50,
                 50, 50,
+                null
+        );
+
+        g2d.drawImage(theme.getCoeurPlein(),
+                getWidth() - oiseau_x + 10, getSol() - 50 - 30,
+                25, 25,
                 null
         );
 
@@ -142,7 +158,7 @@ public class Victoire extends PanneauSol {
             oiseau_x = perso_x + 80;
             oiseau_dx = -oiseau_dx;
 
-        } else if (oiseau_dx < 0 && oiseau_x + oiseau_dx < 9*larg) {
+        } else if (oiseau_dx < 0 && oiseau_x + oiseau_dx < 8*larg+50) {
             oiseau_x = perso_x - 80;
             oiseau_dx = -oiseau_dx;
         }
@@ -151,11 +167,19 @@ public class Victoire extends PanneauSol {
         if (perso_x + perso_dx > getWidth()) {
             perso_dx = -perso_dx;
 
-        } else if (perso_dx < 0 && perso_x + perso_dx < 9*larg) {
+        } else if (perso_dx < 0 && perso_x + perso_dx < 8*larg+50) {
             perso_dx = -perso_dx;
         }
 
-        // Balle
+        // Balle et BadSnoopy
+        bad_x += bad_dx;
+        if (bad_x + bad_dx + Moteur.LARG_IMG * 4/5.0 > Moteur.LARG_IMG * 24/5.0) {
+            bad_dx = -bad_dx;
+
+        } else if (bad_x + bad_dx < 0) {
+            bad_dx = -bad_dx;
+        }
+
         balle_x += balle_dx;
         if (balle_x + balle_dx + Balle.RAYON * 8/5.0 > Moteur.LARG_IMG * 24/5.0) {
             balle_dx = -balle_dx;
@@ -172,6 +196,7 @@ public class Victoire extends PanneauSol {
 
         // Animation
         numAnimPerso = (numAnimPerso + 1) % theme.getNbImgPerso(Direction.DROITE);
+        numAnimBad = (numAnimBad + 1) % theme.getNbImgBad(Direction.DROITE);
         numAnimOiseau = (numAnimOiseau + 1) % theme.getNbImgOiseau();
 
         // Et on redessine l'écran

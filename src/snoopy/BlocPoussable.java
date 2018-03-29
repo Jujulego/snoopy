@@ -3,7 +3,9 @@ package snoopy;
 import java.awt.*;
 
 /**
- * Représente un bloc sur la carte
+ * Bloc que Snoopy peut pousser
+ *
+ * @author julien
  */
 public class BlocPoussable extends Bloc implements Animation, Poussable {
     // Attributs
@@ -17,6 +19,12 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
                                // Passe de 0 à 1, en 200ms de seconde
 
     // Constructeur
+    /**
+     * Construit le bloc
+     *
+     * @param x position dans la carte
+     * @param y position dans la carte
+     */
     public BlocPoussable(int x, int y) {
         super(x, y);
 
@@ -50,6 +58,14 @@ public class BlocPoussable extends Bloc implements Animation, Poussable {
         return etat < 1.0;
     }
 
+    /**
+     * Dessine le bloc (graphique)
+     *
+     * @param g2d
+     * @param x position d'affichage
+     * @param y position d'affichage
+     * @param theme thème à utiliser
+     */
     private void dessiner(Graphics2D g2d, int x, int y, Theme theme) {
         g2d.drawImage(theme.getBlocImg(1),
                 x, y,

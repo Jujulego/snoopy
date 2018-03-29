@@ -2,14 +2,27 @@ package snoopy;
 
 import java.awt.*;
 
+/**
+ * Bloc que Snoopy peut casser
+ *
+ * @author julien
+ */
 public class BlocCassable extends Bloc implements Animation {
-    // Constructeur
-    public BlocCassable(int x, int y) {
-        super(x, y);
-    }
+    // Attributs
     private boolean anim_casse =false;
     private int num_anim=0;
     private double prec_anim=0;
+
+    // Constructeur
+    /**
+     * Construit le bloc
+     *
+     * @param x position dans la carte
+     * @param y position dans la carte
+     */
+    public BlocCassable(int x, int y) {
+        super(x, y);
+    }
 
     // Méthodes
     @Override
@@ -27,6 +40,7 @@ public class BlocCassable extends Bloc implements Animation {
                 prec_anim = 0.0;
             }
 
+            // L'animation est finie, on enleve le bloc
             if (num_anim >= theme.getNbImageAnimBloc()) {
                 anim_casse = false;
                 carte.enlever(this);
@@ -63,6 +77,12 @@ public class BlocCassable extends Bloc implements Animation {
         }
     }
 
+    /**
+     * Casse le bloc : lance l'animation sauf en console
+     *
+     * @param carte carte du jeu
+     * @param console indique si on en est en console
+     */
     public void casser(Carte carte, boolean console) {
         if (console) {
             carte.enlever(this);

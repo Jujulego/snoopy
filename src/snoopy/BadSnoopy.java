@@ -2,11 +2,22 @@ package snoopy;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * Bad Snoopy est l'ennemis de Snoopy, il le chasse à travers la carte
+ *
+ * @author julien
+ */
 public class BadSnoopy extends Perso {
     // Attributs
     private int pause = 0;
 
     // Constructeur
+    /**
+     * Construit BadSnoopy
+     *
+     * @param x coordonnées de départ dans la matrice
+     * @param y coordonnées de départ dans la matrice
+     */
     public BadSnoopy(int x, int y) {
         super(x, y, 2);
     }
@@ -14,7 +25,7 @@ public class BadSnoopy extends Perso {
     // Méthodes
     @Override
     public boolean estBloquant() {
-        return true;
+        return true; // Empeche d'autres objets de se mettre sur BadSnoopy
     }
 
     @Override

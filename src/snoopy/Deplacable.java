@@ -2,6 +2,8 @@ package snoopy;
 
 /**
  * Rend un objet déplacable
+ *
+ * @author julien
  */
 public interface Deplacable {
     /**

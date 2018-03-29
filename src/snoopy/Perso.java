@@ -155,6 +155,7 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
     @Override
     public synchronized void teleportation(Teleporteur teleporteur) {
         dernier_teleporteur = teleporteur;
+
         setX(teleporteur.getX());
         setY(teleporteur.getY());
         ox = teleporteur.getX();
