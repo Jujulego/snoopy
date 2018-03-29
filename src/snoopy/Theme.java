@@ -31,6 +31,7 @@ public class Theme {
     private BufferedImage balle;
     private BufferedImage coeurPlein;
     private BufferedImage coeurVide;
+    private BufferedImage portail;
 
     // Constructeur
     public Theme(int num_theme)
@@ -73,6 +74,9 @@ public class Theme {
         // Chargment coeurs
         coeurPlein = chargerImage(cheminTheme("coeur/coeur1"));
         coeurVide = chargerImage(cheminTheme("coeur/coeur0"));
+
+        //Chargement portail
+        portail = chargerImage(cheminTheme("portail/portail.png"));
     }
 
     // Méthodes
@@ -174,6 +178,7 @@ public class Theme {
     public BufferedImage getBalleImg() {
         return balle;
     }
+    public BufferedImage getPortailImg(){return  portail;}
 
 
     // le nombre d'images par animations
