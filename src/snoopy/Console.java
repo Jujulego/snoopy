@@ -179,7 +179,7 @@ public class Console {
         // Création de la carte
         Carte carte = new Carte(5, 5);
 
-        Snoopy snoopy = new Snoopy(2, 2);
+        Snoopy snoopy = new Snoopy(2, 2, Snoopy.MAX_VIES);
         carte.ajouter(snoopy);
 
         carte.ajouter(new Oiseau(0, 0));

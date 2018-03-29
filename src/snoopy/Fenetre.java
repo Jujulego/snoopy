@@ -2,13 +2,7 @@ package snoopy;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Gestion de la fenêtre, changements entre les panels
@@ -28,8 +22,10 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     private Victoire victoire;
     private Aire aire = null;
     private Theme theme = new Theme(Theme.SNOOPY);
-    
-    private ArrayList<String> al;
+
+    private int score = 0;
+    private int num_niveau = 1;
+    private int vies = Snoopy.MAX_VIES;
 
     // Constructeur
     /**
@@ -57,19 +53,13 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         perdu = new Perdu(theme);
 
         perdu.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
-        perdu.getBtnRecommencer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
+        perdu.getBtnRecommencer().addActionListener((ActionEvent actionEvent) -> premierNiveau());
 
         // Setup victoire
         victoire = new Victoire(theme);
 
         victoire.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
-        //victoire.getBtnContinuer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
-    
-        
-        /////////////////////////////
-    	al = new ArrayList<String>();
-    	//////////////////////////////
-    	
+        victoire.getBtnContinuer().addActionListener((ActionEvent actionEvent) -> niveauSuivant());
     }
 
     // Méthodes
@@ -96,6 +86,30 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     }
 
     /**
+     * Prépare le niveau 1
+     */
+    public void premierNiveau() {
+        // Initialisation
+        score = 0;
+        num_niveau = 1;
+        vies = Snoopy.MAX_VIES;
+
+        // Activation !!!
+        lancerJeu();
+    }
+
+    /**
+     * Prépare le niveau suivant
+     */
+    public void niveauSuivant() {
+        // Evolution
+        num_niveau++;
+
+        // Activation !!!
+        lancerJeu();
+    }
+
+    /**
      * Prépare l'affichage du jeu
      */
     public void lancerJeu() {
@@ -110,7 +124,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 
         // Création de l'aire
         try {
-	        Moteur moteur = Moteur.charger("map.txt", theme);
+	        Moteur moteur = Moteur.charger(String.format("map%d", num_niveau), theme, score, vies);
 	        aire = new Aire(moteur, theme);
 	        aire.ajouterFinListener(this);
 	
@@ -118,9 +132,10 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 	        setMinimumSize(aire.getMinimumSize());
 	        setSize(aire.getMinimumSize());
 	        aire.requestFocus();
+
 	    } catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// Pas de niveau suivant ...
+			retourMenu();
 	    } 
     }
 
@@ -148,9 +163,11 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 
     /**
      * Affiche l'écran de victoire
+     * @param score score final
+     * @param vies nombre de vies a la fin
      */
     @Override
-    public void gagne() {
+    public void gagne(int score, int vies) {
         if (etat == Etat.VICTOIRE) return;
         etat = Etat.VICTOIRE;
 
@@ -166,5 +183,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         victoire.requestFocus();
 
         victoire.lancer();
+
+        // Evolution
+        this.score = score;
+        this.vies = vies;
     }
 }

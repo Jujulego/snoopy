@@ -11,12 +11,20 @@ public class Snoopy extends Perso {
     public static final int MAX_VIES = 3;
 
     // Attributs
-    private int vies = MAX_VIES;
+    private int vies;
     private LinkedList<Oiseau> oiseaux = new LinkedList<>();
 
     // Constructeur
-    public Snoopy(int x, int y) {
+    /**
+     * Construit snoopy
+     *
+     * @param x coordonnées de départ
+     * @param y coordonnées de départ
+     * @param vies nombre de vies
+     */
+    public Snoopy(int x, int y, int vies) {
         super(x, y, 3);
+        this.vies = vies;
     }
     
     // Méthodes

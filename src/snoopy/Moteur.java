@@ -82,24 +82,24 @@ public class Moteur {
      *
      * @param fichier nom du fichier à charger
      * @param theme thème à utiliser
+     * @param score score de départ
+     * @param vies nombre de vies
      * @return l'objet moteur controllant le jeu
      *
      * @throws IOException envoyée en cas d'erreur d'ouverture ou de lecture du fichier
      */
-    public static Moteur charger(String fichier, Theme theme) throws IOException {
+    public static Moteur charger(String fichier, Theme theme, int score, int vies) throws IOException {
     	//Ouverture fichier 
-        File file = new File(fichier);
-    	BufferedReader buff = null;
-    	FileReader filereader;
+        File file = new File("niveaux/" + fichier + ".txt");
+
+        FileReader filereader = new FileReader(file);
+    	BufferedReader buff = new BufferedReader(filereader);
         
     	//Déclaration variables 
-    	String line;
-    	String recup[];
+    	String line = null;
+    	String recup[] = null;
     	Carte carte = null;
     	Snoopy snoopy = null;
-    	
-		filereader = new FileReader(file);
-		buff = new BufferedReader(filereader);
 		
 		//Première ligne = Taille de la map
 		line = buff.readLine();
@@ -110,11 +110,11 @@ public class Moteur {
 		//Création de la carte
 		carte = new Carte(map_x,map_y);
 		
-		//Dexuième ligne = Coordonnées snoopy
+		//Deuxième ligne = Coordonnées snoopy
 		line = buff.readLine();
 		recup = line.split(" ");
 		
-		snoopy = new Snoopy(Integer.parseInt(recup[0]),Integer.parseInt(recup[1]));
+		snoopy = new Snoopy(Integer.parseInt(recup[0]), Integer.parseInt(recup[1]), vies);
    		carte.ajouter(snoopy); 		
 		
    		
@@ -167,7 +167,6 @@ public class Moteur {
 			}
 			
 		}
-		
 
     	//Téléporteurs manuellement ajoutés
         Teleporteur tp1 = new Teleporteur(4,4);
@@ -178,7 +177,9 @@ public class Moteur {
         carte.ajouter(tp2);
         
         // Création du moteur
-        Moteur moteur = new Moteur(carte, snoopy, theme, 0);
+        Moteur moteur = new Moteur(carte, snoopy, theme, score);
+
+        // Balle manuellement ajoutée
         moteur.ajouterBalle(new Balle(
                 (int) (2.5 * Moteur.LARG_IMG), (int) (0.5 * Moteur.LONG_IMG),
                 -4, 4
@@ -879,7 +880,7 @@ public class Moteur {
         if (snoopy.getOiseaux() == carte.getNbOiseaux()) {
             // Listeners
             for (MoteurListener listener : listeners) {
-                listener.fin();
+                listener.fin(getScore(), snoopy.getVies());
             }
         }
     }
@@ -1068,7 +1069,7 @@ public class Moteur {
     // Listener
     public interface MoteurListener {
         void mort();
-        void fin();
+        void fin(int score, int vies);
 
         void animer();
     }

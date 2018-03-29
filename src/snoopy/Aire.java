@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * L'aire de jeu.
@@ -103,7 +102,7 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
      * Appelle les listeners de fin de jeu
      *
      * @see FinListener#mort()
-     * @see Aire#fin()
+     * @see Moteur.MoteurListener#fin(int, int)
      */
     @Override
     public void mort() {
@@ -117,14 +116,16 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
      * Snoopy à gagné !!!
      * Appelle les listeners
      *
-     * @see FinListener#fin()
+     * @see Moteur.MoteurListener#fin(int, int)
      * @see Aire#mort()
+     * @param score score final
+     * @param vies nombre de vies
      */
     @Override
-    public void fin() {
+    public void fin(int score, int vies) {
         // Fin du jeu ?
         for (FinListener listener : listeners) {
-            listener.gagne();
+            listener.gagne(score, vies);
         }
     }
 
@@ -328,8 +329,10 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         /**
          * Appelée quand snoopy à récupéré tous les oiseaux
          *
-         * @see Aire#fin()
+         * @see Moteur.MoteurListener#fin(int, int)
+         * @param score
+         * @param vies
          */
-        void gagne();
+        void gagne(int score, int vies);
     }
 }
