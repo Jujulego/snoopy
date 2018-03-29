@@ -107,112 +107,21 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         menu.stop();
         perdu.stop();
         victoire.stop();
-        
-       
-        //Ouverture fichier 
-        File file = new File("map.txt");
-    	BufferedReader buff = null;
-    	FileReader filereader;
-        
-    	//Déclaration variables 
-    	String line;
-    	String recup[];
-    	Carte carte = null;
-    	Snoopy snoopy = null;
-    	
-    	try {
-    		
-    		filereader = new FileReader(file);
-    		buff = new BufferedReader(filereader);
-    		
-    		//Première ligne = Taille de la map
-    		line = buff.readLine();
-    		recup = line.split(" ");
-    		int x = Integer.parseInt(recup[0]);
-    		int y = Integer.parseInt(recup[1]);
-    		
-    		//Création de la carte
-    		carte = new Carte(x,y);
-    		
-    		//Dexuième ligne = Coordonnées snoopy
-    		line = buff.readLine();
-    		recup = line.split(" ");
-    		
-    		snoopy = new Snoopy(Integer.parseInt(recup[0]),Integer.parseInt(recup[1]));
-       		carte.ajouter(snoopy); 		
-    		
-       		
-    		//Le reste = Tous les autres éléments de la map
-    		for(int i=0; i<x;i++) {
-    			
-    			//A chaque tour de boucle, une ligne est lue
-    			line = buff.readLine();
-    			    			
-    			//On décortique la ligne pour créer le perso adécuat 
-    			for(int j=0;j<y;j++) {
-    				
-    				switch(line.charAt(j)) {
-    					
-    				case 'o': //Oiseau
-    						carte.ajouter(new Oiseau(j,i));
-    						break;
-    					case 'C': //Bloc Cassable
-    						carte.ajouter(new BlocCassable(j, i));
-    						break;
-    					case 'P': //Piege
-    						carte.ajouter(new BlocPiege(j, i));
-    						break;
-    					case 'D': //Déplaçable
-    						carte.ajouter(new BlocPoussable(j, i));
-    						break;
-    				}
-    			}
-    			
-    		}
 
-        // Création de la carte
-        Carte carte = new Carte(20, 10);
-
-        Snoopy snoopy = new Snoopy(2, 4);
-        carte.ajouter(snoopy);
-
-        carte.ajouter(new Oiseau(0, 0));
-        carte.ajouter(new Oiseau(19, 0));
-        carte.ajouter(new Oiseau(19, 9));
-        carte.ajouter(new Oiseau(0, 9));
-
-        Teleporteur tp1 = new Teleporteur(4,4);
-        Teleporteur tp2 = new Teleporteur(16, 6, tp1);
-        tp1.setPaire(tp2);
-
-        carte.ajouter(tp1);
-        carte.ajouter(tp2);
-
-        carte.ajouter(new BadSnoopy(6, 4));
-
-        for (int x = 0; x < carte.getTx(); ++x) {
-            carte.ajouter(new Bloc(x, 5));
-        }
-
-        // Création de l'aire de jeu
-        Moteur moteur = new Moteur(carte, snoopy, theme, 0);
-        moteur.ajouterBalle(new Balle(
-                (int) (2.5 * Moteur.LARG_IMG), (int) (0.5 * Moteur.LONG_IMG),
-                -4, 4
-        ));
-
-        aire = new Aire(moteur, theme);
-        aire.ajouterFinListener(this);
-
-        setContentPane(aire);
-        setMinimumSize(aire.getMinimumSize());
-        setSize(aire.getMinimumSize());
-        aire.requestFocus();
-        
-     } catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-     } 
+        // Création de l'aire
+        try {
+	        Moteur moteur = Moteur.charger("map.txt", theme);
+	        aire = new Aire(moteur, theme);
+	        aire.ajouterFinListener(this);
+	
+	        setContentPane(aire);
+	        setMinimumSize(aire.getMinimumSize());
+	        setSize(aire.getMinimumSize());
+	        aire.requestFocus();
+	    } catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+	    } 
     }
 
     /**
