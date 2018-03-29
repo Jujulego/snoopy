@@ -121,7 +121,7 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         carte.afficher(g2d, theme, carte_x, carte_y);
 
         // Conseils
-        Moteur.Mouvement conseil = moteur.conseil();
+        Moteur.Mouvement conseil = moteur.conseil(null);
 
         g2d.setColor(Color.green);
         g2d.fillOval(
@@ -132,16 +132,12 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
 
         // Balles
         g2d.setColor(Color.red);
-        for (Balle balle : moteur.getBalles()) {
-            LinkedList<Case> prevision = balle.prevision(carte, 5*FPS / Snoopy.DUREE_DEPL);
-
-            for (Case c : prevision) {
-                g2d.fillOval(
-                        (int) ((c.getX() + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
-                        (int) ((c.getY() + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
-                        20, 20
-                );
-            }
+        for (Case c : moteur.previsions()) {
+            g2d.fillOval(
+                    (int) ((c.getX() + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
+                    (int) ((c.getY() + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
+                    20, 20
+            );
         }
 
         for (Balle balle : moteur.getBalles()) {

@@ -18,6 +18,7 @@ public class Balle implements Animation, Affichable {
     private int angle_rot=1;
 
     private boolean touche = false;
+    private Teleporteur dernier_teleporteur = null;
 
     // Constructeur
     public Balle(int x, int y, int dx, int dy) {
@@ -27,6 +28,10 @@ public class Balle implements Animation, Affichable {
 
         this.x = x;
         this.y = y;
+    }
+    private Balle(Balle copie) {
+        this(copie.x, copie.y, copie.dx, copie.dy);
+        dernier_teleporteur = copie.dernier_teleporteur;
     }
 
     // Méthodes
@@ -66,6 +71,27 @@ public class Balle implements Animation, Affichable {
         } else if (y + RAYON >= carte.getTy() * Moteur.LONG_IMG) {
             y = carte.getTy() * Moteur.LONG_IMG - RAYON;
             dy = -dy;
+        }
+
+        // Téléportation
+        if (!estAuBord(RAYON)) {
+            Case case_ = carte.getCase(x / Moteur.LARG_IMG, y / Moteur.LONG_IMG);
+            Teleporteur tp = case_.getTeleporteur();
+
+            if (tp != null && tp.getPaire() != null) {
+                if (dernier_teleporteur == null) {
+                    Case arr = carte.getCase(tp.getPaire().getX(), tp.getPaire().getY());
+
+                    if (arr.accessible()) {
+                        x = arr.getX() * Moteur.LARG_IMG + x % Moteur.LARG_IMG;
+                        y = arr.getY() * Moteur.LONG_IMG + y % Moteur.LONG_IMG;
+
+                        dernier_teleporteur = tp;
+                    }
+                }
+            } else {
+                dernier_teleporteur = null;
+            }
         }
 
         // Rebond sur les blocs
@@ -129,7 +155,7 @@ public class Balle implements Animation, Affichable {
         ));
 
         // Copie !
-        Balle balle = new Balle(x, y, dx, dy);
+        Balle balle = new Balle(this);
         for (int i = 0; i < delta; ++i) {
             // Mouvement de la balle
             balle.animer(carte, null); // le theme n'est pas utilisé !

@@ -1,5 +1,6 @@
 package snoopy;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -12,7 +13,6 @@ public class Moteur {
     public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
     public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
 
-    public static final double VAL_PX_BALLE = 0.05;
     public static final int VAL_CASE_OISEAU = 4;
     public static final int MAX_DEPL = 200;
     public static final int PREVISIONS = 5;
@@ -21,10 +21,13 @@ public class Moteur {
     // - jeu
     private Carte carte;    // Carte affichée
     private Snoopy snoopy;  // Le personnage controlé
-    private boolean auto = false; // Mode automatique
+    private LinkedList<BadSnoopy> badSnoopies = new LinkedList<>();
     private int base_score; // Score de départ
     private int timer = 60; // Timer
     private LinkedList<Balle> balles = new LinkedList<>(); // gestion des balles
+
+    // - ia
+    private boolean auto = false; // Mode automatique
     private int attente = 0;
     private int duree_depl = 0;
 
@@ -46,6 +49,7 @@ public class Moteur {
 
         // Ajout des objets animés de la carte
         animations.addAll(carte.objetsAnimes());
+        badSnoopies.addAll(carte.getBadSnoopies());
     }
 
     // Méthodes
@@ -56,6 +60,7 @@ public class Moteur {
     private void animer() {
         // Evolution des animation
         if (!pause) {
+            // Mouvements
             for (Animation a : animations) {
                 if (a.animation()) a.animer(carte, theme);
             }
@@ -79,14 +84,53 @@ public class Moteur {
             }
         }
 
+        // Téléportation
+        for (int x = 0; x < carte.getTx(); ++x) {
+            for (int y = 0; y < carte.getTy(); ++y) {
+                Case case_ = carte.getCase(x, y);
+                Teleporteur tp = case_.getTeleporteur();
+
+                // Pas de téléporteur
+                if (tp == null || tp.getPaire() == null) {
+                    continue;
+                }
+
+                // Téléportation !!!
+                Teleporteur tp_arr = tp.getPaire();
+                Case case_arr = carte.getCase(tp_arr.getX(), tp_arr.getY());
+
+                // Il peu y avoir un bloc sur le téléporteur arrivée
+                if (!case_arr.accessible()) {
+                    continue;
+                }
+
+                for (Objet objet : case_.listeObjets()) {
+                    // On ne téléporte pas les objets en pleine animation
+                    if (objet instanceof Animation && ((Animation) objet).animation()) {
+                        continue;
+                    }
+
+                    // Téléportation !
+                    if (objet instanceof Teleportable && ((Teleportable) objet).teleportable()) {
+                        case_.enlever(objet);
+                        case_arr.ajouter(objet);
+
+                        ((Teleportable) objet).teleportation(tp_arr);
+                    }
+                }
+            }
+        }
+
         // Listeners
         for (MoteurListener listener : listeners) {
             listener.animer();
         }
 
         // Automatique
+        LinkedList<Case> previsions = previsions();
+
         if (!pause && auto && !snoopy.animation() && attente == 0) {
-            Mouvement mvt = conseil();
+            Mouvement mvt = conseil(previsions);
 
             if (mvt.dir != null) {
                 // Déplacement
@@ -103,6 +147,9 @@ public class Moteur {
         } else if (attente > 0) {
             attente--;
         }
+
+        // Mouvement des bad snoopies
+        deplacerBadSnoopies(previsions);
     }
 
     /**
@@ -138,6 +185,32 @@ public class Moteur {
     }
 
     /**
+     * Prévision des positions interdites
+     */
+    public LinkedList<Case> previsions() {
+        LinkedList<Case> previsions = new LinkedList<>();
+        for (Balle balle : balles) {
+            previsions.addAll(balle.prevision(carte, duree_depl * PREVISIONS));
+        }
+
+        for (BadSnoopy badSnoopy : badSnoopies) {
+            int x = badSnoopy.getX();
+            int y = badSnoopy.getY();
+
+            previsions.add(carte.getCase(x, y));
+
+            for (Direction dir : directionsPossibles(x, y, false, false, false, previsions)) {
+                int nx = ajouterDirX(x, dir);
+                int ny = ajouterDirY(y, dir);
+
+                previsions.add(carte.getCase(nx, ny));
+            }
+        }
+
+        return previsions;
+    }
+
+    /**
      * Gestion du déplacement de snoopy
      *
      * @param dx mvt en x
@@ -145,7 +218,7 @@ public class Moteur {
      */
     public void deplacerSnoopy(int dx, int dy) {
         // Ignoré si animation en cours
-        if (snoopy.animation() || pause) {
+        if (snoopy.animation() || pause || !snoopy.deplacable()) {
             return;
         }
 
@@ -155,6 +228,59 @@ public class Moteur {
         // Check fin
         mort();
         fin();
+    }
+
+    /**
+     * Gestion du déplacement des bad snoopies
+     */
+    public void deplacerBadSnoopies(LinkedList<Case> previsions) {
+        // Pause !!!
+        if (pause || badSnoopies.size() == 0) {
+            return;
+        }
+
+        // Mouvement !
+        boolean mouv = false;
+        for (BadSnoopy badSnoopy : badSnoopies) {
+            // Ignoré si animation en cours
+            if (badSnoopy.animation() || !badSnoopy.deplacable()) {
+                continue;
+            }
+
+            // En direction de Snoopy
+            int dist = Moteur.MAX_DEPL;
+            int dx = 0, dy = 0;
+
+            if (badSnoopy.getX() != snoopy.getX() || badSnoopy.getY() != snoopy.getY()) {
+                for (Direction dir : directionsPossibles(badSnoopy.getX(), badSnoopy.getY(), false, false, false, previsions)) {
+                    int x = ajouterDirX(badSnoopy.getX(), dir);
+                    int y = ajouterDirY(badSnoopy.getY(), dir);
+
+                    int d = distanceSnoopy(x, y, previsions);
+                    if (d <= dist) {
+                        dist = d;
+                        dx = dir.dx();
+                        dy = dir.dy();
+
+                        if (d == 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Déplacement !
+            if (dx != 0 || dy != 0) {
+                badSnoopy.deplacer(carte, theme, dx, dy);
+            }
+
+            mouv = true;
+        }
+
+        // Check fin (si il y à eu du mouvement ...)
+        if (mouv) {
+            mort();
+        }
     }
 
     /**
@@ -306,20 +432,119 @@ public class Moteur {
             coord = file.getLast();
             file.removeLast();
 
+            Case case_ = carte.getCase(coord.x, coord.y);
+
+            // Téléportation
+            if (case_.getTeleporteur() != null && case_.getTeleporteur().getPaire() != null) {
+                Teleporteur tp = case_.getTeleporteur().getPaire();
+                case_ = carte.getCase(tp.getX(), tp.getY());
+
+                if (case_.accessible()) {
+                    // Téléportation !!
+                    coord.x = case_.getX();
+                    coord.y = case_.getY();
+
+                    // La case arrivée est déjà traitée !!!
+                    if (marques.contains(coord)) {
+                        continue;
+                    }
+                    marques.add(coord);
+                }
+            }
+
+            // Directions
+            directions = directionsPossibles(coord.x, coord.y,
+                    true, true, false, previsions
+            );
+            for (Direction dir : directions) {
+                CoordDist ncoord = coord.ajouter(dir);
+                case_ = carte.getCase(ncoord.x, ncoord.y);
+
+                // Oiseau ?
+                for (Objet obj : case_.listeObjets()) {
+                    // La casse compte pour 1
+                    if (obj instanceof BlocCassable) {
+                        ncoord.distance++;
+
+                    } if (obj instanceof Oiseau) {
+                        return ncoord.distance;
+                    }
+                }
+
+                // Ajout à la file sauf si déjà traité
+                if (!marques.contains(ncoord)) {
+                    file.addFirst(ncoord);
+                    marques.add(ncoord);
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Cherche le chemin le plus court vers Snoopy (BFS)
+     *
+     * @param dep_x point de départ
+     * @param dep_y point de départ
+     * @param previsions positions futures des balles (si déjà calculées)
+     * @return distance à parcourir
+     */
+    private int distanceSnoopy(int dep_x, int dep_y, LinkedList<Case> previsions) {
+        // Cas de base
+        if (snoopy.getX() == dep_x && snoopy.getY() == dep_y) {
+            return 0;
+        }
+
+        // Initialisation
+        LinkedList<CoordDist> file = new LinkedList<>();
+        Set<Coord> marques = new HashSet<>();
+        LinkedList<Direction> directions;
+
+        // BFS !
+        CoordDist coord = new CoordDist(dep_x, dep_y, 0);
+        marques.add(coord);
+        file.addFirst(coord);
+
+        while (!file.isEmpty()) {
+            // Défilage
+            coord = file.getLast();
+            file.removeLast();
+
+            Case case_ = carte.getCase(coord.x, coord.y);
+
+            // Téléportation (sauf pt de départ)
+            if (dep_x != coord.x || dep_y != coord.y) {
+                if (case_.getTeleporteur() != null && case_.getTeleporteur().getPaire() != null) {
+                    Teleporteur tp = case_.getTeleporteur().getPaire();
+                    case_ = carte.getCase(tp.getX(), tp.getY());
+
+                    if (case_.accessible()) {
+                        // Téléportation !!
+                        coord.x = case_.getX();
+                        coord.y = case_.getY();
+
+                        // La case arrivée est déjà traitée !!!
+                        if (marques.contains(coord)) {
+                            continue;
+                        }
+                        marques.add(coord);
+                    }
+                }
+            }
+
             // Directions
             directions = directionsPossibles(coord.x, coord.y,
                     false, false, false, previsions
             );
             for (Direction dir : directions) {
                 CoordDist ncoord = coord.ajouter(dir);
+                case_ = carte.getCase(ncoord.x, ncoord.y);
 
-                // Oiseau ?
-                for (Objet obj : carte.getCase(ncoord.x, ncoord.y).listeObjets()) {
+                // Snoopy ?
+                for (Objet obj : case_.listeObjets()) {
                     // La casse compte pour 1
-                    if (obj instanceof BlocCassable) {
-                        ncoord.distance++;
-
-                    } if (obj instanceof Oiseau) {
+                    if (obj instanceof Snoopy) {
                         return ncoord.distance;
                     }
                 }
@@ -342,15 +567,10 @@ public class Moteur {
      * @param y point d'application de l'heuristique
      * @return la valeur de l'heuristique
      */
-    public double heuristique(int x, int y) {
-        double heu = 0;
+    public int heuristique(int x, int y, LinkedList<Case> previsions) {
+        int heu = 0;
 
         // 1er critère : distance aux balles
-        LinkedList<Case> previsions = new LinkedList<>();
-        for (Balle balle : balles) {
-            previsions.addAll(balle.prevision(carte, duree_depl * PREVISIONS));
-        }
-
         for (Case c : previsions) {
             if (c.getX() == x && c.getY() == y) {
                 return 0; // Faut bouger de la !!!
@@ -368,15 +588,23 @@ public class Moteur {
      *
      * @return Mouvement conseillé
      */
-    public Mouvement conseil() {
+    public Mouvement conseil(LinkedList<Case> previsions) {
+        // Prévision de la position des balles
+        if (previsions == null) {
+            previsions = previsions();
+        }
+
+        // Case actuelle
         LinkedList<Direction> directions = directionsPossibles(true, true, true);
         Mouvement conseil = new Mouvement(snoopy.getX(), snoopy.getY(), null);
-        double heu = heuristique(conseil.x, conseil.y);
+        int heu = heuristique(conseil.x, conseil.y, previsions);
+        if (heu == 0) heu = -1;
 
+        // Mouvement
         for (Direction dir : directions) {
             int nx = Moteur.ajouterDirX(getSnoopy().getX(), dir);
             int ny = Moteur.ajouterDirY(getSnoopy().getY(), dir);
-            double nheu = heuristique(nx, ny);
+            int nheu = heuristique(nx, ny, previsions);
 
             if (nheu > heu) {
                 heu = nheu;

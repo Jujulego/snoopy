@@ -21,6 +21,7 @@ public class Theme {
     // Attributs
     private int num_theme=0;
     private HashMap<Direction,ArrayList<BufferedImage>> perso = new HashMap<>();
+    private HashMap<Direction,ArrayList<BufferedImage>> bad = new HashMap<>();
     private ArrayList<BufferedImage> img_oiseau;
     private ArrayList<BufferedImage> anim_bloc;
     private ArrayList<BufferedImage> anim_boom;
@@ -44,6 +45,12 @@ public class Theme {
         perso.put(Direction.BAS,    chargerAnimation(cheminTheme("perso1/anim%d")));
         perso.put(Direction.GAUCHE, chargerAnimation(cheminTheme("perso2/anim%d")));
         perso.put(Direction.DROITE, chargerAnimation(cheminTheme("perso3/anim%d")));
+
+        // Chargement images badsnoopy
+        bad.put(Direction.HAUT,   chargerAnimation(cheminTheme("bad0/anim%d")));
+        bad.put(Direction.BAS,    chargerAnimation(cheminTheme("bad1/anim%d")));
+        bad.put(Direction.GAUCHE, chargerAnimation(cheminTheme("bad2/anim%d")));
+        bad.put(Direction.DROITE, chargerAnimation(cheminTheme("bad3/anim%d")));
 
         // Chargement des oiseaux
         img_oiseau = chargerAnimation(cheminTheme("oizo/anim%d"));
@@ -133,6 +140,10 @@ public class Theme {
     {
         return perso.get(direction).get(num_anim);
     }
+    public BufferedImage getBadImg(Direction direction, int num_anim)
+    {
+        return bad.get(direction).get(num_anim);
+    }
     public BufferedImage getOiseauImg(int num_anim)
     {
         return img_oiseau.get(num_anim);
@@ -168,6 +179,9 @@ public class Theme {
     // le nombre d'images par animations
     public int getNbImgPerso(Direction direction) {
         return perso.get(direction).size();
+    }
+    public int getNbImgBad(Direction direction) {
+        return bad.get(direction).size();
     }
     public int getNbImgOiseau()
     {

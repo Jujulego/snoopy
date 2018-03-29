@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 /**
  * Gestion de la grille.
- * AccÃ¨s aux cases et gestion de l'affichage
+ * Accès aux cases et gestion de l'affichage
  */
 public class Carte implements Affichable {
     // Attributs
@@ -16,6 +16,7 @@ public class Carte implements Affichable {
     private int ty;
 
     private int nbOiseaux = 0;
+    private LinkedList<BadSnoopy> badSnoopies = new LinkedList<>();
 
     // Constructeur
     public Carte(int tx, int ty) {
@@ -90,6 +91,8 @@ public class Carte implements Affichable {
 
         if (obj instanceof Oiseau) {
             ++nbOiseaux;
+        } else if (obj instanceof BadSnoopy) {
+            badSnoopies.add((BadSnoopy) obj);
         }
     }
 
@@ -138,5 +141,9 @@ public class Carte implements Affichable {
 
     public int getNbOiseaux() {
         return nbOiseaux;
+    }
+
+    public LinkedList<BadSnoopy> getBadSnoopies() {
+        return badSnoopies;
     }
 }
