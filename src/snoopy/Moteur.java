@@ -1,5 +1,9 @@
 package snoopy;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -71,6 +75,99 @@ public class Moteur {
         animations.addAll(carte.objetsAnimes());
         badSnoopies.addAll(carte.getBadSnoopies());
     }
+    
+    public static Moteur charger(String fichier, Theme theme) throws IOException {
+    	//Ouverture fichier 
+        File file = new File(fichier);
+    	BufferedReader buff = null;
+    	FileReader filereader;
+        
+    	//Déclaration variables 
+    	String line;
+    	String recup[];
+    	Carte carte = null;
+    	Snoopy snoopy = null;
+    	
+		filereader = new FileReader(file);
+		buff = new BufferedReader(filereader);
+		
+		//Première ligne = Taille de la map
+		line = buff.readLine();
+		recup = line.split(" ");
+		int map_x = Integer.parseInt(recup[0]);
+		int map_y = Integer.parseInt(recup[1]);
+		
+		//Création de la carte
+		carte = new Carte(map_x,map_y);
+		
+		//Dexuième ligne = Coordonnées snoopy
+		line = buff.readLine();
+		recup = line.split(" ");
+		
+		snoopy = new Snoopy(Integer.parseInt(recup[0]),Integer.parseInt(recup[1]));
+   		carte.ajouter(snoopy); 		
+		
+   		
+		//Le reste = Tous les autres éléments de la map
+		for(int i=0; i<map_y;i++) {
+			
+			System.out.println(i);
+			//A chaque tour de boucle, une ligne est lue
+			line = buff.readLine();
+			    			
+			//On décortique la ligne pour créer le perso adécuat 
+			for(int j=0;j<map_x;j++) {
+				
+				switch(line.charAt(j)) {
+					
+					case 'o': //Oiseau
+						carte.ajouter(new Oiseau(j,i));
+						break;
+					case 'C': //Bloc Cassable
+						carte.ajouter(new BlocCassable(j, i));
+						break;
+					case 'P': //Piege
+						carte.ajouter(new BlocPiege(j, i));
+						break;
+					case 'D': //Déplaçable
+						carte.ajouter(new BlocPoussable(j, i));
+						break;
+					case 'X': //Bad Snoopy
+						carte.ajouter(new BadSnoopy(j,i));
+						break;
+					case 'F': //Bloc Fixe
+						carte.ajouter(new Bloc(j,i));
+						break;
+					//Ajouter les téléporteur
+					//Nombres dans le txt. Chaque même nombre est lié au précédant
+						
+				}
+			}
+			
+		}
+		
+
+    	//Téléporteurs manuellement ajoutés
+        Teleporteur tp1 = new Teleporteur(4,4);
+        Teleporteur tp2 = new Teleporteur(16, 6, tp1);
+        tp1.setPaire(tp2);
+        
+        carte.ajouter(tp1);
+        carte.ajouter(tp2);
+        
+        // Création du moteur
+        Moteur moteur = new Moteur(carte, snoopy, theme, 0);
+        moteur.ajouterBalle(new Balle(
+                (int) (2.5 * Moteur.LARG_IMG), (int) (0.5 * Moteur.LONG_IMG),
+                -4, 4
+        ));
+        
+        return moteur;
+    }
+    
+    //Timer, nombre de vie de snoopy, positions de tous les éléments, état de tous les élémtents
+    //score 
+
 
     // Méthodes
     /**

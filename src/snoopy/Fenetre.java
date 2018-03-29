@@ -3,6 +3,12 @@ package snoopy;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Gestion de la fenêtre, changements entre les panels
@@ -22,6 +28,8 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     private Victoire victoire;
     private Aire aire = null;
     private Theme theme = new Theme(Theme.SNOOPY);
+    
+    private ArrayList<String> al;
 
     // Constructeur
     /**
@@ -56,6 +64,12 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 
         victoire.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
         //victoire.getBtnContinuer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
+    
+        
+        /////////////////////////////
+    	al = new ArrayList<String>();
+    	//////////////////////////////
+    	
     }
 
     // Méthodes
@@ -94,47 +108,20 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         perdu.stop();
         victoire.stop();
 
-        // Création de la carte
-        Carte carte = new Carte(20, 10);
-
-        Snoopy snoopy = new Snoopy(2, 4);
-        carte.ajouter(snoopy);
-
-        carte.ajouter(new Oiseau(0, 0));
-        carte.ajouter(new Oiseau(19, 0));
-        carte.ajouter(new Oiseau(19, 9));
-        carte.ajouter(new Oiseau(0, 9));
-
-        carte.ajouter(new Pause(5, 6));
-        carte.ajouter(new Invincible(4, 6));
-
-        Teleporteur tp1 = new Teleporteur(4,4);
-        Teleporteur tp2 = new Teleporteur(16, 6, tp1);
-        tp1.setPaire(tp2);
-
-        carte.ajouter(tp1);
-        carte.ajouter(tp2);
-
-        carte.ajouter(new BadSnoopy(6, 4));
-
-        for (int x = 0; x < carte.getTx(); ++x) {
-            carte.ajouter(new Bloc(x, 5));
-        }
-
-        // Création de l'aire de jeu
-        Moteur moteur = new Moteur(carte, snoopy, theme, 0);
-        moteur.ajouterBalle(new Balle(
-                (int) (2.5 * Moteur.LARG_IMG), (int) (0.5 * Moteur.LONG_IMG),
-                -4, 4
-        ));
-
-        aire = new Aire(moteur, theme);
-        aire.ajouterFinListener(this);
-
-        setContentPane(aire);
-        setMinimumSize(aire.getMinimumSize());
-        setSize(aire.getMinimumSize());
-        aire.requestFocus();
+        // Création de l'aire
+        try {
+	        Moteur moteur = Moteur.charger("map.txt", theme);
+	        aire = new Aire(moteur, theme);
+	        aire.ajouterFinListener(this);
+	
+	        setContentPane(aire);
+	        setMinimumSize(aire.getMinimumSize());
+	        setSize(aire.getMinimumSize());
+	        aire.requestFocus();
+	    } catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+	    } 
     }
 
     /**
