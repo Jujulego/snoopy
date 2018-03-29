@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Moteur de jeu
  * Gère les interactions entre les objets du jeu, leurs mouvements.
- * IA
+ * Algorithmes IA
  *
  * @author julien
  */
@@ -351,7 +351,7 @@ public class Moteur {
     public LinkedList<Case> previsions(boolean bonusPause) {
         LinkedList<Case> previsions = new LinkedList<>();
         for (Balle balle : balles) {
-            previsions.addAll(balle.prevision(carte, duree_depl * PREVISIONS));
+            previsions.addAll(balle.prevision(carte, bonusPause ?  0 : duree_depl * PREVISIONS));
         }
 
         for (BadSnoopy badSnoopy : badSnoopies) {
