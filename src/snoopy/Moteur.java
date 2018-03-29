@@ -1,6 +1,5 @@
 package snoopy;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -8,14 +7,26 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Moteur de jeu
+ * Gère les interactions entre les objets du jeu, leurs mouvements.
+ * IA
+ *
+ * @author julien
+ */
 public class Moteur {
     // Constantes
     public static final int LARG_IMG = 50; // Largeur de base (d'une case de la grille)
     public static final int LONG_IMG = 50; // Longueur de base (d'une case de la grille)
 
-    public static final int VAL_CASE_OISEAU = 4;
-    public static final int MAX_DEPL = 200;
-    public static final int PREVISIONS = 5;
+    private static final int VAL_CASE_OISEAU = 4;
+    private static final int MAX_DEPL = 200;
+    private static final int PREVISIONS = 2;
+
+    public static final int TAILLE_HISTORIQUE  = 10;
+    public static final int ATTENTE_HISTORIQUE = 4;
+    private static final double VAL_HISTORIQUE = 2;
+    private static final int MALUS_STABLE = 50;
 
     // Attributs
     // - jeu
@@ -30,6 +41,7 @@ public class Moteur {
     private boolean auto = false; // Mode automatique
     private int attente = 0;
     private int duree_depl = 0;
+    private LinkedList<Coord> historique = new LinkedList<>();
 
     // - animation
     private Theme theme;
@@ -41,6 +53,14 @@ public class Moteur {
     private LinkedList<MoteurListener> listeners = new LinkedList<>();
 
     // Constructeur
+    /**
+     * Initialisation du Moteur de jeu
+     *
+     * @param carte carte du niveau
+     * @param snoopy le personnage controlé
+     * @param theme theme de jeu
+     * @param base_score score de départ
+     */
     public Moteur(Carte carte, Snoopy snoopy, Theme theme, int base_score) {
         this.carte = carte;
         this.snoopy = snoopy;
@@ -54,7 +74,7 @@ public class Moteur {
 
     // Méthodes
     /**
-     * Gestion des animations et mise à jour de l'écran
+     * Gestion des animations et les mouvements automatiques
      * Appelée FPS fois par secondes
      */
     private void animer() {
@@ -104,7 +124,8 @@ public class Moteur {
                     continue;
                 }
 
-                for (Objet objet : case_.listeObjets()) {
+                // On fait un copie de la liste, car on va modifier l'original
+                for (Objet objet : new LinkedList<>(case_.listeObjets())) {
                     // On ne téléporte pas les objets en pleine animation
                     if (objet instanceof Animation && ((Animation) objet).animation()) {
                         continue;
@@ -130,7 +151,7 @@ public class Moteur {
         LinkedList<Case> previsions = previsions();
 
         if (!pause && auto && !snoopy.animation() && attente == 0) {
-            Mouvement mvt = conseil(previsions);
+            Mouvement mvt = conseil(previsions, false);
 
             if (mvt.dir != null) {
                 // Déplacement
@@ -203,7 +224,14 @@ public class Moteur {
                 int nx = ajouterDirX(x, dir);
                 int ny = ajouterDirY(y, dir);
 
-                previsions.add(carte.getCase(nx, ny));
+                Case case_ = carte.getCase(nx, ny);
+                previsions.add(case_);
+
+                // Cas de la téléportation
+                if (case_.getTeleporteur() != null && case_.getTeleporteur().getPaire() != null) {
+                    Teleporteur tp = case_.getTeleporteur().getPaire();
+                    previsions.add(carte.getCase(tp.getX(), tp.getY()));
+                }
             }
         }
 
@@ -257,7 +285,7 @@ public class Moteur {
                     int y = ajouterDirY(badSnoopy.getY(), dir);
 
                     int d = distanceSnoopy(x, y, previsions);
-                    if (d <= dist) {
+                    if (d < dist) {
                         dist = d;
                         dx = dir.dx();
                         dy = dir.dy();
@@ -326,10 +354,7 @@ public class Moteur {
 
         // Prévision des balles
         if (previsions == null) {
-            previsions = new LinkedList<>();
-            for (Balle balle : balles) {
-                previsions.addAll(balle.prevision(carte, duree_depl * PREVISIONS));
-            }
+            previsions = previsions();
         }
 
         // Remplissage
@@ -344,22 +369,26 @@ public class Moteur {
             }
 
             // Objet
-            Objet obj = case_.getObjet();
-            if (check_poussees && obj instanceof Poussable) {
-                // Y a un poussable : peut on pousser ?
-                if (!((Poussable) obj).poussable()) {
+            if (!case_.accessible()) {
+                Poussable poussable = case_.getPoussable();
+                Bloc obj = case_.getBloc();
+
+                if (check_poussees && poussable != null) { // Y a un poussable : peut on pousser ?
+                    if (!poussable.poussable()) {
+                        continue;
+                    }
+
+                    int px = ajouterDirX(nx, dir);
+                    int py = ajouterDirY(ny, dir);
+
+                    case_ = carte.getCase(px, py);
+                    if ((case_ == null) || !case_.accessible()) {
+                        continue;
+                    }
+                } else if (check_casse && (obj instanceof BlocCassable)) {
+                } else {
                     continue;
                 }
-
-                int px = ajouterDirX(nx, dir);
-                int py = ajouterDirY(ny, dir);
-
-                case_ = carte.getCase(px, py);
-                if ((case_ == null) || !case_.accessible()) {
-                    continue;
-                }
-            } else if (!(check_casse && obj instanceof BlocCassable) && !case_.accessible()) {
-                continue;
             }
 
             // Balles !!!!
@@ -402,7 +431,7 @@ public class Moteur {
      *
      * @param dep_x point de départ
      * @param dep_y point de départ
-     * @param previsions positions futures des balles (si déjà calculées)
+     * @param previsions positions futures des balles
      * @return distance à parcourir jusqu'à l'oiseau le plus proche
      */
     private int distanceOiseau(int dep_x, int dep_y, LinkedList<Case> previsions) {
@@ -479,7 +508,7 @@ public class Moteur {
             }
         }
 
-        return 0;
+        return Moteur.MAX_DEPL;
     }
 
     /**
@@ -487,7 +516,7 @@ public class Moteur {
      *
      * @param dep_x point de départ
      * @param dep_y point de départ
-     * @param previsions positions futures des balles (si déjà calculées)
+     * @param previsions positions futures des balles
      * @return distance à parcourir
      */
     private int distanceSnoopy(int dep_x, int dep_y, LinkedList<Case> previsions) {
@@ -513,23 +542,21 @@ public class Moteur {
 
             Case case_ = carte.getCase(coord.x, coord.y);
 
-            // Téléportation (sauf pt de départ)
-            if (dep_x != coord.x || dep_y != coord.y) {
-                if (case_.getTeleporteur() != null && case_.getTeleporteur().getPaire() != null) {
-                    Teleporteur tp = case_.getTeleporteur().getPaire();
-                    case_ = carte.getCase(tp.getX(), tp.getY());
+            // Téléportation
+            if (case_.getTeleporteur() != null && case_.getTeleporteur().getPaire() != null) {
+                Teleporteur tp = case_.getTeleporteur().getPaire();
+                case_ = carte.getCase(tp.getX(), tp.getY());
 
-                    if (case_.accessible()) {
-                        // Téléportation !!
-                        coord.x = case_.getX();
-                        coord.y = case_.getY();
+                if (case_.accessible()) {
+                    // Téléportation !!
+                    coord.x = case_.getX();
+                    coord.y = case_.getY();
 
-                        // La case arrivée est déjà traitée !!!
-                        if (marques.contains(coord)) {
-                            continue;
-                        }
-                        marques.add(coord);
+                    // La case arrivée est déjà traitée !!!
+                    if (marques.contains(coord)) {
+                        continue;
                     }
+                    marques.add(coord);
                 }
             }
 
@@ -557,7 +584,7 @@ public class Moteur {
             }
         }
 
-        return 0;
+        return Moteur.MAX_DEPL;
     }
 
     /**
@@ -565,6 +592,7 @@ public class Moteur {
      *
      * @param x point d'application de l'heuristique
      * @param y point d'application de l'heuristique
+     * @param previsions positions futures des balles
      * @return la valeur de l'heuristique
      */
     public int heuristique(int x, int y, LinkedList<Case> previsions) {
@@ -586,9 +614,11 @@ public class Moteur {
     /**
      * Conseil sur le mouvement à réaliser
      *
+     * @param previsions positions futures des balles (si déjà calculées)
+     * @param fake
      * @return Mouvement conseillé
      */
-    public Mouvement conseil(LinkedList<Case> previsions) {
+    public Mouvement conseil(LinkedList<Case> previsions, boolean fake) {
         // Prévision de la position des balles
         if (previsions == null) {
             previsions = previsions();
@@ -597,14 +627,27 @@ public class Moteur {
         // Case actuelle
         LinkedList<Direction> directions = directionsPossibles(true, true, true);
         Mouvement conseil = new Mouvement(snoopy.getX(), snoopy.getY(), null);
-        int heu = heuristique(conseil.x, conseil.y, previsions);
-        if (heu == 0) heu = -1;
+        double heu = heuristique(conseil.x, conseil.y, previsions);
+        if (heu == 0) {
+            heu = -1;
+        } else {
+            heu -= MALUS_STABLE;
+        }
 
         // Mouvement
         for (Direction dir : directions) {
             int nx = Moteur.ajouterDirX(getSnoopy().getX(), dir);
             int ny = Moteur.ajouterDirY(getSnoopy().getY(), dir);
-            int nheu = heuristique(nx, ny, previsions);
+            double nheu = heuristique(nx, ny, previsions);
+
+            // Prise en compte de l'historique
+            for (int i = ATTENTE_HISTORIQUE; i < historique.size(); ++i) {
+                Coord c = historique.get(i);
+
+                if (c.x == nx && c.y == ny) {
+                    nheu -= (TAILLE_HISTORIQUE - i) * VAL_HISTORIQUE;
+                }
+            }
 
             if (nheu > heu) {
                 heu = nheu;
@@ -621,6 +664,14 @@ public class Moteur {
                         break;
                     }
                 }
+            }
+        }
+
+        // Historique
+        if (!fake) {
+            historique.addFirst(conseil);
+            if (historique.size() > TAILLE_HISTORIQUE) {
+                historique.removeLast();
             }
         }
 
@@ -756,6 +807,10 @@ public class Moteur {
         scheduler.shutdown();
     }
 
+    public LinkedList<Coord> getHistorique() {
+        return historique;
+    }
+
     // Méthodes statiques
     public static int ajouterDirX(int x, Direction direction) {
         switch (direction) {
@@ -799,7 +854,10 @@ public class Moteur {
     }
 
     // Classes
-    private class Coord {
+    /**
+     * Stockage de coordonneées
+     */
+    public class Coord {
         // Attributs
         protected int x, y;
 
@@ -831,7 +889,11 @@ public class Moteur {
             );
         }
     }
-    private class CoordDist extends Coord {
+
+    /**
+     * Stockage de coordonneées et la distance pour les BFS
+     */
+    public class CoordDist extends Coord {
         // Attributs
         private int distance;
 
@@ -848,6 +910,12 @@ public class Moteur {
             return new CoordDist(coord.x, coord.y, distance+1);
         }
     }
+
+    /**
+     * Résultat de conseil
+     *
+     * @see Moteur#conseil(LinkedList, boolean)
+     */
     public class Mouvement extends Coord {
         // Attributs
         private Direction dir;

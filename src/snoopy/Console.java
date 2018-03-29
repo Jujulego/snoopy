@@ -6,6 +6,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Gestion du mode console
+ *
+ * @author julien
+ */
 public class Console {
     // Attributs
     private int tx, ty;
@@ -35,14 +40,13 @@ public class Console {
     }
 
     // Méthodes
-    public void clear() {
-        for (int i = 0; i < ty; ++i) {
-            for (int j = 0; j < tx; ++j) {
-                buffer[i][j] = ' ';
-            }
-        }
-    }
-
+    /**
+     * "Affiche" du texte dans la matrice interne
+     *
+     * @param str texte à afficher
+     * @param x position du début du texte
+     * @param y position du début du texte
+     */
     public void print(String str, int x, int y) {
         for (char c : str.toCharArray()) {
             buffer[y][x] = c;
@@ -55,6 +59,9 @@ public class Console {
         }
     }
 
+    /**
+     * Affiche le jeu dans la matrice, puis la matrice sur l'ecran
+     */
     public void afficher() {
         // Carte
         int i = 1;
@@ -91,6 +98,9 @@ public class Console {
         }
     }
 
+    /**
+     * Gère les interactions clavier
+     */
     public void clavier() {
         while (true) {
             String ligne = scanner.nextLine();
@@ -127,23 +137,34 @@ public class Console {
         }
     }
 
+    /**
+     * Active le mode console
+     */
     public void lancer() {
          scheduler = new ScheduledThreadPoolExecutor(2);
          scheduler.scheduleAtFixedRate(this::afficher, 0, 1000/25, TimeUnit.MILLISECONDS);
          scheduler.schedule(this::clavier, 0, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Arrête les threads internes
+     */
     public void arreter() {
         scheduler.shutdown();
     }
 
     // Méthodes statiques
+    /**
+     * Efface l'ecran
+     */
     public static void eff_ecran() {
         try {
             if (System.getProperty("os.name").contains("Windows")) {
+                // Version Windows
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
 
             } else {
+                // Version Linux
                 System.out.print("\033[H\033[2J");
                 System.out.flush();
             }
@@ -151,6 +172,9 @@ public class Console {
         }
     }
 
+    /**
+     * Main !
+     */
     public static void main(String[] args) {
         // Création de la carte
         Carte carte = new Carte(5, 5);

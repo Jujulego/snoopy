@@ -6,6 +6,8 @@ import java.util.LinkedList;
 
 /**
  * Gestion d'une case. Permet la présence de plusieurs objets au même endroit
+ *
+ * @author julien
  */
 public class Case implements Affichable, Animation {
     // Attributs
@@ -17,6 +19,12 @@ public class Case implements Affichable, Animation {
     private double etat = 1.0;
 
     // Constructeur
+    /**
+     * Construit la case
+     *
+     * @param x position dans la carte
+     * @param y position dans la carte
+     */
     public Case(int x, int y) {
         this.x = x;
         this.y = y;
@@ -54,24 +62,23 @@ public class Case implements Affichable, Animation {
                 null
         );
 
-        if (objets.size() != 0) {
-            int z = objets.getFirst().getZ();
-
-            Iterator<Objet> it = objets.iterator();
-            while (it.hasNext()) {
-                Objet obj = it.next();
-                obj.afficher(g2d, theme, bx, by);
-            }
-        }
-
     }
 
+    /**
+     * Affiche les objets posés sur la case
+     *
+     * @param g2d
+     * @param theme thème à utiliser
+     * @param bx coordonnées du coin haut gauche de la carte
+     * @param by coordonnées du coin haut gauche de la carte
+     */
     public synchronized void afficher_obj(Graphics2D g2d, Theme theme, int bx, int by) {
-        // Affiche uniqement l'objet avec l'indice z le plus grand
-        if (objets.size() != 0) {
-            objets.getFirst().afficher(g2d, theme, bx, by);
-        }
+        Iterator<Objet> it = objets.descendingIterator();
 
+        while (it.hasNext()) {
+            Objet obj = it.next();
+            obj.afficher(g2d, theme, bx, by);
+        }
     }
 
     /**
@@ -125,7 +132,6 @@ public class Case implements Affichable, Animation {
     public synchronized LinkedList<Objet> listeObjets() {
         return objets;
     }
-
     public synchronized Objet getObjet() {
         if (objets.size() == 0) {
             return null;
@@ -133,15 +139,30 @@ public class Case implements Affichable, Animation {
 
         return objets.getFirst();
     }
+    public synchronized Bloc getBloc() {
+        for (Objet obj : objets) {
+            if (obj instanceof Bloc) {
+                return (Bloc) obj;
+            }
+        }
 
+        return null;
+    }
+    public synchronized Poussable getPoussable() {
+        for (Objet obj : objets) {
+            if (obj instanceof Poussable) {
+                return (Poussable) obj;
+            }
+        }
+
+        return null;
+    }
     public Teleporteur getTeleporteur() {
         return teleporteur;
     }
-
     public int getX() {
         return x;
     }
-
     public int getY() {
         return y;
     }

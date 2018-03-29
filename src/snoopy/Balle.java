@@ -6,14 +6,20 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
+/**
+ * Représente une balle.
+ * Gère le mouvement de la balle, et son affichage
+ *
+ * @author julien
+ */
 public class Balle implements Animation, Affichable {
     // Constantes
     public static final int RAYON = 10;
 
     // Attributs
-    private int x;
+    private int x; // Coordonnées du centre de la balle
     private int y;
-    private int dx;
+    private int dx; // vecteur de vitesse
     private int dy;
     private int angle_rot=1;
 
@@ -21,6 +27,14 @@ public class Balle implements Animation, Affichable {
     private Teleporteur dernier_teleporteur = null;
 
     // Constructeur
+    /**
+     * Construit la balle
+     *
+     * @param x coodonnées de départ
+     * @param y coodonnées de départ
+     * @param dx vecteur vitesse initial
+     * @param dy vecteur vitesse initial
+     */
     public Balle(int x, int y, int dx, int dy) {
         // Attributs
         this.dx = dx;
@@ -29,18 +43,44 @@ public class Balle implements Animation, Affichable {
         this.x = x;
         this.y = y;
     }
+
+    /**
+     * Copie une balle. Constructeur à usage interne
+     *
+     * @param copie Balle à copier
+     */
     private Balle(Balle copie) {
         this(copie.x, copie.y, copie.dx, copie.dy);
         dernier_teleporteur = copie.dernier_teleporteur;
     }
 
     // Méthodes
+    /**
+     * Indique si le centre de la balle est au bord d'une case (bordures verticales)
+     *
+     * @param marge marge d'approximation
+     * @return true si la balle est au bord
+     */
     public boolean estAuBordX(int marge) {
         return (x + marge) / Moteur.LARG_IMG != (x - marge) / Moteur.LARG_IMG;
     }
+
+    /**
+     * Indique si le centre de la balle est au bord d'une case (bordures horizontales)
+     *
+     * @param marge marge d'approximation
+     * @return true si la balle est au bord
+     */
     public boolean estAuBordY(int marge) {
         return (y + marge) / Moteur.LONG_IMG != (y - marge) / Moteur.LONG_IMG;
     }
+
+    /**
+     * Indique si le centre de la balle est au bord d'une case
+     *
+     * @param marge marge d'approximation
+     * @return true si la balle est au bord
+     */
     public boolean estAuBord(int marge) {
         return estAuBordX(marge) || estAuBordY(marge);
     }
@@ -156,6 +196,8 @@ public class Balle implements Animation, Affichable {
 
         // Copie !
         Balle balle = new Balle(this);
+
+        // Prévisions
         for (int i = 0; i < delta; ++i) {
             // Mouvement de la balle
             balle.animer(carte, null); // le theme n'est pas utilisé !
