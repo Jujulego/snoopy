@@ -1,6 +1,9 @@
 package snoopy;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
 /**
@@ -18,6 +21,7 @@ public class Balle implements Animation, Affichable {
     private int y;
     private int dx; // vecteur de vitesse
     private int dy;
+    private int angle_rot=1;
 
     private boolean touche = false;
     private Teleporteur dernier_teleporteur = null;
@@ -223,7 +227,18 @@ public class Balle implements Animation, Affichable {
 
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
-        g2d.drawImage(theme.getBalleImg(),
+
+        BufferedImage bimg = theme.getBalleImg();
+
+        if(theme.getNumTheme() != Theme.SNOOPY)
+        {
+            angle_rot = (angle_rot + 1) % 24;
+            AffineTransform ma_rotation = AffineTransform.getRotateInstance(angle_rot*Math.PI/12, theme.getBalleImg().getWidth() / 2, theme.getBalleImg().getHeight() / 2);
+            AffineTransformOp op = new AffineTransformOp(ma_rotation, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+
+            bimg = op.filter(theme.getBalleImg(), null);
+        }
+        g2d.drawImage(bimg,
                 bx + x - RAYON , by + y - RAYON ,
                 2*RAYON, 2*RAYON,
                 null
