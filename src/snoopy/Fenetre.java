@@ -105,6 +105,9 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         carte.ajouter(new Oiseau(19, 9));
         carte.ajouter(new Oiseau(0, 9));
 
+        carte.ajouter(new Pause(5, 6));
+        carte.ajouter(new Invincible(4, 6));
+
         Teleporteur tp1 = new Teleporteur(4,4);
         Teleporteur tp2 = new Teleporteur(16, 6, tp1);
         tp1.setPaire(tp2);

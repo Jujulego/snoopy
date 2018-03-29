@@ -32,6 +32,8 @@ public class Theme {
     private BufferedImage coeurPlein;
     private BufferedImage coeurVide;
     private BufferedImage portail;
+    private BufferedImage invincible;
+    private BufferedImage pause;
 
     // Constructeur
     public Theme(int num_theme)
@@ -76,7 +78,11 @@ public class Theme {
         coeurVide = chargerImage(cheminTheme("coeur/coeur0"));
 
         //Chargement portail
-        portail = chargerImage(cheminTheme("portail/portail.png"));
+        portail = chargerImage(cheminTheme("portail/portail"));
+
+        // Chargement des bonus
+        invincible = chargerImage(cheminTheme("bonus/invincible"));
+        pause = chargerImage(cheminTheme("bonus/pause"));
     }
 
     // Méthodes
@@ -178,8 +184,15 @@ public class Theme {
     public BufferedImage getBalleImg() {
         return balle;
     }
-    public BufferedImage getPortailImg(){return  portail;}
-
+    public BufferedImage getPortailImg() {
+        return portail;
+    }
+    public BufferedImage getInvincibleImg() {
+        return invincible;
+    }
+    public BufferedImage getPauseImg() {
+        return pause;
+    }
 
     // le nombre d'images par animations
     public int getNbImgPerso(Direction direction) {
