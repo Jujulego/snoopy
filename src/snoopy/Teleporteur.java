@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 public class Teleporteur extends Objet implements Animation, Affichable {
     // Constantes
     public static final int RAYON = 20;
-    private int angle_rot=1;
+    private double angle_rot=0.2;
 
     // Attributs
     private Teleporteur paire = null;
@@ -35,7 +35,7 @@ public class Teleporteur extends Objet implements Animation, Affichable {
 
         if(theme.getNumTheme() != Theme.SNOOPY)
         {
-            angle_rot = (angle_rot + 1) % 24;
+            angle_rot = (angle_rot + 0.3) % 24;
             AffineTransform ma_rotation = AffineTransform.getRotateInstance(angle_rot*Math.PI/12, theme.getPortailImg().getWidth() / 2, theme.getPortailImg().getHeight() / 2);
             AffineTransformOp op = new AffineTransformOp(ma_rotation, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 
