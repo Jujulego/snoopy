@@ -12,6 +12,11 @@ import java.nio.charset.Charset;
 import java.util.Base64;
 import java.util.LinkedList;
 
+/**
+ * Gestion des mots de passe
+ *
+ * @author julien
+ */
 public class MotDePasse extends PanneauSol implements DocumentListener {
     // Attributs
     private String niveau = null;
@@ -22,6 +27,11 @@ public class MotDePasse extends PanneauSol implements DocumentListener {
     private JButton btnRetour = new JButton("Retour");
 
     // Constructeur
+    /**
+     * Prépare le JPanel
+     *
+     * @param theme thème à utiliser
+     */
     public MotDePasse(Theme theme) {
         super(theme);
 
@@ -47,6 +57,12 @@ public class MotDePasse extends PanneauSol implements DocumentListener {
     }
 
     // Méthodes statiques
+    /**
+     * Décode le mot de passe
+     *
+     * @param mdp mot de passe entré
+     * @return nom du fichier
+     */
     public static String decode(String mdp) {
         try {
             // Ajustement longueur
@@ -60,12 +76,21 @@ public class MotDePasse extends PanneauSol implements DocumentListener {
         }
     }
 
+    /**
+     * Encode le nom de fichier pour créer le mot de passe
+     *
+     * @param fichier nom du fichier
+     * @return mot de passe
+     */
     public static String encode(String fichier) {
         String mdp = Charset.forName("ascii").decode(Base64.getEncoder().encode(Charset.forName("ascii").encode(fichier))).toString();
         return mdp.replace("=", "");
     }
 
     // Méthodes
+    /**
+     * Positionne les widgets dans la fenêtre
+     */
     private void positionner() {
         // Widgets
         Insets insets = getInsets();
@@ -113,6 +138,11 @@ public class MotDePasse extends PanneauSol implements DocumentListener {
         Toolkit.getDefaultToolkit().sync();
     }
 
+    /**
+     * Teste si le mot de est valide
+     *
+     * @param doc document contenant le mot de passe tapé par l'utilisateur
+     */
     private void test(Document doc) {
         try {
             // Récupération du mot de passe
@@ -136,6 +166,11 @@ public class MotDePasse extends PanneauSol implements DocumentListener {
         }
     }
 
+    /**
+     * Charge le niveau
+     *
+     * @throws IOException en cas d'erreur de lecture
+     */
     private void charger() throws IOException {
         Moteur moteur = Moteur.charger(niveau, theme, 0, Snoopy.MAX_VIES);
 
@@ -156,8 +191,16 @@ public class MotDePasse extends PanneauSol implements DocumentListener {
 
     @Override
     public void changedUpdate(DocumentEvent e) {
+        // Ignoré
     }
 
+    /**
+     * Ajout un MotDePasseListener
+     *
+     * @param listener listener à ajouter
+     *
+     * @see MotDePasseListener
+     */
     public void ajouterMotDePasseListener(MotDePasseListener listener) {
         listeners.add(listener);
     }
@@ -168,7 +211,15 @@ public class MotDePasse extends PanneauSol implements DocumentListener {
     }
 
     // Listener
+
+    /**
+     * MotDePasseListener
+     */
     public interface MotDePasseListener {
+        /**
+         * Appelée quand l'utilisateur appuye sur Charge avec un mot de passe valide
+         * @param moteur moteur de jeu correspondant au menu chargé
+         */
         void motDePasseOK(Moteur moteur);
     }
 }

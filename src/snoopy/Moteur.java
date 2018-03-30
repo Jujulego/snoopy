@@ -211,40 +211,40 @@ public class Moteur {
         boolean bonusPause = bonusPauseActif();
 
         // Evolution des animation
-        if (!pause && !bonusPause) {
-            // Mouvements
-            for (Animation a : animations) {
-                if (a.animation()) a.animer(carte, theme);
-            }
+        if (!pause) {
+            if (bonusPause) {
+                if (snoopy.aActivePause()) {
+                    snoopy.animer(carte, theme);
 
-            // Touche ?
-            for (Balle balle : balles) {
-                if (!balle.estAuBord(5)) {
-                    if (balleDedans(snoopy, balle)) {
-
-                        if (!balle.getTouche()) {
-                            balle.setTouche(true);
-
-                            // On tue snoopy
-                            snoopy.tuer();
-                            mort();
+                } else {
+                    for (BadSnoopy badSnoopy : badSnoopies) {
+                        if (badSnoopy.aActivePause()) {
+                            badSnoopy.animer(carte, theme);
                         }
-                    } else if (balle.getTouche()) {
-                        balle.setTouche(false);
                     }
                 }
-            }
-        }
-
-        // Bonus pause
-        if (bonusPause) {
-            if (snoopy.aActivePause()) {
-                snoopy.animer(carte, theme);
 
             } else {
-                for (BadSnoopy badSnoopy : badSnoopies) {
-                    if (badSnoopy.aActivePause()) {
-                        badSnoopy.animer(carte, theme);
+                // Mouvements
+                for (Animation a : animations) {
+                    if (a.animation()) a.animer(carte, theme);
+                }
+
+                // Touche ?
+                for (Balle balle : balles) {
+                    if (!balle.estAuBord(5)) {
+                        if (balleDedans(snoopy, balle)) {
+
+                            if (!balle.getTouche()) {
+                                balle.setTouche(true);
+
+                                // On tue snoopy
+                                snoopy.tuer();
+                                mort();
+                            }
+                        } else if (balle.getTouche()) {
+                            balle.setTouche(false);
+                        }
                     }
                 }
             }

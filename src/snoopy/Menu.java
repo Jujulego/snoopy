@@ -302,7 +302,7 @@ public class Menu extends PanneauSol {
 
     // Interface
     /**
-     * Indique u, changement de thème
+     * Indique un changement de thème
      */
     public interface ChgThemeListener {
         void chgTheme(Theme theme);
