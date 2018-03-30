@@ -296,6 +296,9 @@ public class Menu extends PanneauSol {
     public JButton getBtnJouer() {
         return btnJouer;
     }
+    public JButton getBtnMDP() {
+        return btnMDP;
+    }
 
     // Interface
     /**

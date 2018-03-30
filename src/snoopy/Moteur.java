@@ -78,6 +78,16 @@ public class Moteur {
 
     // Méthodes statiques
     /**
+     * Test l'exsitance du niveau
+     *
+     * @param niveau niveau à tester
+     * @return true si le niveau existe
+     */
+    public static boolean testNiveau(String niveau) {
+        return new File("niveaux/" + niveau + ".txt").exists();
+    }
+
+    /**
      * Charge un fichier niveau
      *
      * @param fichier nom du fichier à charger

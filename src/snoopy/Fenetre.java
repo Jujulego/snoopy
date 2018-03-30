@@ -9,10 +9,10 @@ import java.io.IOException;
  *
  * @author julien
  */
-public class Fenetre extends JFrame implements Aire.FinListener {
+public class Fenetre extends JFrame implements Aire.FinListener, MotDePasse.MotDePasseListener {
     // Enumération
     private enum Etat {
-        MENU, JEU, PERDU, VICTOIRE
+        MENU, JEU, PERDU, VICTOIRE, MOTDEPASSE
     }
 
     // Attributs
@@ -20,6 +20,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     private Menu menu;
     private Perdu perdu;
     private Victoire victoire;
+    private MotDePasse motDePasse;
     private Aire aire = null;
     private Theme theme = new Theme(Theme.SNOOPY);
 
@@ -33,13 +34,14 @@ public class Fenetre extends JFrame implements Aire.FinListener {
      */
     public Fenetre() {
         // Paramètres
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setTitle("SnoopMan ECE");
 
         // Setup menu
         menu = new Menu(theme);
-        menu.getBtnJouer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
+        menu.getBtnJouer().addActionListener((ActionEvent actionEvent) -> premierNiveau());
+        menu.getBtnMDP().addActionListener((ActionEvent actionEvent) -> motDePasse());
 
         retourMenu();
 
@@ -60,6 +62,12 @@ public class Fenetre extends JFrame implements Aire.FinListener {
 
         victoire.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
         victoire.getBtnContinuer().addActionListener((ActionEvent actionEvent) -> niveauSuivant());
+
+        // Setup motdepasse
+        motDePasse = new MotDePasse(theme);
+        motDePasse.ajouterMotDePasseListener(this);
+
+        motDePasse.getBtnRetour().addActionListener((ActionEvent actionEvent) -> retourMenu());
     }
 
     // Méthodes
@@ -85,6 +93,21 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         menu.requestFocus();
     }
 
+    public void motDePasse() {
+        // Gardien
+        if (etat == Etat.MOTDEPASSE) return;
+        etat = Etat.MOTDEPASSE;
+
+        // Arrêt du menu
+        menu.stop();
+
+        // Mot de passe
+        setContentPane(motDePasse);
+        setMinimumSize(motDePasse.getMinimumSize());
+        setSize(motDePasse.getMinimumSize());
+        motDePasse.requestFocus();
+    }
+
     /**
      * Prépare le niveau 1
      */
@@ -95,7 +118,13 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         vies = Snoopy.MAX_VIES;
 
         // Activation !!!
-        lancerJeu();
+        try {
+            lancerJeu(Moteur.charger(String.format("map%d", num_niveau), theme, score, vies));
+
+        } catch (IOException e) {
+            // Pas de niveau suivant ...
+            retourMenu();
+        }
     }
 
     /**
@@ -106,13 +135,19 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         num_niveau++;
 
         // Activation !!!
-        lancerJeu();
+        try {
+            lancerJeu(Moteur.charger(String.format("map%d", num_niveau), theme, score, vies));
+
+        } catch (IOException e) {
+            // Pas de niveau suivant ...
+            retourMenu();
+        }
     }
 
     /**
      * Prépare l'affichage du jeu
      */
-    public void lancerJeu() {
+    public void lancerJeu(Moteur moteur) {
         // Gardien
         if (etat == Etat.JEU) return;
         etat = Etat.JEU;
@@ -123,20 +158,13 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         victoire.stop();
 
         // Création de l'aire
-        try {
-	        Moteur moteur = Moteur.charger(String.format("map%d", num_niveau), theme, score, vies);
-	        aire = new Aire(moteur, theme);
-	        aire.ajouterFinListener(this);
-	
-	        setContentPane(aire);
-	        setMinimumSize(aire.getMinimumSize());
-	        setSize(aire.getMinimumSize());
-	        aire.requestFocus();
+        aire = new Aire(moteur, theme);
+        aire.ajouterFinListener(this);
 
-	    } catch (IOException e) {
-			// Pas de niveau suivant ...
-			retourMenu();
-	    } 
+        setContentPane(aire);
+        setMinimumSize(aire.getMinimumSize());
+        setSize(aire.getMinimumSize());
+        aire.requestFocus();
     }
 
     /**
@@ -159,6 +187,7 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         perdu.requestFocus();
 
         perdu.lancer();
+        perdu.setMdp(MotDePasse.encode(String.format("map%d", num_niveau)));
     }
 
     /**
@@ -187,5 +216,10 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         // Evolution
         this.score = score;
         this.vies = vies;
+    }
+
+    @Override
+    public void motDePasseOK(Moteur moteur) {
+        lancerJeu(moteur);
     }
 }
