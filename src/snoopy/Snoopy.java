@@ -12,6 +12,7 @@ public class Snoopy extends Perso {
 
     // Attributs
     private int vies;
+    private int pause = 0; // Mode console
     private LinkedList<Oiseau> oiseaux = new LinkedList<>();
 
     // Constructeur
@@ -35,6 +36,10 @@ public class Snoopy extends Perso {
 
     @Override
     protected String getReprConsole() {
+        if (pause != 0) {
+            pause--;
+        }
+
         return "S";
     }
 
@@ -77,12 +82,21 @@ public class Snoopy extends Perso {
     }
 
     @Override
-    public boolean deplacable() {
-        if (etat == 1) {
-            return vies > 0;
+    public boolean deplacer(Carte carte, Theme theme, int dx, int dy) {
+        if (theme.getNumTheme() == Theme.CONSOLE) {
+            pause = 6;
         }
 
-        return false; // Sauf si il est mort
+        return super.deplacer(carte, theme, dx, dy);
+    }
+
+    @Override
+    public boolean deplacable() {
+        if (etat == 1) {
+            return vies > 0 && pause == 0; // Sauf si il est mort
+        }
+
+        return false;
     }
 
     /**

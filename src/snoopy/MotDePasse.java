@@ -152,7 +152,7 @@ public class MotDePasse extends PanneauSol implements DocumentListener {
             String fichier = decode(mdp);
 
             // Test
-            if (Moteur.testNiveau(fichier)) {
+            if (Moteur.niveauExiste(fichier)) {
                 btnCharger.setEnabled(true);
                 niveau = fichier;
 

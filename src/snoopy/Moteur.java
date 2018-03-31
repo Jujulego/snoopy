@@ -83,7 +83,7 @@ public class Moteur {
      * @param niveau niveau à tester
      * @return true si le niveau existe
      */
-    public static boolean testNiveau(String niveau) {
+    public static boolean niveauExiste(String niveau) {
         return new File("niveaux/" + niveau + ".txt").exists();
     }
 
@@ -234,7 +234,6 @@ public class Moteur {
                 for (Balle balle : balles) {
                     if (!balle.estAuBord(5)) {
                         if (balleDedans(snoopy, balle)) {
-
                             if (!balle.getTouche()) {
                                 balle.setTouche(true);
 
@@ -296,7 +295,7 @@ public class Moteur {
         // Snoopy automatique
         LinkedList<Case> previsions = previsions(bonusPause);
 
-        if (!pause && auto && !snoopy.animation() && attente == 0) {
+        if (!pause && auto && snoopy.deplacable() && attente == 0) {
             if (!bonusPause || snoopy.aActivePause()) {
                 Mouvement mvt = conseil(previsions, false);
 
@@ -789,6 +788,11 @@ public class Moteur {
      * @return Mouvement conseillé
      */
     public Mouvement conseil(LinkedList<Case> previsions, boolean fake) {
+        // Fini !
+        if (snoopy.getOiseaux() == carte.getNbOiseaux()) {
+            return new Mouvement(0, 0, null);
+        }
+
         // Prévision de la position des balles
         if (previsions == null) {
             previsions = previsions(bonusPauseActif());
@@ -1078,9 +1082,24 @@ public class Moteur {
 
     // Listener
     public interface MoteurListener {
+        /**
+         * Appellée quand Snoopy meurt
+         */
         void mort();
+
+        /**
+         * Appellée quand Snoopy gagne
+         *
+         * @param score score final
+         * @param vies nombre de vies à la fin de la partie
+         */
         void fin(int score, int vies);
 
+        /**
+         * Appellée par Moteur.animer
+         *
+         * @see Moteur#animer()
+         */
         void animer();
     }
 

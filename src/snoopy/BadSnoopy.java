@@ -30,6 +30,10 @@ public class BadSnoopy extends Perso {
 
     @Override
     protected String getReprConsole() {
+        if (pause > 0) {
+            pause--;
+        }
+
         return "B";
     }
 

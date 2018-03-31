@@ -140,7 +140,7 @@ public class Perdu extends PanneauSol {
      * @param mdp mote de passe
      */
     public void setMdp(String mdp) {
-        lblMdp.setText(mdp);
+        lblMdp.setText("mdp : " + mdp);
     }
 
     // Accesseurs

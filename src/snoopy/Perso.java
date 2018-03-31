@@ -39,6 +39,15 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
         // Pas d'animation en console
         etat = 1.0;
 
+        // Bonus
+        if (invicible > 0) {
+            invicible--;
+        }
+
+        if (pause > 0) {
+            pause--;
+        }
+
         // Affichage !
         switch (direction) {
             case HAUT:

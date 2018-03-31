@@ -220,7 +220,7 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
 		g2d.setFont(new Font ("Plain", Font.BOLD,20));
 
 		g2d.drawString(
-		        String.valueOf(moteur.getTimer()),
+		        String.format("%02d", moteur.getTimer()),
                 carte_x+larg_carte/2-15, carte_y - 3
         );
 
