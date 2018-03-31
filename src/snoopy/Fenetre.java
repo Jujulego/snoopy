@@ -42,7 +42,8 @@ public class Fenetre extends JFrame implements Aire.FinListener, MotDePasse.MotD
         menu = new Menu(theme);
         menu.getBtnJouer().addActionListener((ActionEvent actionEvent) -> premierNiveau());
         menu.getBtnMDP().addActionListener((ActionEvent actionEvent) -> motDePasse());
-
+        menu.getBtnCharger().addActionListener((ActionEvent actionEvent)-> chargerSauvegarde());
+        
         retourMenu();
 
         menu.addChgThemeListener((Theme theme) -> {
@@ -107,7 +108,20 @@ public class Fenetre extends JFrame implements Aire.FinListener, MotDePasse.MotD
         setSize(motDePasse.getMinimumSize());
         motDePasse.requestFocus();
     }
-
+    
+    public void chargerSauvegarde() { //Charge la dernière partie sauvegardée 
+        num_niveau = 1;
+    	
+        //Activation 
+    	try {
+			lancerJeu(Moteur.charger("sauvegarde", theme, score, vies));
+		} catch (IOException e) { 
+			//Aucun niveau sauvegardé  
+			retourMenu();
+		}
+    	
+    }
+    
     /**
      * Prépare le niveau 1
      */

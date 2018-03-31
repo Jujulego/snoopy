@@ -98,9 +98,13 @@ public class Moteur {
      *
      * @throws IOException envoyée en cas d'erreur d'ouverture ou de lecture du fichier
      */
+    
     public static Moteur charger(String fichier, Theme theme, int score, int vies) throws IOException {
+    	
+   		
     	//Ouverture fichier 
-        File file = new File("niveaux/" + fichier + ".txt");
+    	File file = new File("niveaux/" + fichier + ".txt");
+
 
         FileReader filereader = new FileReader(file);
     	BufferedReader buff = new BufferedReader(filereader);
@@ -124,9 +128,12 @@ public class Moteur {
 		line = buff.readLine();
 		recup = line.split(" ");
 		
-		snoopy = new Snoopy(Integer.parseInt(recup[0]), Integer.parseInt(recup[1]), vies);
-   		carte.ajouter(snoopy); 		
-		
+		if(fichier.equals("sauvegarde")) //Si on est dans un fichier de sauvegarde, on récupère également le nb de vies
+			snoopy = new Snoopy(Integer.parseInt(recup[0]), Integer.parseInt(recup[1]), Integer.parseInt(recup[2]));		
+		else //On est pas dans un fichier de sauvegarde, on prend le nombre de vies par défaut
+			snoopy = new Snoopy(Integer.parseInt(recup[0]), Integer.parseInt(recup[1]), vies);
+	
+		carte.ajouter(snoopy); 		
    		
 		//Le reste = Tous les autres éléments de la map
 		for(int i=0; i < map_y; i++) {
@@ -185,6 +192,16 @@ public class Moteur {
         
         carte.ajouter(tp1);
         carte.ajouter(tp2);
+        
+        //Si on est dans un fichier de sauvegarde, des données sont ajoutées à la fin. On prend la ligne d'après 
+        if(fichier.equals("sauvegarde")) {
+        	line = buff.readLine();
+        	recup = line.split(" ");
+    		
+        	score = Integer.parseInt(recup[0]);	
+    		
+        }
+		
         
         // Création du moteur
         Moteur moteur = new Moteur(carte, snoopy, theme, score);
