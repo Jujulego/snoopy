@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * L'aire de jeu.
@@ -103,7 +102,7 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
      * Appelle les listeners de fin de jeu
      *
      * @see FinListener#mort()
-     * @see Aire#fin()
+     * @see Moteur.MoteurListener#fin(int, int)
      */
     @Override
     public void mort() {
@@ -117,14 +116,16 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
      * Snoopy à gagné !!!
      * Appelle les listeners
      *
-     * @see FinListener#fin()
+     * @see Moteur.MoteurListener#fin(int, int)
      * @see Aire#mort()
+     * @param score score final
+     * @param vies nombre de vies
      */
     @Override
-    public void fin() {
+    public void fin(int score, int vies) {
         // Fin du jeu ?
         for (FinListener listener : listeners) {
-            listener.gagne();
+            listener.gagne(score, vies);
         }
     }
 
@@ -169,7 +170,7 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         // Balles
         if (debug) {
             g2d.setColor(Color.red);
-            for (Case c : moteur.previsions()) {
+            for (Case c : moteur.previsions(moteur.bonusPauseActif())) {
                 g2d.fillOval(
                         (int) ((c.getX() + 0.5) * Moteur.LARG_IMG) - 10 + carte_x,
                         (int) ((c.getY() + 0.5) * Moteur.LONG_IMG) - 10 + carte_y,
@@ -219,7 +220,7 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
 		g2d.setFont(new Font ("Plain", Font.BOLD,20));
 
 		g2d.drawString(
-		        String.valueOf(moteur.getTimer()),
+		        String.format("%02d", moteur.getTimer()),
                 carte_x+larg_carte/2-15, carte_y - 3
         );
 
@@ -328,8 +329,10 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
         /**
          * Appelée quand snoopy à récupéré tous les oiseaux
          *
-         * @see Aire#fin()
+         * @see Moteur.MoteurListener#fin(int, int)
+         * @param score
+         * @param vies
          */
-        void gagne();
+        void gagne(int score, int vies);
     }
 }

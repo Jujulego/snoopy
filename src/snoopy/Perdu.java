@@ -15,50 +15,12 @@ public class Perdu extends PanneauSol {
     private static final float OISEAUX_AY = 0.2f;
 
     // Attributs
-    private class OiseauMouv {
-        // Attributs
-        private float y;
-        private float dy;
-        private int attente = 0;
-
-        // Méthodes
-        public void init(int y, int attente) {
-            this.y = y;
-            this.dy = 0;
-            this.attente = attente;
-        }
-
-        public void mouv() {
-            // Attente
-            if (attente != 0) {
-                attente--;
-                return;
-            }
-
-            // Evolution
-            dy += OISEAUX_AY;
-            y += dy;
-
-            // Rebonds
-            if (y + dy > -50) {
-                dy = -dy-OISEAUX_AY;
-            }
-        }
-
-        public int getY() {
-            return (int) y;
-        }
-
-        public boolean enAttente() {
-            return attente != 0;
-        }
-    }
-
     private ArrayList<OiseauMouv> oiseaux = new ArrayList<>();
     private ScheduledExecutorService scheduler;
 
     private JButton btnRecommencer = new JButton("Recommencer");
     private JButton btnMenu = new JButton("Retourner au Menu");
+    private JLabel lblMdp = new JLabel();
 
     // Constructeur
     public Perdu(Theme theme) {
@@ -68,6 +30,7 @@ public class Perdu extends PanneauSol {
         setLayout(null);
         add(btnRecommencer);
         add(btnMenu);
+        add(lblMdp);
         positionBoutons();
 
         for (int i = 0; i < 5; ++i) {
@@ -92,6 +55,13 @@ public class Perdu extends PanneauSol {
         taille = btnMenu.getPreferredSize();
         btnMenu.setBounds(
                 (getWidth() - taille.width)/2 + insets.left, getSol() + 75 + insets.top,
+                taille.width, taille.height
+        );
+
+        // - mot de passe
+        taille = lblMdp.getPreferredSize();
+        lblMdp.setBounds(
+                getWidth() - 15 - taille.width + insets.left, getSol() + 15 + insets.top,
                 taille.width, taille.height
         );
     }
@@ -164,6 +134,15 @@ public class Perdu extends PanneauSol {
         }
     }
 
+    /**
+     * Indique le mot de passe à afficher
+     *
+     * @param mdp mote de passe
+     */
+    public void setMdp(String mdp) {
+        lblMdp.setText("mdp : " + mdp);
+    }
+
     // Accesseurs
     public JButton getBtnMenu() {
         return btnMenu;
@@ -171,5 +150,58 @@ public class Perdu extends PanneauSol {
 
     public JButton getBtnRecommencer() {
         return btnRecommencer;
+    }
+
+    // Sous classes
+    /**
+     * Représente 1 oiseau rebondissant
+     */
+    private class OiseauMouv {
+        // Attributs
+        private float y;
+        private float dy;
+        private int attente = 0;
+
+        // Méthodes
+        /**
+         * Initialise le mouvement
+         *
+         * @param y coordonnée de départ
+         * @param attente attente avant le debut de l'animation
+         */
+        public void init(int y, int attente) {
+            this.y = y;
+            this.dy = 0;
+            this.attente = attente;
+        }
+
+        /**
+         * Gère le mouvement de l'oiseau
+         */
+        public void mouv() {
+            // Attente
+            if (attente != 0) {
+                attente--;
+                return;
+            }
+
+            // Evolution
+            dy += OISEAUX_AY;
+            y += dy;
+
+            // Rebonds
+            if (y + dy > -50) {
+                dy = -dy-OISEAUX_AY;
+            }
+        }
+
+        // - accesseurs
+        public int getY() {
+            return (int) y;
+        }
+
+        public boolean enAttente() {
+            return attente != 0;
+        }
     }
 }

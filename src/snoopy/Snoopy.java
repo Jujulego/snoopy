@@ -11,12 +11,21 @@ public class Snoopy extends Perso {
     public static final int MAX_VIES = 3;
 
     // Attributs
-    private int vies = MAX_VIES;
+    private int vies;
+    private int pause = 0; // Mode console
     private LinkedList<Oiseau> oiseaux = new LinkedList<>();
 
     // Constructeur
-    public Snoopy(int x, int y) {
+    /**
+     * Construit snoopy
+     *
+     * @param x coordonnées de départ
+     * @param y coordonnées de départ
+     * @param vies nombre de vies
+     */
+    public Snoopy(int x, int y, int vies) {
         super(x, y, 3);
+        this.vies = vies;
     }
     
     // Méthodes
@@ -27,6 +36,10 @@ public class Snoopy extends Perso {
 
     @Override
     protected String getReprConsole() {
+        if (pause != 0) {
+            pause--;
+        }
+
         return "S";
     }
 
@@ -69,12 +82,30 @@ public class Snoopy extends Perso {
     }
 
     @Override
-    public boolean deplacable() {
-        return vies > 0; // Sauf si il est mort
+    public boolean deplacer(Carte carte, Theme theme, int dx, int dy) {
+        if (theme.getNumTheme() == Theme.CONSOLE) {
+            pause = 6;
+        }
+
+        return super.deplacer(carte, theme, dx, dy);
     }
 
+    @Override
+    public boolean deplacable() {
+        if (etat == 1) {
+            return vies > 0 && pause == 0; // Sauf si il est mort
+        }
+
+        return false;
+    }
+
+    /**
+     * Enlève une vie à Snoopy, sauf si Snoopy est invincible
+     *
+     * @return true si snoopy est mort
+     */
     public boolean tuer() {
-        if (vies > 0) {
+        if (!estInvicible() && vies > 0) {
             vies--;
         }
 

@@ -77,13 +77,13 @@ public class Victoire extends PanneauSol {
         int x = getWidth() - 8*larg, y = getSol()-long_;
 
         for (int i = 1; i < 4; ++i) {
-            g2d.drawImage(theme.getBlocImg((i + 1) % 2),
+            g2d.drawImage(theme.getBlocImg((i + ((x + 1) % 2)) % 2),
                     x, y - i*long_,
                     larg, long_,
                     null
             );
 
-            g2d.drawImage(theme.getBlocImg(i % 2),
+            g2d.drawImage(theme.getBlocImg((i + (x % 2)) % 2),
                     getWidth()-larg, y - i*long_,
                     larg, long_,
                     null

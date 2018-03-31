@@ -5,9 +5,11 @@ import java.awt.image.BufferedImage;
 
 public abstract class Perso extends Objet implements Deplacable, Animation, Teleportable {
     // Constantes
-    public static final int DUREE_DEPL = 5;
+    public static final int DUREE_DEPL = 5; // Cale la vitesse de l'IA
 
     // Attributs
+    private int pause = 0;
+    private int invicible = 0;
     private Direction direction = Direction.BAS;
     private Teleporteur dernier_teleporteur = null;
 
@@ -36,6 +38,15 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
     public String afficher() {
         // Pas d'animation en console
         etat = 1.0;
+
+        // Bonus
+        if (invicible > 0) {
+            invicible--;
+        }
+
+        if (pause > 0) {
+            pause--;
+        }
 
         // Affichage !
         switch (direction) {
@@ -79,10 +90,12 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
     }
 
     private void dessiner(Graphics2D g2d, Theme theme, int x, int y) {
-        g2d.drawImage(getReprGraphique(theme, direction),
-                x, y, Moteur.LARG_IMG, Moteur.LONG_IMG,
-                null
-        );
+        if (invicible % 8 <= 4) { // Clignotement invincible
+            g2d.drawImage(getReprGraphique(theme, direction),
+                    x, y, Moteur.LARG_IMG, Moteur.LONG_IMG,
+                    null
+            );
+        }
     }
 
     @Override
@@ -95,11 +108,20 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
                 etat = 1.0;
             }
         }
+
+        // Bonus
+        if (invicible > 0) {
+            invicible--;
+        }
+
+        if (pause > 0) {
+            pause--;
+        }
     }
 
     @Override
     public synchronized boolean animation() {
-        return etat < 1.0;
+        return etat < 1.0 || estInvicible();
     }
 
     @Override
@@ -123,6 +145,13 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
         Case case_ = carte.getCase(nx, ny);
         if (case_ == null) { // La case n'existe pas !
             return false;
+        }
+
+        // Bonus
+        Bonus bonus = case_.getBonus();
+        if (bonus != null) {
+            bonus.activer(this);
+            carte.enlever(bonus);
         }
 
         // Interactions
@@ -164,5 +193,37 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
 
     public Direction getDirection() {
         return direction;
+    }
+
+    /**
+     * Indique si le perso est invincible !!!
+     *
+     * @return true si le perso est invincible
+     */
+    public boolean estInvicible() {
+        return invicible != 0;
+    }
+
+    /**
+     * Rend le personnage invincible
+     */
+    public void activerInvicibilite() {
+        invicible += Invincible.DUREE;
+    }
+
+    /**
+     * Indique si le perso est invincible !!!
+     *
+     * @return true si le perso est invincible
+     */
+    public boolean aActivePause() {
+        return pause != 0;
+    }
+
+    /**
+     * Appellée quand le perso active la pause (lui permet de continuer à bouger)
+     */
+    public void activerPause() {
+        pause += Pause.DUREE;
     }
 }

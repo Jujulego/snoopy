@@ -2,23 +2,17 @@ package snoopy;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Gestion de la fenêtre, changements entre les panels
  *
  * @author julien
  */
-public class Fenetre extends JFrame implements Aire.FinListener {
+public class Fenetre extends JFrame implements Aire.FinListener, MotDePasse.MotDePasseListener {
     // Enumération
     private enum Etat {
-        MENU, JEU, PERDU, VICTOIRE
+        MENU, JEU, PERDU, VICTOIRE, MOTDEPASSE
     }
 
     // Attributs
@@ -26,10 +20,13 @@ public class Fenetre extends JFrame implements Aire.FinListener {
     private Menu menu;
     private Perdu perdu;
     private Victoire victoire;
+    private MotDePasse motDePasse;
     private Aire aire = null;
     private Theme theme = new Theme(Theme.SNOOPY);
-    
-    private ArrayList<String> al;
+
+    private int score = 0;
+    private int num_niveau = 1;
+    private int vies = Snoopy.MAX_VIES;
 
     // Constructeur
     /**
@@ -37,13 +34,14 @@ public class Fenetre extends JFrame implements Aire.FinListener {
      */
     public Fenetre() {
         // Paramètres
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setTitle("SnoopMan ECE");
 
         // Setup menu
         menu = new Menu(theme);
-        menu.getBtnJouer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
+        menu.getBtnJouer().addActionListener((ActionEvent actionEvent) -> premierNiveau());
+        menu.getBtnMDP().addActionListener((ActionEvent actionEvent) -> motDePasse());
 
         retourMenu();
 
@@ -57,19 +55,19 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         perdu = new Perdu(theme);
 
         perdu.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
-        perdu.getBtnRecommencer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
+        perdu.getBtnRecommencer().addActionListener((ActionEvent actionEvent) -> premierNiveau());
 
         // Setup victoire
         victoire = new Victoire(theme);
 
         victoire.getBtnMenu().addActionListener((ActionEvent actionEvent) -> retourMenu());
-        //victoire.getBtnContinuer().addActionListener((ActionEvent actionEvent) -> lancerJeu());
-    
-        
-        /////////////////////////////
-    	al = new ArrayList<String>();
-    	//////////////////////////////
-    	
+        victoire.getBtnContinuer().addActionListener((ActionEvent actionEvent) -> niveauSuivant());
+
+        // Setup motdepasse
+        motDePasse = new MotDePasse(theme);
+        motDePasse.ajouterMotDePasseListener(this);
+
+        motDePasse.getBtnRetour().addActionListener((ActionEvent actionEvent) -> retourMenu());
     }
 
     // Méthodes
@@ -95,10 +93,61 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         menu.requestFocus();
     }
 
+    public void motDePasse() {
+        // Gardien
+        if (etat == Etat.MOTDEPASSE) return;
+        etat = Etat.MOTDEPASSE;
+
+        // Arrêt du menu
+        menu.stop();
+
+        // Mot de passe
+        setContentPane(motDePasse);
+        setMinimumSize(motDePasse.getMinimumSize());
+        setSize(motDePasse.getMinimumSize());
+        motDePasse.requestFocus();
+    }
+
+    /**
+     * Prépare le niveau 1
+     */
+    public void premierNiveau() {
+        // Initialisation
+        score = 0;
+        num_niveau = 1;
+        vies = Snoopy.MAX_VIES;
+
+        // Activation !!!
+        try {
+            lancerJeu(Moteur.charger(String.format("map%d", num_niveau), theme, score, vies));
+
+        } catch (IOException e) {
+            // Pas de niveau suivant ...
+            retourMenu();
+        }
+    }
+
+    /**
+     * Prépare le niveau suivant
+     */
+    public void niveauSuivant() {
+        // Evolution
+        num_niveau++;
+
+        // Activation !!!
+        try {
+            lancerJeu(Moteur.charger(String.format("map%d", num_niveau), theme, score, vies));
+
+        } catch (IOException e) {
+            // Pas de niveau suivant ...
+            retourMenu();
+        }
+    }
+
     /**
      * Prépare l'affichage du jeu
      */
-    public void lancerJeu() {
+    public void lancerJeu(Moteur moteur) {
         // Gardien
         if (etat == Etat.JEU) return;
         etat = Etat.JEU;
@@ -109,19 +158,13 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         victoire.stop();
 
         // Création de l'aire
-        try {
-	        Moteur moteur = Moteur.charger("map.txt", theme);
-	        aire = new Aire(moteur, theme);
-	        aire.ajouterFinListener(this);
-	
-	        setContentPane(aire);
-	        setMinimumSize(aire.getMinimumSize());
-	        setSize(aire.getMinimumSize());
-	        aire.requestFocus();
-	    } catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-	    } 
+        aire = new Aire(moteur, theme);
+        aire.ajouterFinListener(this);
+
+        setContentPane(aire);
+        setMinimumSize(aire.getMinimumSize());
+        setSize(aire.getMinimumSize());
+        aire.requestFocus();
     }
 
     /**
@@ -144,13 +187,16 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         perdu.requestFocus();
 
         perdu.lancer();
+        perdu.setMdp(MotDePasse.encode(String.format("map%d", num_niveau)));
     }
 
     /**
      * Affiche l'écran de victoire
+     * @param score score final
+     * @param vies nombre de vies a la fin
      */
     @Override
-    public void gagne() {
+    public void gagne(int score, int vies) {
         if (etat == Etat.VICTOIRE) return;
         etat = Etat.VICTOIRE;
 
@@ -166,5 +212,14 @@ public class Fenetre extends JFrame implements Aire.FinListener {
         victoire.requestFocus();
 
         victoire.lancer();
+
+        // Evolution
+        this.score = score;
+        this.vies = vies;
+    }
+
+    @Override
+    public void motDePasseOK(Moteur moteur) {
+        lancerJeu(moteur);
     }
 }

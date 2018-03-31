@@ -296,10 +296,13 @@ public class Menu extends PanneauSol {
     public JButton getBtnJouer() {
         return btnJouer;
     }
+    public JButton getBtnMDP() {
+        return btnMDP;
+    }
 
     // Interface
     /**
-     * Indique u, changement de thème
+     * Indique un changement de thème
      */
     public interface ChgThemeListener {
         void chgTheme(Theme theme);

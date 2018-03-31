@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Moteur de jeu
  * Gère les interactions entre les objets du jeu, leurs mouvements.
- * IA
+ * Algorithmes IA
  *
  * @author julien
  */
@@ -75,21 +75,41 @@ public class Moteur {
         animations.addAll(carte.objetsAnimes());
         badSnoopies.addAll(carte.getBadSnoopies());
     }
-    
-    public static Moteur charger(String fichier, Theme theme) throws IOException {
+
+    // Méthodes statiques
+    /**
+     * Test l'exsitance du niveau
+     *
+     * @param niveau niveau à tester
+     * @return true si le niveau existe
+     */
+    public static boolean niveauExiste(String niveau) {
+        return new File("niveaux/" + niveau + ".txt").exists();
+    }
+
+    /**
+     * Charge un fichier niveau
+     *
+     * @param fichier nom du fichier à charger
+     * @param theme thème à utiliser
+     * @param score score de départ
+     * @param vies nombre de vies
+     * @return l'objet moteur controllant le jeu
+     *
+     * @throws IOException envoyée en cas d'erreur d'ouverture ou de lecture du fichier
+     */
+    public static Moteur charger(String fichier, Theme theme, int score, int vies) throws IOException {
     	//Ouverture fichier 
-        File file = new File(fichier);
-    	BufferedReader buff = null;
-    	FileReader filereader;
+        File file = new File("niveaux/" + fichier + ".txt");
+
+        FileReader filereader = new FileReader(file);
+    	BufferedReader buff = new BufferedReader(filereader);
         
     	//Déclaration variables 
-    	String line;
-    	String recup[];
+    	String line = null;
+    	String recup[] = null;
     	Carte carte = null;
     	Snoopy snoopy = null;
-    	
-		filereader = new FileReader(file);
-		buff = new BufferedReader(filereader);
 		
 		//Première ligne = Taille de la map
 		line = buff.readLine();
@@ -100,44 +120,56 @@ public class Moteur {
 		//Création de la carte
 		carte = new Carte(map_x,map_y);
 		
-		//Dexuième ligne = Coordonnées snoopy
+		//Deuxième ligne = Coordonnées snoopy
 		line = buff.readLine();
 		recup = line.split(" ");
 		
-		snoopy = new Snoopy(Integer.parseInt(recup[0]),Integer.parseInt(recup[1]));
+		snoopy = new Snoopy(Integer.parseInt(recup[0]), Integer.parseInt(recup[1]), vies);
    		carte.ajouter(snoopy); 		
 		
    		
 		//Le reste = Tous les autres éléments de la map
-		for(int i=0; i<map_y;i++) {
-			
-			System.out.println(i);
-			//A chaque tour de boucle, une ligne est lue
+		for(int i=0; i < map_y; i++) {
+		    //A chaque tour de boucle, une ligne est lue
 			line = buff.readLine();
 			    			
 			//On décortique la ligne pour créer le perso adécuat 
-			for(int j=0;j<map_x;j++) {
+			for(int j=0; j < map_x; j++) {
 				
 				switch(line.charAt(j)) {
 					
 					case 'o': //Oiseau
-						carte.ajouter(new Oiseau(j,i));
+						carte.ajouter(new Oiseau(j, i));
 						break;
+
 					case 'C': //Bloc Cassable
 						carte.ajouter(new BlocCassable(j, i));
 						break;
+
 					case 'P': //Piege
 						carte.ajouter(new BlocPiege(j, i));
 						break;
+
 					case 'D': //Déplaçable
 						carte.ajouter(new BlocPoussable(j, i));
 						break;
+
 					case 'X': //Bad Snoopy
-						carte.ajouter(new BadSnoopy(j,i));
+						carte.ajouter(new BadSnoopy(j, i));
 						break;
+
 					case 'F': //Bloc Fixe
-						carte.ajouter(new Bloc(j,i));
+						carte.ajouter(new Bloc(j, i));
 						break;
+
+                    case 'i': // Invincible !!!
+                        carte.ajouter(new Invincible(j, i));
+                        break;
+
+                    case 'p': // Pause !!!
+                        carte.ajouter(new Pause(j, i));
+                        break;
+
 					//Ajouter les téléporteur
 					//Nombres dans le txt. Chaque même nombre est lié au précédant
 						
@@ -145,7 +177,6 @@ public class Moteur {
 			}
 			
 		}
-		
 
     	//Téléporteurs manuellement ajoutés
         Teleporteur tp1 = new Teleporteur(4,4);
@@ -156,7 +187,9 @@ public class Moteur {
         carte.ajouter(tp2);
         
         // Création du moteur
-        Moteur moteur = new Moteur(carte, snoopy, theme, 0);
+        Moteur moteur = new Moteur(carte, snoopy, theme, score);
+
+        // Balle manuellement ajoutée
         moteur.ajouterBalle(new Balle(
                 (int) (2.5 * Moteur.LARG_IMG), (int) (0.5 * Moteur.LONG_IMG),
                 -4, 4
@@ -181,27 +214,42 @@ public class Moteur {
      * Appelée FPS fois par secondes
      */
     private void animer() {
+        boolean bonusPause = bonusPauseActif();
+
         // Evolution des animation
         if (!pause) {
-            // Mouvements
-            for (Animation a : animations) {
-                if (a.animation()) a.animer(carte, theme);
-            }
+            if (bonusPause) {
+                if (snoopy.aActivePause()) {
+                    snoopy.animer(carte, theme);
 
-            // Touche ?
-            for (Balle balle : balles) {
-                if (!balle.estAuBord(5)) {
-                    if (pointDedans(snoopy, balle)) {
-
-                        if (!balle.getTouche()) {
-                            balle.setTouche(true);
-
-                            // On tue snoopy
-                            snoopy.tuer();
-                            mort();
+                } else {
+                    for (BadSnoopy badSnoopy : badSnoopies) {
+                        if (badSnoopy.aActivePause()) {
+                            badSnoopy.animer(carte, theme);
                         }
-                    } else if (balle.getTouche()) {
-                        balle.setTouche(false);
+                    }
+                }
+
+            } else {
+                // Mouvements
+                for (Animation a : animations) {
+                    if (a.animation()) a.animer(carte, theme);
+                }
+
+                // Touche ?
+                for (Balle balle : balles) {
+                    if (!balle.estAuBord(5)) {
+                        if (balleDedans(snoopy, balle)) {
+                            if (!balle.getTouche()) {
+                                balle.setTouche(true);
+
+                                // On tue snoopy
+                                snoopy.tuer();
+                                mort();
+                            }
+                        } else if (balle.getTouche()) {
+                            balle.setTouche(false);
+                        }
                     }
                 }
             }
@@ -230,7 +278,7 @@ public class Moteur {
                 // On fait un copie de la liste, car on va modifier l'original
                 for (Objet objet : new LinkedList<>(case_.listeObjets())) {
                     // On ne téléporte pas les objets en pleine animation
-                    if (objet instanceof Animation && ((Animation) objet).animation()) {
+                    if (objet instanceof Deplacable && ((Deplacable) objet).deplacable()) {
                         continue;
                     }
 
@@ -250,23 +298,25 @@ public class Moteur {
             listener.animer();
         }
 
-        // Automatique
-        LinkedList<Case> previsions = previsions();
+        // Snoopy automatique
+        LinkedList<Case> previsions = previsions(bonusPause);
 
-        if (!pause && auto && !snoopy.animation() && attente == 0) {
-            Mouvement mvt = conseil(previsions, false);
+        if (!pause && auto && snoopy.deplacable() && attente == 0) {
+            if (!bonusPause || snoopy.aActivePause()) {
+                Mouvement mvt = conseil(previsions, false);
 
-            if (mvt.dir != null) {
-                // Déplacement
-                deplacerSnoopy(mvt.dir.dx(), mvt.dir.dy());
-
-                // Attaque !
-                if (mvt.casse) {
-                    attaquer();
+                if (mvt.dir != null) {
+                    // Déplacement
                     deplacerSnoopy(mvt.dir.dx(), mvt.dir.dy());
+
+                    // Attaque !
+                    if (mvt.casse) {
+                        attaquer();
+                        deplacerSnoopy(mvt.dir.dx(), mvt.dir.dy());
+                    }
+                } else {
+                    attente = 12;
                 }
-            } else {
-                attente = 12;
             }
         } else if (attente > 0) {
             attente--;
@@ -280,7 +330,7 @@ public class Moteur {
      * Gestion du timer
      */
     private void clock() {
-        if (!pause) {
+        if (!pause && !bonusPauseActif()) {
             // Chaque seconde il change l'état d'une variable de Air
             if (timer == 0) {
                 //Si on arrive à 0, Snoopy perd une vie
@@ -306,23 +356,33 @@ public class Moteur {
      */
     public void auto() {
         auto = !auto;
+        historique = new LinkedList<>(); // Reset historique
     }
 
     /**
      * Prévision des positions interdites
+     *
+     * @param bonusPause indique si le bonusPause à été activé
      */
-    public LinkedList<Case> previsions() {
+    public LinkedList<Case> previsions(boolean bonusPause) {
         LinkedList<Case> previsions = new LinkedList<>();
         for (Balle balle : balles) {
-            previsions.addAll(balle.prevision(carte, duree_depl * PREVISIONS));
+            previsions.addAll(balle.prevision(carte, bonusPause ?  0 : duree_depl * PREVISIONS));
         }
 
         for (BadSnoopy badSnoopy : badSnoopies) {
             int x = badSnoopy.getX();
             int y = badSnoopy.getY();
 
+            // position actuelle
             previsions.add(carte.getCase(x, y));
 
+            // Bonus pause
+            if (bonusPause && !badSnoopy.aActivePause()) {
+                continue;
+            }
+
+            // Positions futures
             for (Direction dir : directionsPossibles(x, y, false, false, false, previsions)) {
                 int nx = ajouterDirX(x, dir);
                 int ny = ajouterDirY(y, dir);
@@ -349,7 +409,12 @@ public class Moteur {
      */
     public void deplacerSnoopy(int dx, int dy) {
         // Ignoré si animation en cours
-        if (snoopy.animation() || pause || !snoopy.deplacable()) {
+        if (pause || !snoopy.deplacable()) {
+            return;
+        }
+
+        // Bonus Pause
+        if (bonusPauseActif() && !snoopy.aActivePause()) {
             return;
         }
 
@@ -374,7 +439,7 @@ public class Moteur {
         boolean mouv = false;
         for (BadSnoopy badSnoopy : badSnoopies) {
             // Ignoré si animation en cours
-            if (badSnoopy.animation() || !badSnoopy.deplacable()) {
+            if (!badSnoopy.deplacable()) {
                 continue;
             }
 
@@ -418,7 +483,13 @@ public class Moteur {
      * Snoopy attaque le bloc face à lui : soit il casse, soit il était piégé
      */
     public void attaquer() {
-        if (snoopy.animation() || pause || snoopy.getVies() == 0) {
+        // Mort !!
+        if (!snoopy.deplacable() || pause || snoopy.getVies() == 0) {
+            return;
+        }
+
+        // Bonus Pause
+        if (bonusPauseActif() && !snoopy.aActivePause()) {
             return;
         }
 
@@ -447,17 +518,17 @@ public class Moteur {
      * @param y coordonée du point
      * @param check_poussees indique s'il faut prendre en compte les possibilités de poussées
      * @param check_casse indique s'il faut prendre en compte les possibilités de casse
-     * @param check_balles indique s'il faut prendre en compte les balles
+     * @param check_previsions indique s'il faut prendre en compte les prévisions
      * @param previsions positions futures des balles (si déjà calculées)
      * @return la liste des déplacements possibles
      */
-    public LinkedList<Direction> directionsPossibles(int x, int y, boolean check_poussees, boolean check_casse, boolean check_balles, LinkedList<Case> previsions) {
+    public LinkedList<Direction> directionsPossibles(int x, int y, boolean check_poussees, boolean check_casse, boolean check_previsions, LinkedList<Case> previsions) {
         // Création de l'objet
         LinkedList<Direction> liste = new LinkedList<>();
 
         // Prévision des balles
-        if (previsions == null) {
-            previsions = previsions();
+        if (previsions == null && check_previsions) {
+            previsions = previsions(bonusPauseActif());
         }
 
         // Remplissage
@@ -495,7 +566,7 @@ public class Moteur {
             }
 
             // Balles !!!!
-            if (check_balles) {
+            if (check_previsions) {
                 // Check balles !
                 boolean echec = false;
                 for (Case c : previsions) {
@@ -586,7 +657,7 @@ public class Moteur {
 
             // Directions
             directions = directionsPossibles(coord.x, coord.y,
-                    true, true, false, previsions
+                    true, true, true, previsions
             );
             for (Direction dir : directions) {
                 CoordDist ncoord = coord.ajouter(dir);
@@ -718,13 +789,19 @@ public class Moteur {
      * Conseil sur le mouvement à réaliser
      *
      * @param previsions positions futures des balles (si déjà calculées)
-     * @param fake
+     * @param fake indique que le calcul n'est pas fait dans le cadre de l'IA, mais pour un affichage
+     *             => le résultat ne sera pas stocké dans l'historique
      * @return Mouvement conseillé
      */
     public Mouvement conseil(LinkedList<Case> previsions, boolean fake) {
+        // Fini !
+        if (snoopy.getOiseaux() == carte.getNbOiseaux()) {
+            return new Mouvement(0, 0, null);
+        }
+
         // Prévision de la position des balles
         if (previsions == null) {
-            previsions = previsions();
+            previsions = previsions(bonusPauseActif());
         }
 
         // Case actuelle
@@ -782,6 +859,27 @@ public class Moteur {
     }
 
     /**
+     * Teste si un personnage à activer le bonus Pause
+     *
+     * @return true si le bonus à été activé
+     */
+    public boolean bonusPauseActif() {
+        // Snoopy ?
+        if (snoopy.aActivePause()) {
+            return true;
+        }
+
+        // BadSnoopies ?
+        for (BadSnoopy badSnoopy : badSnoopies) {
+            if (badSnoopy.aActivePause()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Condition de fin : mort
      */
     private void mort() {
@@ -802,7 +900,7 @@ public class Moteur {
         if (snoopy.getOiseaux() == carte.getNbOiseaux()) {
             // Listeners
             for (MoteurListener listener : listeners) {
-                listener.fin();
+                listener.fin(getScore(), snoopy.getVies());
             }
         }
     }
@@ -910,11 +1008,23 @@ public class Moteur {
         scheduler.shutdown();
     }
 
+    /**
+     * Accès à l'historique de l'IA
+     *
+     * @return les dernière positions de l'IA
+     */
     public LinkedList<Coord> getHistorique() {
         return historique;
     }
 
     // Méthodes statiques
+    /**
+     * Calcule la nouvelle coordonée (x) en appliquant la direction donnée
+     *
+     * @param x coordonnée de départ
+     * @param direction direction à applique
+     * @return nouvelle coordonée
+     */
     public static int ajouterDirX(int x, Direction direction) {
         switch (direction) {
             case DROITE:
@@ -927,6 +1037,14 @@ public class Moteur {
                 return x;
         }
     }
+
+    /**
+     * Calcule la nouvelle coordonée (y) en appliquant la direction donnée
+     *
+     * @param y coordonnée de départ
+     * @param direction direction à applique
+     * @return nouvelle coordonée
+     */
     public static int ajouterDirY(int y, Direction direction) {
         switch (direction) {
             case BAS:
@@ -940,9 +1058,29 @@ public class Moteur {
         }
     }
 
-    public static boolean pointDedans(Objet obj, Balle balle) {
+    /**
+     * Indique si la balle se trouve sur la même case que l'objet
+     *
+     * @param obj objet à tester
+     * @param balle balle à tester
+     * @return true si les cases correspondent
+     *
+     * @see Moteur#pointDedans(int, int, int, int)
+     */
+    public static boolean balleDedans(Objet obj, Balle balle) {
         return pointDedans(obj.getX(), obj.getY(), balle.getX(), balle.getY());
     }
+
+    /**
+     * Indique si le point (coordonnées en pixels depuis le coin haut gauche de la carte) se
+     * trouve sur la case indiquée par casex et casey
+     *
+     * @param casex coordonées de la case
+     * @param casey coordonées de la case
+     * @param ptx coordonées du point
+     * @param pty coordonées du point
+     * @return true si le point est dans la case
+     */
     public static boolean pointDedans(int casex, int casey, int ptx, int pty) {
         return casex * LARG_IMG < ptx && ptx < (casex + 1) * LARG_IMG &&
                 casey * LONG_IMG < pty && pty < (casey + 1) * LONG_IMG;
@@ -950,9 +1088,24 @@ public class Moteur {
 
     // Listener
     public interface MoteurListener {
+        /**
+         * Appellée quand Snoopy meurt
+         */
         void mort();
-        void fin();
 
+        /**
+         * Appellée quand Snoopy gagne
+         *
+         * @param score score final
+         * @param vies nombre de vies à la fin de la partie
+         */
+        void fin(int score, int vies);
+
+        /**
+         * Appellée par Moteur.animer
+         *
+         * @see Moteur#animer()
+         */
         void animer();
     }
 
@@ -985,6 +1138,12 @@ public class Moteur {
             return false;
         }
 
+        /**
+         * Calcule un nouvel objet Coord en appliquant la direction donnée a l'objet actuel
+         *
+         * @param dir direction à appliquer
+         * @return un nouvel objet coordonnées
+         */
         public Coord ajouter(Direction dir) {
             return new Coord(
                     ajouterDirX(x, dir),
@@ -994,7 +1153,10 @@ public class Moteur {
     }
 
     /**
-     * Stockage de coordonneées et la distance pour les BFS
+     * Stockage de coordonnées et d'une distance pour les BFS
+     *
+     * @see Moteur#distanceOiseau(int, int, LinkedList)
+     * @see Moteur#distanceSnoopy(int, int, LinkedList)
      */
     public class CoordDist extends Coord {
         // Attributs
@@ -1015,7 +1177,8 @@ public class Moteur {
     }
 
     /**
-     * Résultat de conseil
+     * Résultat de conseil :
+     * représente un mouvement à appliquer à Snoopy
      *
      * @see Moteur#conseil(LinkedList, boolean)
      */

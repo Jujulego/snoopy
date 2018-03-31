@@ -30,6 +30,10 @@ public class BadSnoopy extends Perso {
 
     @Override
     protected String getReprConsole() {
+        if (pause > 0) {
+            pause--;
+        }
+
         return "B";
     }
 
@@ -51,9 +55,9 @@ public class BadSnoopy extends Perso {
 
     @Override
     public synchronized void animer(Carte carte, Theme theme) {
-        if (super.animation() || pause == 0) {
-            super.animer(carte, theme);
-        } else {
+        super.animer(carte, theme);
+
+        if (pause > 0) {
             pause--;
         }
     }
@@ -82,6 +86,6 @@ public class BadSnoopy extends Perso {
 
     @Override
     public boolean deplacable() {
-        return true;
+        return etat == 1 && pause == 0;
     }
 }
