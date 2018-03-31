@@ -168,7 +168,13 @@ public class Moteur {
     //Timer, nombre de vie de snoopy, positions de tous les éléments, état de tous les élémtents
     //score 
 
-
+    public static Moteur sauvegarder() {
+		
+    	
+    	return null;
+    	
+    }
+    
     // Méthodes
     /**
      * Gestion des animations et les mouvements automatiques
