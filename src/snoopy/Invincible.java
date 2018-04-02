@@ -2,6 +2,12 @@ package snoopy;
 
 import java.awt.*;
 
+/**
+ * Bonus d'invincibilité !!!
+ * Rend le personnage qui le récupère invulnérable !
+ *
+ * @author julien
+ */
 public class Invincible extends Bonus {
     // Constantes
     public static final int DUREE = 128;

@@ -3,6 +3,10 @@ package snoopy;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Base des menu graphiques
+ * Affiche un environnement, avec le ciel et le sol
+ */
 public class PanneauSol extends JPanel {
     // Constantes
     private static final float FRONTIERE = 3/5.0f;
@@ -11,6 +15,11 @@ public class PanneauSol extends JPanel {
     protected Theme theme;
 
     // Constructeur
+    /**
+     * Prépare le JPanel
+     *
+     * @param theme thème à utiliser
+     */
     public PanneauSol(Theme theme) {
         this.theme = theme;
 
@@ -27,7 +36,7 @@ public class PanneauSol extends JPanel {
         Graphics2D g2d = (Graphics2D) graphics;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Fond
+        // Ciel
         g2d.setBackground(new Color(108, 213, 231));
         g2d.clearRect(0, 0, getWidth(), getHeight());
 
@@ -49,6 +58,11 @@ public class PanneauSol extends JPanel {
         }
     }
 
+    /**
+     * Indique l'ordonnée frontière entre le ciel et le sol
+     *
+     * @return la frontière entre ciel et sol
+     */
     public int getSol() {
         return (int) (getHeight() * FRONTIERE);
     }

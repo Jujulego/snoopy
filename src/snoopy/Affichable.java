@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * Base de tout objet affiché aussi bien en console qu'en graphique
  *
- * @author julien
+ * @author julien benjamin
  */
 public interface Affichable {
     /**

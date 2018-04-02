@@ -135,10 +135,16 @@ public class Console implements Moteur.MoteurListener {
                 case 'e': // Quitter
                     quitterJeu();
                     break;
+
+                case 'w': // Sauvegarde
+                    break;
             }
         }
     }
 
+    /**
+     * Appelée en cas de mort du personnage
+     */
     @Override
     public synchronized void mort() {
         score = 0;
@@ -147,6 +153,9 @@ public class Console implements Moteur.MoteurListener {
         quitterJeu();
     }
 
+    /**
+     * Appelée en cas de victoire du personnage
+     */
     @Override
     public synchronized void fin(int score, int vies) {
         this.score = score;
@@ -163,7 +172,7 @@ public class Console implements Moteur.MoteurListener {
     /**
      * Affiche l'entête
      */
-    public void entete() {
+    public static void entete() {
         System.out.println("    ____                                     ");
         System.out.println("   /    \\                                    ");
         System.out.println("  /   __/ ____    ___    ___    ___  __    __");
@@ -208,6 +217,11 @@ public class Console implements Moteur.MoteurListener {
                         break;
                     }
 
+                case "2":
+                    if (fichier == null) {
+                        fichier = "sauvegarde";
+                    }
+
                 case "1":
                     boolean continuer = true;
                     int num_niveau = 1;
@@ -237,9 +251,6 @@ public class Console implements Moteur.MoteurListener {
                         }
                     }
 
-                    break;
-
-                case "2":
                     break;
 
                 case "4":
@@ -308,7 +319,7 @@ public class Console implements Moteur.MoteurListener {
     }
 
     /**
-     * Appelée pour mettre fin à l'attente du main thread et mettre fin au jeu
+     * Appelée pour réveiller le main thread et mettre fin au jeu
      */
     public synchronized void quitterJeu() {
         fin = true;
@@ -455,21 +466,5 @@ public class Console implements Moteur.MoteurListener {
             }
         } catch (IOException | InterruptedException ignored) {
         }
-    }
-
-    /**
-     * Main !
-     */
-    public static void main(String[] args) {
-        try {
-            // Mode console
-            Console console = new Console();
-            console.menu();
-
-        } catch (InterruptedException err) {
-            err.printStackTrace();
-        }
-
-        System.exit(0);
     }
 }

@@ -7,7 +7,7 @@ import java.util.LinkedList;
 /**
  * Gestion d'une case. Permet la présence de plusieurs objets au même endroit
  *
- * @author julien
+ * @author julien benjamin
  */
 public class Case implements Affichable, Animation {
     // Attributs
@@ -16,7 +16,6 @@ public class Case implements Affichable, Animation {
     private Teleporteur teleporteur = null;
 
     private LinkedList<Objet> objets = new LinkedList<>();
-    private double etat = 1.0;
 
     // Constructeur
     /**
@@ -44,8 +43,6 @@ public class Case implements Affichable, Animation {
     // Méthodes
     @Override
     public void animer(Carte carte, Theme theme) {
-        etat++;
-        etat%=60;
     }
 
     @Override
@@ -53,6 +50,14 @@ public class Case implements Affichable, Animation {
         return true;
     }
 
+    /**
+     * Affiche uniquement le fond de la case
+     *
+     * @param g2d
+     * @param theme theme à utiliser
+     * @param bx coordonnées du coin haut gauche de la carte
+     * @param by coordonnées du coin haut gauche de la carte
+     */
     @Override
     public synchronized void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affiche uniqement l'objet avec l'indice z le plus grand
@@ -99,6 +104,7 @@ public class Case implements Affichable, Animation {
 
     /**
      * Ajoute un objet à la case
+     *
      * @param objet l'objet à ajouter
      */
     public synchronized void ajouter(Objet objet) {
@@ -107,7 +113,7 @@ public class Case implements Affichable, Animation {
         // Tri décroissant sur l'indice Z
         objets.sort((Objet obj1, Objet obj2) -> obj2.getZ() - obj1.getZ());
 
-        // Cas du teleporteur
+        // Cas du téléporteur
         if (objet instanceof Teleporteur) {
             teleporteur = (Teleporteur) objet;
         }
@@ -115,6 +121,7 @@ public class Case implements Affichable, Animation {
 
     /**
      * Enlève un objet à la case
+     *
      * @param objet l'objet à enlever
      */
     public synchronized void enlever(Objet objet) {
@@ -129,9 +136,20 @@ public class Case implements Affichable, Animation {
     }
 
     // Accesseurs
+    /**
+     * Renvoie une liste des objets posés sur la carte, triés par Z décroissants
+     *
+     * @return la liste des objets présents sur la carte
+     */
     public synchronized LinkedList<Objet> listeObjets() {
         return objets;
     }
+
+    /**
+     * Renvoie le 1er objet de la liste
+     *
+     * @return un objet ou null
+     */
     public synchronized Objet getObjet() {
         if (objets.size() == 0) {
             return null;
@@ -139,6 +157,12 @@ public class Case implements Affichable, Animation {
 
         return objets.getFirst();
     }
+
+    /**
+     * Renvoie un bloc posé sur la case
+     *
+     * @return un bloc ou null
+     */
     public synchronized Bloc getBloc() {
         for (Objet obj : objets) {
             if (obj instanceof Bloc) {
@@ -148,6 +172,12 @@ public class Case implements Affichable, Animation {
 
         return null;
     }
+
+    /**
+     * Renvoie un bonus posé sur la case
+     *
+     * @return un bonus ou null
+     */
     public synchronized Bonus getBonus() {
         for (Objet obj : objets) {
             if (obj instanceof Bonus) {
@@ -157,6 +187,12 @@ public class Case implements Affichable, Animation {
 
         return null;
     }
+
+    /**
+     * Renvoie un poussable posé sur la case
+     *
+     * @return un poussable ou null
+     */
     public synchronized Poussable getPoussable() {
         for (Objet obj : objets) {
             if (obj instanceof Poussable) {
@@ -166,9 +202,16 @@ public class Case implements Affichable, Animation {
 
         return null;
     }
+
+    /**
+     * Renvoie un téléporteur posé sur la case
+     *
+     * @return un téléporteur ou null
+     */
     public Teleporteur getTeleporteur() {
         return teleporteur;
     }
+
     public int getX() {
         return x;
     }

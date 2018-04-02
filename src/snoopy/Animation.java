@@ -3,7 +3,7 @@ package snoopy;
 /**
  * Base de la gestion des animations
  *
- * @author julien
+ * @author julien benjamin
  */
 public interface Animation {
     /**

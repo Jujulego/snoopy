@@ -4,6 +4,8 @@ import java.awt.*;
 
 /**
  * Représente un oiseau sur la carte
+ *
+ * @author julien benjamin
  */
 public class Oiseau extends Objet implements Animation {
     // Constructeur

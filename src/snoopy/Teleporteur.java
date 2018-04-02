@@ -5,6 +5,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
+/**
+ * Représente un téléporteur
+ */
 public class Teleporteur extends Objet implements Animation, Affichable {
     // Constantes
     public static final int RAYON = 20;
@@ -14,10 +17,23 @@ public class Teleporteur extends Objet implements Animation, Affichable {
     private Teleporteur paire = null;
 
     // Constructeur
+    /**
+     * Positionne le téléporteur
+     *
+     * @param x coordonnées dans la carte
+     * @param y coordonnées dans la carte
+     */
     public Teleporteur(int x, int y) {
         super(x, y, 1);
     }
 
+    /**
+     * Positionne le téléporteur et le paire avec un autre
+     *
+     * @param x coordonnées dans la carte
+     * @param y coordonnées dans la carte
+     * @param paire téléporteur associé
+     */
     public Teleporteur(int x, int y, Teleporteur paire) {
         this(x, y);
         this.paire = paire;
@@ -54,10 +70,20 @@ public class Teleporteur extends Objet implements Animation, Affichable {
         return false;
     }
 
+    /**
+     * Renvoie le téléporteur associé
+     *
+     * @return téléporteur associé
+     */
     public Teleporteur getPaire() {
         return paire;
     }
 
+    /**
+     * Associe le téléporteur avec un autre
+     *
+     * @param paire
+     */
     public void setPaire(Teleporteur paire) {
         this.paire = paire;
     }

@@ -10,7 +10,7 @@ import java.util.LinkedList;
  * Représente une balle.
  * Gère le mouvement de la balle, et son affichage
  *
- * @author julien
+ * @author julien benjamin
  */
 public class Balle implements Animation, Affichable {
     // Constantes
@@ -90,6 +90,13 @@ public class Balle implements Animation, Affichable {
         return "Ba";
     }
 
+    /**
+     * Gère les déplacements de la balle, les rebonds contre les bords et les blocs,
+     * ainsi que la téléportation des balles
+     *
+     * @param carte carte affichée
+     * @param theme thème à utiliser
+     */
     @Override
     public void animer(Carte carte, Theme theme) {
         // Déplacement
@@ -225,9 +232,16 @@ public class Balle implements Animation, Affichable {
         return true;
     }
 
+    /**
+     * Affiche une image et la fait tourner, suaf pour le thème Snoopy
+     *
+     * @param g2d
+     * @param theme theme à utiliser
+     * @param bx coordonnées de base
+     * @param by coordonnées de base
+     */
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
-
         BufferedImage bimg = theme.getBalleImg();
 
         if(theme.getNumTheme() != Theme.SNOOPY)
@@ -255,10 +269,21 @@ public class Balle implements Animation, Affichable {
         return y;
     }
 
+    /**
+     * Indique si la balle à déjà touché Snoopy dans cette case
+     *
+     * @return true si la balle à déjà touché Snoopy
+     */
     public boolean getTouche() {
         return touche;
     }
 
+    /**
+     * Indique au système si la balle est en train de toucher Snoopy
+     * Pour de ne pas enlever plus d'une vie par touche
+     *
+     * @param touche true si a balle touche Snoopy
+     */
     public void setTouche(boolean touche) {
         this.touche = touche;
     }

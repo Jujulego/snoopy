@@ -2,6 +2,10 @@ package snoopy;
 
 import java.awt.*;
 
+/**
+ * Bonus de pause !!!
+ * Arrête tout (y compris le timer !) sauf les mouvements du personnage qui l'a récupéré
+ */
 public class Pause extends Bonus {
     // Constantes
     public static final int DUREE = 128;

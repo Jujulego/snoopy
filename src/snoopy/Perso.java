@@ -3,6 +3,10 @@ package snoopy;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * Gestion générique d'un personnage
+ * Gère, les déplacements les animations directionnelles et la téléportation
+ */
 public abstract class Perso extends Objet implements Deplacable, Animation, Teleportable {
     // Constantes
     public static final int DUREE_DEPL = 5; // Cale la vitesse de l'IA
@@ -17,9 +21,16 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
     private int ox; // position précédante
     private int oy;
     protected double etat = 1.0; // varie de 0 -> 1, représente l'avancement dans l'animation
-                               // Passe de 0 à 1, en 400ms de seconde
+                                 // Passe de 0 à 1, en 400ms de seconde
 
     // Constructeur
+    /**
+     * Construit le personnage
+     *
+     * @param x coordonnées de départ
+     * @param y coordonnées de départ
+     * @param z indice d'affichage
+     */
     public Perso(int x, int y, int z) {
         super(x, y, z);
 
@@ -29,8 +40,31 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
     }
 
     // Méthodes abstraites
+    /**
+     * Renvoie les caractères à afficher en console pour représenter le personnage
+     *
+     * @return 2 caractères
+     */
     protected abstract String getReprConsole();
+
+    /**
+     * Renvoie l'image à afficher pour représenter le personnage
+     *
+     * @return une image
+     */
     protected abstract BufferedImage getReprGraphique(Theme theme, Direction dir);
+
+    /**
+     * Gestion des interactions spécifiques au personnage
+     *
+     * @param case_ case contenant les objets avec lesquels interagir
+     * @param carte carte actuelle
+     * @param theme theme utilisé
+     * @param dx déplacement en x
+     * @param dy déplacement en y
+     *
+     * @return true si l'interaction authorise le mouvement, false sinon
+     */
     protected abstract boolean interactions(Case case_, Carte carte, Theme theme, int dx, int dy);
 
     // Méthodes
@@ -89,6 +123,14 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
         dessiner(g2d,theme, bx + (int) (x * Moteur.LARG_IMG), by + (int) (y * Moteur.LONG_IMG));
     }
 
+    /**
+     * Affiche l'image, clignotante en cas d'invinciblilité
+     *
+     * @param g2d
+     * @param theme thème à utiliser
+     * @param x coordonnées d'affichage absolues
+     * @param y coordonnées d'affichage absolues
+     */
     private void dessiner(Graphics2D g2d, Theme theme, int x, int y) {
         if (invicible % 8 <= 4) { // Clignotement invincible
             g2d.drawImage(getReprGraphique(theme, direction),
@@ -191,6 +233,10 @@ public abstract class Perso extends Objet implements Deplacable, Animation, Tele
         oy = teleporteur.getY();
     }
 
+    /**
+     * Donne la direction dans laquelle est tournée le personnage
+     * @return
+     */
     public Direction getDirection() {
         return direction;
     }

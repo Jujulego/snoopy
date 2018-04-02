@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * Bloc piégé : explose dès que Snoopy le touche
  *
- * @author julien
+ * @author julien benjamin
  */
 public class BlocPiege extends Bloc implements Animation {
     // Attributs

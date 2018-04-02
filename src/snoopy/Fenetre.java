@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * Gestion de la fenêtre, changements entre les panels
  *
- * @author julien
+ * @author julien marin
  */
 public class Fenetre extends JFrame implements Aire.FinListener, MotDePasse.MotDePasseListener {
     // Enumération
@@ -30,7 +30,7 @@ public class Fenetre extends JFrame implements Aire.FinListener, MotDePasse.MotD
 
     // Constructeur
     /**
-     * Construit la fenêtre, intialise les panels
+     * Construit la fenêtre, intialise les panels, met en place les listeners
      */
     public Fenetre() {
         // Paramètres
@@ -73,7 +73,7 @@ public class Fenetre extends JFrame implements Aire.FinListener, MotDePasse.MotD
 
     // Méthodes
     /**
-     * Prépare à l'affichage du menu
+     * Prépare à l'affichage du menu général
      */
     public void retourMenu() {
         // Gardien
@@ -94,6 +94,9 @@ public class Fenetre extends JFrame implements Aire.FinListener, MotDePasse.MotD
         menu.requestFocus();
     }
 
+    /**
+     * Prépare à l'affichage du menu mot de passe
+     */
     public void motDePasse() {
         // Gardien
         if (etat == Etat.MOTDEPASSE) return;
@@ -108,13 +111,17 @@ public class Fenetre extends JFrame implements Aire.FinListener, MotDePasse.MotD
         setSize(motDePasse.getMinimumSize());
         motDePasse.requestFocus();
     }
-    
-    public void chargerSauvegarde() { //Charge la dernière partie sauvegardée 
+
+    /**
+     * Charge la dernière partie sauvegardée
+     */
+    public void chargerSauvegarde() {
         num_niveau = 1;
     	
         //Activation 
     	try {
 			lancerJeu(Moteur.charger("sauvegarde", theme, score, vies));
+
 		} catch (IOException e) { 
 			//Aucun niveau sauvegardé  
 			retourMenu();
@@ -232,6 +239,11 @@ public class Fenetre extends JFrame implements Aire.FinListener, MotDePasse.MotD
         this.vies = vies;
     }
 
+    /**
+     * Appelée quand l'utilisateur entre un mot de passe valide
+     *
+     * @param moteur moteur de jeu correspondant au niveau chargé
+     */
     @Override
     public void motDePasseOK(Moteur moteur) {
         lancerJeu(moteur);

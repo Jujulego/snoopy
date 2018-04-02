@@ -9,7 +9,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-
+/**
+ * Thème de jeu : rassemble les images d'un même thème
+ *
+ * @author benjamin julien
+ */
 public class Theme {
     // Constantes
     public static final int SOKOBAN = 1;
@@ -36,6 +40,11 @@ public class Theme {
     private BufferedImage pause;
 
     // Constructeur
+    /**
+     * Charge le thème indiqué
+     *
+     * @param num_theme numéro du thème à charger
+     */
     public Theme(int num_theme)
     {
         this.num_theme = num_theme;

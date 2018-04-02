@@ -15,8 +15,9 @@ import java.util.concurrent.TimeUnit;
  * Moteur de jeu
  * Gère les interactions entre les objets du jeu, leurs mouvements.
  * Algorithmes IA
+ * Chargements et sauvegardes
  *
- * @author julien
+ * @author julien marin
  */
 public class Moteur {
     // Constantes
@@ -98,7 +99,6 @@ public class Moteur {
      *
      * @throws IOException envoyée en cas d'erreur d'ouverture ou de lecture du fichier
      */
-    
     public static Moteur charger(String fichier, Theme theme, int score, int vies) throws IOException {
     	
    		
@@ -264,9 +264,9 @@ public class Moteur {
                                 snoopy.tuer();
                                 mort();
                             }
-                        } else if (balle.getTouche()) {
-                            balle.setTouche(false);
                         }
+                    } else if (balle.getTouche()) {
+                        balle.setTouche(false);
                     }
                 }
             }

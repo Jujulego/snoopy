@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * Bloc que Snoopy peut casser
  *
- * @author julien
+ * @author julien benjamin
  */
 public class BlocCassable extends Bloc implements Animation {
     // Attributs

@@ -2,13 +2,15 @@ package snoopy;
 
 /**
  * Représente un objet sur la carte
+ *
+ * @author julien
  */
 public abstract class Objet implements Affichable {
     // Attributs
     // - coordonées
     private int x;
     private int y;
-    private int z = 0; // indice z, sur une même case seul l'objet avec l'indice le plus grand sera affiché
+    private int z = 0; // indice z, ordre d'affichage dans les cases
                        // Ne pas changer !
 
     // Constructeur
@@ -32,20 +34,47 @@ public abstract class Objet implements Affichable {
     }
 
     // Accesseurs
+    /**
+     * Coordonée X de l'objet dans la carte
+     *
+     * @return coordonnée x
+     */
     public int getX() {
         return x;
     }
+
+    /**
+     * Coordonée X de l'objet dans la carte
+     *
+     * @param x nouvelle coordonnée
+     */
     public void setX(int x) {
         this.x = x;
     }
 
+    /**
+     * Coordonée Y de l'objet dans la carte
+     *
+     * @return coordonnée y
+     */
     public int getY() {
         return y;
     }
+
+    /**
+     * Coordonée Y de l'objet dans la carte
+     *
+     * @param y nouvelle coordonnée
+     */
     public void setY(int y) {
         this.y = y;
     }
 
+    /**
+     * Indice Z, sur une même case, l'indice z le plus petit sera affiché et premier.
+     *
+     * @return indice z
+     */
     public int getZ() {
         return z;
     }

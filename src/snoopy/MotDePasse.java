@@ -179,6 +179,7 @@ public class MotDePasse extends PanneauSol implements DocumentListener {
         }
     }
 
+    // Evenements du JTextField
     @Override
     public void insertUpdate(DocumentEvent e) {
         test(e.getDocument());
@@ -218,7 +219,8 @@ public class MotDePasse extends PanneauSol implements DocumentListener {
     public interface MotDePasseListener {
         /**
          * Appelée quand l'utilisateur appuye sur Charge avec un mot de passe valide
-         * @param moteur moteur de jeu correspondant au menu chargé
+         *
+         * @param moteur moteur de jeu correspondant au niveau chargé
          */
         void motDePasseOK(Moteur moteur);
     }

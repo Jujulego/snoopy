@@ -7,6 +7,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Menu en cas de victoire de l'utilisateur
+ *
+ * @author julien
+ */
 public class Victoire extends PanneauSol {
     // Attributs
     private int perso_x = -50;
@@ -33,6 +38,11 @@ public class Victoire extends PanneauSol {
     private JButton btnMenu = new JButton("Retourner au Menu");
 
     // Constructeur
+    /**
+     * Prépare les boutons et les animations
+     *
+     * @param theme thème à utiliser
+     */
     public Victoire(Theme theme) {
         super(theme);
 
@@ -43,6 +53,10 @@ public class Victoire extends PanneauSol {
         positionBoutons();
     }
 
+    // Méthodes
+    /**
+     * Postionne les boutons en fonction de la fenêtre
+     */
     private void positionBoutons() {
         // Boutons
         Insets insets = getInsets();
@@ -149,6 +163,9 @@ public class Victoire extends PanneauSol {
         Toolkit.getDefaultToolkit().sync();
     }
 
+    /**
+     * Gestion des animations
+     */
     private void animer() {
         int larg  = (int) (Moteur.LARG_IMG * 4/5.0);
 
@@ -203,12 +220,18 @@ public class Victoire extends PanneauSol {
         repaint();
     }
 
+    /**
+     * Active les animations
+     */
     public void lancer() {
         // Animation !
         scheduler = new ScheduledThreadPoolExecutor(1);
         scheduler.scheduleAtFixedRate(this::animer, 0, 1000/30, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Arrête les animations
+     */
     public void stop() {
         if (scheduler != null) {
             scheduler.shutdown();

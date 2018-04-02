@@ -67,6 +67,14 @@ public class Carte implements Affichable {
         return builder.toString();
     }
 
+    /**
+     * Affiche chacunes des cases puis les objets sur ces cases et le contour de la carte
+     *
+     * @param g2d
+     * @param theme theme à utiliser
+     * @param bx coordonnées de base
+     * @param by coordonnées de base
+     */
     @Override
     public void afficher(Graphics2D g2d, Theme theme, int bx, int by) {
         // Affichage des cases
@@ -82,7 +90,7 @@ public class Carte implements Affichable {
             }
         }
 
-        // Grille
+        // Contour
         g2d.setColor(Color.black);
         g2d.drawLine(bx, by, bx, by + ty * Moteur.LONG_IMG);
         g2d.drawLine(bx + tx * Moteur.LARG_IMG, by, bx + tx * Moteur.LARG_IMG, by + ty * Moteur.LONG_IMG);
@@ -156,9 +164,21 @@ public class Carte implements Affichable {
     public int getTy() {
         return ty;
     }
+
+    /**
+     * Indique le nombre d'oiseaux présent sur la carte au début du jeu
+     *
+     * @return le nombre d'oiseaux
+     */
     public int getNbOiseaux() {
         return nbOiseaux;
     }
+
+    /**
+     * Renvoie la liste des BadSnoopies présents sur la carte
+     *
+     * @return la liste des BadSnoopies
+     */
     public LinkedList<BadSnoopy> getBadSnoopies() {
         return badSnoopies;
     }

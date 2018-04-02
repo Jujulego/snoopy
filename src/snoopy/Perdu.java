@@ -10,6 +10,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Menu affiché en cas de défaite
+ */
 public class Perdu extends PanneauSol {
     // Constantes
     private static final float OISEAUX_AY = 0.2f;
@@ -23,6 +26,11 @@ public class Perdu extends PanneauSol {
     private JLabel lblMdp = new JLabel();
 
     // Constructeur
+    /**
+     * Prépare les boutons et les oiseaux
+     *
+     * @param theme thème à utiliser
+     */
     public Perdu(Theme theme) {
         super(theme);
 
@@ -39,6 +47,9 @@ public class Perdu extends PanneauSol {
     }
 
     // Méthodes
+    /**
+     * Positionne les boutons en fonction de la taille de la fenêtre
+     */
     public void positionBoutons() {
         // Boutons
         Insets insets = getInsets();
@@ -107,6 +118,9 @@ public class Perdu extends PanneauSol {
         Toolkit.getDefaultToolkit().sync();
     }
 
+    /**
+     * Fait bouger les oiseaux !
+     */
     private void animer() {
         // Mouvement des oiseaux
         for (OiseauMouv oiseau : oiseaux) {
@@ -116,6 +130,9 @@ public class Perdu extends PanneauSol {
         repaint();
     }
 
+    /**
+     * Active, et initialise l'animation.
+     */
     public void lancer() {
         // Animation !
         scheduler = new ScheduledThreadPoolExecutor(1);
@@ -128,6 +145,9 @@ public class Perdu extends PanneauSol {
         }
     }
 
+    /**
+     * Arrête l'animation
+     */
     public void stop() {
         if (scheduler != null) {
             scheduler.shutdown();

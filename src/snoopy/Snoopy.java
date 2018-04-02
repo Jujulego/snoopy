@@ -84,7 +84,7 @@ public class Snoopy extends Perso {
     @Override
     public boolean deplacer(Carte carte, Theme theme, int dx, int dy) {
         if (theme.getNumTheme() == Theme.CONSOLE) {
-            pause = 6;
+            pause = 2;
         }
 
         return super.deplacer(carte, theme, dx, dy);

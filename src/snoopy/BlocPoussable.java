@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * Bloc que Snoopy peut pousser
  *
- * @author julien
+ * @author julien benjamin
  */
 public class BlocPoussable extends Bloc implements Animation, Poussable {
     // Attributs

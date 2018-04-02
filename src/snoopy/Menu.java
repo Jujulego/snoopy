@@ -12,7 +12,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Gestion du menu principal
+ * Gestion du menu principal graphique
  *
  * @author julien
  */
@@ -45,7 +45,6 @@ public class Menu extends PanneauSol {
     private JButton btnThemeP = new JButton(">>");
 
     // Constructeur
-
     /**
      * Construction du menu, des boutons.
      *
@@ -288,6 +287,11 @@ public class Menu extends PanneauSol {
         }
     }
 
+    /**
+     * Ajout de listener de changement de thème
+     *
+     * @param listener listener à ajouter
+     */
     public void addChgThemeListener(ChgThemeListener listener) {
         listeners.add(listener);
     }
@@ -308,6 +312,11 @@ public class Menu extends PanneauSol {
      * Indique un changement de thème
      */
     public interface ChgThemeListener {
+        /**
+         * Appelée lors d'un changement de thème
+         *
+         * @param theme nouveau thème choisi
+         */
         void chgTheme(Theme theme);
     }
 }

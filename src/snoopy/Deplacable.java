@@ -11,7 +11,7 @@ public interface Deplacable {
      * Ne gère pas la mise à jour de l'affichage
      *
      * @param carte carte sur laquelle appliquer le déplacement
-     * @param theme
+     * @param theme thème actuel
      * @param dx    déplacement en x
      * @param dy    déplacement en y
      * @return true si le mouvement a été réalisé, false sinon
