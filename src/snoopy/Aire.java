@@ -282,8 +282,7 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
                 debug = !debug;
                 break;
                 
-            case KeyEvent.VK_S: //Sauvegarder
-            	System.out.println("On sauvegarde");
+            case KeyEvent.VK_S: //Sauvegarde
             	moteur.sauvegarder();
             	break;
             	

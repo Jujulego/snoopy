@@ -40,7 +40,7 @@ public class Moteur {
     private Snoopy snoopy;  // Le personnage controlé
     private LinkedList<BadSnoopy> badSnoopies = new LinkedList<>();
     private int base_score; // Score de départ
-    private int timer = 60; // Timer
+    private int timer=60; // Timer
     private LinkedList<Balle> balles = new LinkedList<>(); // gestion des balles
 
     // - ia
@@ -67,11 +67,21 @@ public class Moteur {
      * @param theme theme de jeu
      * @param base_score score de départ
      */
-    public Moteur(Carte carte, Snoopy snoopy, Theme theme, int base_score) {
+    public Moteur(Carte carte, Snoopy snoopy, Theme theme, int base_score, boolean sauvegarde) {
         this.carte = carte;
         this.snoopy = snoopy;
         this.theme = theme;
-        this.base_score = base_score;
+        
+        
+        //A revoir
+        if(sauvegarde) {
+        	this.timer = this.timer - (60 - (base_score/100));
+        	this.base_score = 0;
+    	}	
+        else {
+        	this.base_score = base_score;
+        	this.timer = 60;
+        }
 
         // Ajout des objets animés de la carte
         animations.addAll(carte.objetsAnimes());
@@ -177,9 +187,6 @@ public class Moteur {
                     case 'p': // Pause !!!
                         carte.ajouter(new Pause(j, i));
                         break;
-
-					//Ajouter les téléporteur
-					//Nombres dans le txt. Chaque même nombre est lié au précédant
 						
 				}
 			}
@@ -194,21 +201,22 @@ public class Moteur {
         carte.ajouter(tp1);
         carte.ajouter(tp2);
         
-        //Si on est dans un fichier de sauvegarde, des données sont ajoutées à la fin. On prend la ligne d'après 
+        boolean sauvegarde;
         
-        
+        //Récupération du timer
         if(fichier.equals("sauvegarde")) {
+        	
         	line = buff.readLine();
         	recup = line.split(" ");
-    		
-        	score = Integer.parseInt(recup[0]);	
-    		
+        	
+        	score = Integer.parseInt(recup[0]);
+        	sauvegarde = true;
         }
-        
-		
+        else
+        	sauvegarde = false;
         
         // Création du moteur
-        Moteur moteur = new Moteur(carte, snoopy, theme, score);
+        Moteur moteur = new Moteur(carte, snoopy, theme, score,sauvegarde);
 
         // Balle manuellement ajoutée
         moteur.ajouterBalle(new Balle(
@@ -218,6 +226,8 @@ public class Moteur {
         
         return moteur;
     }
+    
+    
     
     //Timer, nombre de vie de snoopy, positions de tous les éléments, état de tous les élémtents
     //score 
@@ -236,46 +246,35 @@ public class Moteur {
 			file_writer = new FileWriter(fileSauvegarde);
 			buff_writer = new BufferedWriter(file_writer);
     	
-	    	System.out.println("Entree sauvegarde");
-	    	
-	    	//Taille de la map 
-	    	int map_x = carte.getTx();
-	    	int map_y = carte.getTy();	    	
-	    	
 	    	//Sauvegarde Taille de la map
-	    	elem = String.valueOf(map_x);
-	    	buff_writer.write(elem);
+	    	elem = String.valueOf(carte.getTx());
 	    	
-	    	elem = " ";
 	    	buff_writer.write(elem);
+	    	buff_writer.write(' ');
 	    	
-	    	elem = String.valueOf(map_y);
+	    	elem = String.valueOf(carte.getTy());
 	    	buff_writer.write(elem);
-	    	
 	    	buff_writer.newLine();
-	    	
-	    	//Coordonnées de snoopy + nb de vies
-	    	int snoopy_x = snoopy.getX();
-	    	int snoopy_y = snoopy.getY();
-	    	int snoopy_vies = snoopy.getVies();
-	    	
+	    		
 	    	//Sauvegarde snoopy + nb de vies
-	    	elem = String.valueOf(snoopy_x);
+	    	elem = String.valueOf(snoopy.getX());
 	    	buff_writer.write(elem);
 	    	buff_writer.write(" ");
 	    	
-	    	elem = String.valueOf(snoopy_y);
+	    	elem = String.valueOf(snoopy.getY());
 	    	buff_writer.write(elem);
 	    	buff_writer.write(" ");
 	    	
-	    	elem = String.valueOf(snoopy_vies);
+	    	elem = String.valueOf(snoopy.getVies());
 	    	buff_writer.write(elem);
 	    	
 	    	buff_writer.newLine();
 	    	    	
 	    	//Sauvegarde de la carte entière (qui contient les éléments sur le plateau)
-	    	for(int y=0; y<map_y; y++) {	    		
-	    		for(int x=0; x<map_x; x++) {
+	    	for(int y=0; y<carte.getTy(); y++) {	    		
+	    		for(int x=0; x<carte.getTx(); x++) {
+	    			
+	    			System.out.println("Sauvegarde");
 	    			
 	    			if((carte.getCase(x, y).getObjet()) instanceof Oiseau) {
 	    				element_carte = 'o';
@@ -284,11 +283,13 @@ public class Moteur {
 	    				element_carte = 'C';
 	    			}
 	    			else if(carte.getCase(x, y).getObjet() instanceof BlocPoussable) {
+	    				BlocPoussable bp = (BlocPoussable) carte.getCase(x, y).getObjet();
+	    				
 	    				//On vérifie si l'objet a déjà été poussé ou non
-	    				if(carte.getCase(x, y).getObjet().estBloquant())
-	    					element_carte ='F';
-	    				else
+	    				if(bp.poussable())
 	    					element_carte ='D';
+	    				else
+	    					element_carte ='F'; //Il a déjà été poussé, il devient un bloc fixe
 	    			}
 	    			else if(carte.getCase(x, y).getObjet() instanceof BlocPiege) {
 	    				element_carte = 'P';
@@ -305,7 +306,10 @@ public class Moteur {
 	    			else if(carte.getCase(x, y).getObjet() instanceof Bloc) {
 	    				element_carte = 'F';
 	    			}
-	    			
+	    			else if(carte.getCase(x, y).getObjet() instanceof BadSnoopy) {
+	    				element_carte = 'X';
+	    				System.out.println("BadSnoopy");
+	    			}
 	    			else if(carte.getCase(x, y).getObjet()==null) {
 	    				element_carte = '.';
 	    			}
@@ -314,14 +318,16 @@ public class Moteur {
 	    			buff_writer.write(element_carte);
 	    			
 	    		}buff_writer.newLine(); //On va à la ligne dans le fichier 
-	    		
-	    			
 	    	}
+	    	
+	 
 	    
-	    //On inscrit le score en court
-	    int t=5000;
-	    String tx = String.valueOf(t);
-	    buff_writer.write(tx);	
+	    
+	    //On inscrit le score en cours
+	    int score= base_score + (timer*100);
+	    
+	    String score_str = String.valueOf(score);
+	    buff_writer.write(score_str);	
 		
 	    buff_writer.flush();
     	
@@ -330,7 +336,6 @@ public class Moteur {
 			e.printStackTrace();
 		}
     	
-    		
     	//Score 
     	
     	//On écrit ensuite toutes les données dans le fichier

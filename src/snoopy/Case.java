@@ -166,6 +166,7 @@ public class Case implements Affichable, Animation {
 
         return null;
     }
+    
     public Teleporteur getTeleporteur() {
         return teleporteur;
     }
