@@ -112,8 +112,6 @@ public class Moteur {
      * @throws IOException envoyée en cas d'erreur d'ouverture ou de lecture du fichier
      */
     public static Moteur charger(String fichier, Theme theme, int score, int vies) throws IOException {
-    	
-   		
     	//Ouverture fichier 
     	File file = new File("niveaux/" + fichier + ".txt");
 
@@ -226,13 +224,11 @@ public class Moteur {
         
         return moteur;
     }
-    
-    
-    
-    //Timer, nombre de vie de snoopy, positions de tous les éléments, état de tous les élémtents
-    //score 
 
-    public Moteur sauvegarder() {
+    /**
+     * Sauvegarde du niveau
+     */
+    public void sauvegarder() {
 		
     	//On ouvre le fichier sauvegarde
     	File fileSauvegarde = new File("niveaux/sauvegarde.txt");
@@ -319,28 +315,20 @@ public class Moteur {
 	    			
 	    		}buff_writer.newLine(); //On va à la ligne dans le fichier 
 	    	}
-	    	
-	 
-	    
-	    
-	    //On inscrit le score en cours
-	    int score= base_score + (timer*100);
-	    
-	    String score_str = String.valueOf(score);
-	    buff_writer.write(score_str);	
-		
-	    buff_writer.flush();
-    	
+
+            //On inscrit le score en cours
+            int score= base_score + (timer*100);
+
+            String score_str = String.valueOf(score);
+            buff_writer.write(score_str);
+
+            buff_writer.flush();
+
     	} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	
-    	//Score 
-    	
-    	//On écrit ensuite toutes les données dans le fichier
-    	return null;
-    	
+    	//Score
     }
     
     // Méthodes

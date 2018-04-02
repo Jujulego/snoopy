@@ -137,6 +137,7 @@ public class Console implements Moteur.MoteurListener {
                     break;
 
                 case 'w': // Sauvegarde
+                    moteur.sauvegarder();
                     break;
             }
         }
