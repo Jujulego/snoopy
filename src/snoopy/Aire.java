@@ -281,7 +281,12 @@ public class Aire extends JPanel implements KeyListener, Moteur.MoteurListener {
             case KeyEvent.VK_D: // Debug
                 debug = !debug;
                 break;
-        }
+                
+            case KeyEvent.VK_S: //Sauvegarde
+            	moteur.sauvegarder();
+            	break;
+            	
+        }	
 
         // Controle du jeu (ignoré en mode auto)
         if (!moteur.isAuto()) {
